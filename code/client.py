@@ -12,7 +12,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
 
 	# Create an instance of ProcessData() to send to server.
-	variable = Card("hello", 3)
+	variable = Card()
 	# Pickle the object and send it to the server
 	data_string = pickle.dumps(variable)
 	s.send(data_string)
