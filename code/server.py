@@ -27,5 +27,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
 	socket_server.close()
 
 	print('Data received from client')
-        
-            
+
