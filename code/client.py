@@ -32,9 +32,9 @@ def main():
 				break
 
 		if choix == 1:
-			pass
+			pass # joinGame()
 		if choix == 2:
-			pass
+			pass # createGame()
 		if choix == 3:
 			loop = False
 	

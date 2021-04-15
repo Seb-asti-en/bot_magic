@@ -11,16 +11,16 @@ def main():
 		print("  portServer : numéro de port d'écoute du serveur")
 		sys.exit(-1)
 
-	host = str(sys.argv[1])
+	hostServer = str(sys.argv[1])
 	
-	port = int(sys.argv[2])
+	portServer = int(sys.argv[2])
 
-	if port < 1024:
+	if portServer < 1024:
 		print("Port invalide")
 		sys.exit(-1)
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
-		socket_server.bind((host, port))
+		socket_server.bind((hostServer, portServer))
 		socket_server.listen(5)
 		conn, address = socket_server.accept()
 		
