@@ -22,5 +22,5 @@ from card import Card
 
 #class HumanPlayer:
 
-c=Card("hello", 3)
+c = Card("hello", 3)
 print (c.get_name())
