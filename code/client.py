@@ -1,27 +1,54 @@
 #!/usr/bin/env python3
 
-import socket, pickle
+import socket, pickle, sys
 from card import Card
-
-HOST = 'localhost'  # The server's hostname or IP address
-PORT = 5000        # The port used by the server
+from network import Network
 
 def main():
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_client:
-		socket_client.connect((HOST, PORT))
+	if len(sys.argv) != 3:
+		print("Usage : %s hostServer portServer" % sys.argv[0])
+		print("Où :")
+		print("  hostServer : adresse IPv4 du serveur")
+		print("  portServer : numéro de port d'écoute du serveur")
+		sys.exit(-1)
 
-		card = Card()
-		data_string = pickle.dumps(card)
-		socket_client.send(data_string)
+	hostServer = str(sys.argv[1])
+	
+	portServer = int(sys.argv[2])
 
-		print ('Data Sent to Server')
+	if portServer < 1024:
+		print("Port invalide")
+		sys.exit(-1)
 
-		data = socket_client.recv(4096)
-		fff = pickle.loads(data).get_name()
-		print('Received', fff)
+	loop = True
 
-		socket_client.close()
+	while loop:
+		while True:
+			print("1 - Rejoindre une partie")
+			print("2 - Démarrer une partie")
+			print("3 - Quitter")
+			choix = int(input("Choix : "))
+			if choix >= 1 and choix <= 3:
+				break
+
+		if choix == 1:
+			pass
+		if choix == 2:
+			pass
+		if choix == 3:
+			loop = False
+	
+	network = Network(hostServer, portServer)
+	network.connect()
+
+	card = Card()
+	network.send(card)
+
+	print ('Data Sent to Server')
+
+	data = network.recv(4096)
+	rcard = pickle.loads(data)
+	print('Received', rcard.get_name())
 
 if __name__ == "__main__":
 	main()
-
