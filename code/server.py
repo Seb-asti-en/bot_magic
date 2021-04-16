@@ -25,7 +25,6 @@ def main():
 		sys.exit(-1)
 
 	hostServer = str(sys.argv[1])
-	
 	portServer = int(sys.argv[2])
 
 	if portServer < 1024:
