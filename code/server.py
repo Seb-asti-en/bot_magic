@@ -35,23 +35,11 @@ def main():
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
 		socket_server.bind((hostServer, portServer))
 		socket_server.listen(5)
-		conn, address = socket_server.accept()
 		
-		
-		print('Connected by', address)
-		
-		
-#		while True:
-#			data = conn.recv(4096)
-#			if not data:
-#				break
-#			data_variable = pickle.loads(data)
-#			print(data_variable)
-#			conn.send(data)
-#		conn.close()
-		
-		
-		Thread(target=threaded_func, args=(conn,address)).start()
+		while True:
+			conn, address = socket_server.accept()
+			print('Connected by', address)
+			Thread(target=threaded_func, args=(conn,address)).start()
 		
 		socket_server.close()
 
