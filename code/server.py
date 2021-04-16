@@ -1,7 +1,20 @@
 #!/usr/bin/env python3
 
 import socket, pickle, sys
+from threading import Thread
 from card import Card
+
+
+def threaded_func(conn, address):
+	while True:
+		data = conn.recv(4096)
+		if not data:
+			break
+		data_variable = pickle.loads(data)
+		print('Data received from client :')
+		print(data_variable)
+		conn.send(data)
+	conn.close()
 
 def main():
 	if len(sys.argv) != 3:
@@ -24,22 +37,25 @@ def main():
 		socket_server.listen(5)
 		conn, address = socket_server.accept()
 		
-		with conn:
-			print('Connected by', address)
-			
-			while True:
-				data = conn.recv(4096)
-				if not data:
-					break
-				data_variable = pickle.loads(data)
-				print(data_variable)
-				conn.send(data)
-					
-			conn.close()
-			
+		
+		print('Connected by', address)
+		
+		
+#		while True:
+#			data = conn.recv(4096)
+#			if not data:
+#				break
+#			data_variable = pickle.loads(data)
+#			print(data_variable)
+#			conn.send(data)
+#		conn.close()
+		
+		
+		Thread(target=threaded_func, args=(conn,address)).start()
+		
 		socket_server.close()
 
-		print('Data received from client')
+		
 
 if __name__ == "__main__":
 	main()

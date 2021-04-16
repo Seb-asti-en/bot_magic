@@ -84,6 +84,7 @@ class Card:
 
 		string += self._text + "\n"
 		string += self._quote + "\n"
+		return string
 
 
 
@@ -120,5 +121,3 @@ class InstantCard(Card):
 
 		super().__init__(**kwargs)
 
-
-card = Card()

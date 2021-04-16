@@ -41,14 +41,15 @@ def main():
 	network = Network(hostServer, portServer)
 	network.connect()
 
-	card = Card()
+	card = Card("","","cardname","","",[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
 	network.send(card)
 
 	print ('Data Sent to Server')
 
 	data = network.recv(4096)
 	rcard = pickle.loads(data)
-	print('Received', rcard.get_name())
+	print('Received', rcard)
+	print('Received', rcard.to_string())
 
 if __name__ == "__main__":
 	main()
