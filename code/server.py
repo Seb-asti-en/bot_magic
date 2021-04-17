@@ -5,6 +5,26 @@ from threading import Thread
 from card import Card
 
 
+########################################################################
+############			PROTOTYPES IN UML			####################
+########################################################################
+
+def run():
+	pass
+
+def create_game():
+	pass
+
+def send_action():
+	pass
+
+def receive_action():
+	pass
+
+########################################################################
+
+
+#
 def threaded_func(conn, address):
 	while True:
 		data = conn.recv(4096)

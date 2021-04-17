@@ -7,6 +7,27 @@ class Player:
 		self._graveyard	     = graveyard
 		self._hand			 = hand
 		self._battleground	 = battleground
+	
+	def draw_card():
+		pass
+	
+	def play_card():
+		pass
+	
+	def use_card():
+		pass
+	
+	def discard_card():
+		pass
+	
+	def attack():
+		pass
+	
+	def block():
+		pass
+	
+	def concede():
+		pass
 
 
 class HumanPlayer(Player):

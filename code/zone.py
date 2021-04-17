@@ -7,9 +7,6 @@ class Deck:
 	def shuffle(self):
 		pass
 		
-	def draw(self):
-		return 0
-		
 	def add_card_deck(self, card):
 		self.__cards.append(card)
 

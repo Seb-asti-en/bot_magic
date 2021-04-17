@@ -28,8 +28,6 @@ def contact_server(network, choix):
 		print('Received', rcard)
 		print('Received', rcard.to_string())
 		
-		
-		
 		loop = False
 	#"2 - Démarrer une partie"
 	elif choix == 2:
@@ -41,10 +39,6 @@ def contact_server(network, choix):
 		loop = False
 	else:
 		loop = True
-	
-	
-	
-	
 	return loop
 
 def join_game():
@@ -52,6 +46,40 @@ def join_game():
 
 def create_game():
 	pass
+
+########################################################################
+############			PROTOTYPES IN UML			####################
+########################################################################
+
+def connect_server():
+	pass
+
+def connect_game():
+	pass
+
+def send_action():
+	pass
+
+def receive_action():
+	pass
+
+def play():
+	pass
+
+def start_phase():
+	pass
+
+def main_phase():
+	pass
+
+def battle_phase():
+	pass
+
+def end_phase():
+	pass
+
+########################################################################
+
 
 def main():
 	if len(sys.argv) != 3:
