@@ -2,7 +2,7 @@
 
 import socket, pickle, sys
 from card import Card
-from network import Network
+from network import TCPNetwork
 
 
 def menu():
@@ -68,7 +68,7 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
-	network = Network(hostServer, portServer)
+	network = TCPNetwork(hostServer, portServer)
 	network.connect()
 	
 	loop = True

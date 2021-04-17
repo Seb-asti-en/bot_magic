@@ -15,6 +15,13 @@ def threaded_func(conn, address):
 		print(data_variable)
 		conn.send(data)
 	conn.close()
+	
+#	socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
+#	socket_server.bind((hostServer, portServer))
+#	socket_server.listen(5)
+#	conn, address = socket_server.accept()
+#	conn.close()
+#	socket_server.close()
 
 def main():
 	if len(sys.argv) != 3:
@@ -31,6 +38,7 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
+
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
 		socket_server.bind((hostServer, portServer))
 		socket_server.listen(5)
@@ -46,3 +54,29 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
