@@ -9,11 +9,31 @@ from card import Card
 ############			PROTOTYPES IN UML			####################
 ########################################################################
 
-def run():
-	pass
+def run(host_server, port_server):
+	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	sock.bind((host_server,port_server))
+	while True:
+		print ("Waiting for client...")
+		data,addr = sock.recvfrom(1024)
+		print ("Received Messages:",data," from",addr)
+		if data.decode() == "ng":
+			#Thread(target=create_game, args=(host_server, port_server)).start()
+			sock.sendto(pickle.dumps((host_server, port_server)),addr)
+		else:
+			sock.sendto(pickle.dumps("come back when you wanna do someting"),addr)
+#		data,addr = sock.recvfrom(1024)
+#		print ("Received Messages:",data," from",addr)
+#		sock.sendto(data,addr)
 
-def create_game():
-	pass
+def create_game(host_server, port_server):
+	socket_game = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	socket_game.bind((host_server, port_server))
+	socket_game.listen(5)
+	while True:
+		conn, address = socket_game.accept()
+		print('Connected by', address)
+#			Thread(target=threaded_func, args=(conn,address)).start()
+	socket_game.close()
 
 def send_action():
 	pass
@@ -23,18 +43,19 @@ def receive_action():
 
 ########################################################################
 
-def udp_fct_serv(udp_host="127.0.0.1", udp_port=12345):
-	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-	msg = "Hello Python!"
-	sock.bind((udp_host,udp_port))
-	while True:
-		print ("Waiting for client...")
-		data,addr = sock.recvfrom(1024)
-		print ("Received Messages:",data," from",addr)
-		sock.sendto(data,addr)
-		data,addr = sock.recvfrom(1024)
-		print ("Received Messages:",data," from",addr)
-		sock.sendto(data,addr)
+#def udp_fct_serv(host_server, port_server):
+#	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+#	msg = "Hello Python!"
+#	sock.bind((host_server,port_server))
+#	while True:
+#		print ("Waiting for client...")
+#		data,addr = sock.recvfrom(1024)
+#		print ("Received Messages:",data," from",addr)
+#		sock.sendto(data,addr)
+#		create_game(host_server, port_server)
+##		data,addr = sock.recvfrom(1024)
+#		print ("Received Messages:",data," from",addr)
+#		sock.sendto(data,addr)
 
 
 #
@@ -50,7 +71,7 @@ def threaded_func(conn, address):
 	conn.close()
 	
 #	socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
-#	socket_server.bind((hostServer, portServer))
+#	socket_server.bind((host_server, port_server))
 #	socket_server.listen(5)
 #	conn, address = socket_server.accept()
 #	conn.close()
@@ -58,31 +79,24 @@ def threaded_func(conn, address):
 
 def main():
 	if len(sys.argv) != 3:
-		print("Usage : %s hostServer portServer" % sys.argv[0])
+		print("Usage : %s host_server port_server" % sys.argv[0])
 		print("Où :")
-		print("  hostServer : adresse IPv4 du serveur")
-		print("  portServer : numéro de port d'écoute du serveur")
+		print("  host_server : adresse IPv4 du serveur")
+		print("  port_server : numéro de port d'écoute du serveur")
 		sys.exit(-1)
 
-	hostServer = str(sys.argv[1])
-	portServer = int(sys.argv[2])
+	host_server = str(sys.argv[1])
+	port_server = int(sys.argv[2])
 
-	if portServer < 1024:
+	if port_server < 1024:
 		print("Port invalide")
 		sys.exit(-1)
 
-	Thread(target=udp_fct_serv, args=(hostServer, portServer)).start()
+	run(host_server, port_server)
 
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
-		socket_server.bind((hostServer, portServer))
-		socket_server.listen(5)
-		
-		while True:
-			conn, address = socket_server.accept()
-			print('Connected by', address)
-			Thread(target=threaded_func, args=(conn,address)).start()
-		
-		socket_server.close()
+#	Thread(target=udp_fct_serv, args=(host_server, port_server)).start()
+
+
 
 		
 

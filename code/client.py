@@ -13,57 +13,12 @@ def menu():
 	print("3 - Quitter")
 	return int(input("Choix : "))
 
-def contact_server(network, choix):
-	#"1 - Rejoindre une partie"
-	if choix == 1:
-		#send a request
-		
-		
-		card = Card("","","cardname","","",
-		[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
-		network.send(card)
-
-		print ('Data Sent to Server')
-
-		rcard = network.recv(4096)
-		
-		print('Received', rcard)
-		print('Received', rcard.to_string())
-		
-		loop = False
-	#"2 - Démarrer une partie"
-	elif choix == 2:
-		#send a request
-		loop = False
-	#"3 - Quitter"
-	elif choix == 3:
-		#send a request
-		loop = False
-	else:
-		loop = True
-	return loop
 
 def join_game():
 	pass
 
 def create_game():
 	pass
-
-
-def udp_fct_cli(udp_host="127.0.0.1", udp_port=12345):
-	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-	msg = "Hello Python!"
-	while True:
-		c = (input("Send ? y/n \n"))
-		if c == 'y':
-			sock.sendto(msg.encode(),(udp_host,udp_port))
-			data,addr = sock.recvfrom(1024)
-			print ("Received Messages:",data," from",addr)
-			sock.sendto(data,addr)
-			data,addr = sock.recvfrom(1024)
-			print ("Received Messages:",data," from",addr)
-		else:
-			break
 
 
 
@@ -74,28 +29,48 @@ def udp_fct_cli(udp_host="127.0.0.1", udp_port=12345):
 
 def connect_server(host_server, port_server):
 	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	sock.settimeout(10.0)
 	msg = "Hello Python!"
-	address = 1
+	address_game = (host_server, port_server)
 	while True:
 		c = menu()
 		if c == 1:
+			msg = "join"
 			sock.sendto(msg.encode(),(host_server,port_server))
-			data,addr = sock.recvfrom(1024)
-			print ("Received Messages:",data," from",addr)
-			sock.sendto(data,addr)
-			data,addr = sock.recvfrom(1024)
-			print ("Received Messages:",data," from",addr)
+			try:
+				data,addr = sock.recvfrom(1024)
+				print ("Received Messages:",pickle.loads(data)," from",addr)
+			except socket.timeout:
+				print('Request timed out')
 			break
 		elif c == 2:
+			msg = "ng"
+			sock.sendto(msg.encode(),(host_server,port_server))
+			try:
+				data,addr = sock.recvfrom(1024)
+				print ("Received Messages:",pickle.loads(data)," from",addr)
+			except socket.timeout:
+				print('Request timed out')
 			break
 		elif c == 3:
 			break
 		else :
 			pass
-	return address
+	return address_game
 
-def connect_game():
-	pass
+def connect_game(address_game):
+	network = TCPNetwork(address_game)
+	network.connect()
+	card = Card("","","cardname","","",
+	[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
+	network.send(card)
+
+	print ('Data Sent to Server')
+
+	rcard = network.recv(4096)
+		
+	print('Received', rcard)
+	print('Received', rcard.to_string())
 
 def send_action():
 	pass
@@ -136,7 +111,9 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
-	connect_server(host_server, port_server)
+	adress_game = connect_server(host_server, port_server)
+	print("YAY")
+	#connect_game(adress_game)
 
 #	network = TCPNetwork(host_server, port_server)
 #	network.connect(host_server, port_server)
