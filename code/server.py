@@ -71,7 +71,7 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
-	Thread(target=udp_fct_serv).start()
+	Thread(target=udp_fct_serv, args=(hostServer, portServer)).start()
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
 		socket_server.bind((hostServer, portServer))
