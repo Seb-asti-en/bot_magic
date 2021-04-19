@@ -47,6 +47,25 @@ def join_game():
 def create_game():
 	pass
 
+
+def udp_fct_cli(udp_host="127.0.0.1", udp_port=12345):
+	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	msg = "Hello Python!"
+	while True:
+		c = (input("Send ? y/n \n"))
+		if c == 'y':
+			sock.sendto(msg.encode(),(udp_host,udp_port))
+			data,addr = sock.recvfrom(1024)
+			print ("Received Messages:",data," from",addr)
+			sock.sendto(data,addr)
+			data,addr = sock.recvfrom(1024)
+			print ("Received Messages:",data," from",addr)
+		else:
+			break
+
+
+
+
 ########################################################################
 ############			PROTOTYPES IN UML			####################
 ########################################################################
@@ -95,6 +114,8 @@ def main():
 	if portServer < 1024:
 		print("Port invalide")
 		sys.exit(-1)
+
+	udp_fct_cli(udp_host="127.0.0.1", udp_port=12345)
 
 	network = TCPNetwork(hostServer, portServer)
 	network.connect()

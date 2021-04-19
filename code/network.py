@@ -23,7 +23,7 @@ class TCPNetwork:
 		return pickle.loads(self.client.recv(size))
 
 
-class NetworkUDP:
+class UDPNetwork:
 	def __init__(self, host = 'localhost', port = 5000):
 		self.client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.__addr = (host, port)
