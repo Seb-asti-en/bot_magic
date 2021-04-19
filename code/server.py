@@ -23,6 +23,19 @@ def receive_action():
 
 ########################################################################
 
+def udp_fct_serv(udp_host="127.0.0.1", udp_port=12345):
+	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	msg = "Hello Python!"
+	sock.bind((udp_host,udp_port))
+	while True:
+		print ("Waiting for client...")
+		data,addr = sock.recvfrom(1024)
+		print ("Received Messages:",data," from",addr)
+		sock.sendto(data,addr)
+		data,addr = sock.recvfrom(1024)
+		print ("Received Messages:",data," from",addr)
+		sock.sendto(data,addr)
+
 
 #
 def threaded_func(conn, address):
@@ -58,6 +71,7 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
+	Thread(target=udp_fct_serv, args=(hostServer, portServer)).start()
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
 		socket_server.bind((hostServer, portServer))
@@ -73,8 +87,11 @@ def main():
 		
 
 if __name__ == "__main__":
-	main()
-
+	try:
+		main()
+	except KeyboardInterrupt:
+		print ('Interrupted')
+		sys.exit(0)
 
 
 
