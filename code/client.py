@@ -26,7 +26,7 @@ class Client:
 	############			PROTOTYPES IN UML			####################
 	########################################################################
 
-	# communicate withe the server via udp
+	# communicate with the server via udp
 	# either asks to create a new game or for a list of existing ones to join
 	def connect_server(self,):
 		self.__server_socket.settimeout(10.0)
@@ -40,28 +40,33 @@ class Client:
 				try:
 					data,addr = self.__server_socket.recvfrom(1024)
 					print ("Received Messages:",pickle.loads(data)," from",addr)
+					self.__game_info = pickle.loads(data)
 				except socket.timeout:
 					print('Request timed out')
 				break
+				
+				
 			elif c == 2:
 				msg = "ng"
 				self.__server_socket.sendto(msg.encode(),self.__server_info)
 				try:
 					data,addr = self.__server_socket.recvfrom(1024)
 					print ("Received Messages:",pickle.loads(data)," from",addr)
+					self.__game_info = pickle.loads(data)
 				except socket.timeout:
 					print('Request timed out')
 				break
+				print(self.__game_info)
 			elif c == 3:
 				break
 			else :
 				pass
-		return address_game
 
 	# connect to the chosen game
-	def connect_game(self, address_game):
-		if self.__address_game != None:
-			self.__socket_game.connect()
+	def connect_game(self):
+		if self.__game_info != None:
+			print(self.__game_info)
+			self.__socket_game.connect(self.__game_info)
 			
 			card = Card("","","cardname","","",
 			[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
@@ -115,6 +120,7 @@ def main():
 
 	client = Client(host_server, port_server, None)
 	client.connect_server()
+	client.connect_game()
 	print("YAY")
 	#connect_game(adress_game)
 
