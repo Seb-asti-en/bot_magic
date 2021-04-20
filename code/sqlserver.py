@@ -4,16 +4,68 @@
 # Fermeture du serveur : killall -TERM mysqld
 # https://gist.github.com/hofmannsven/9164408
 
-import subprocess
+# import subprocess
+# import os
+# import time
+
+# sqlserver = subprocess.Popen(["mysqld"],stderr = subprocess.DEVNULL)
+
+# print("Récupération des données depuis la BD..")
+
+# time.sleep(2)
+
+# os.system("sudo mysql -u root sys -e 'SELECT * FROM host_summary'")
+
+# sqlserver.terminate()
+
+# import os
+# import time
+
+# sqlserver = subprocess.Popen(["mysqld"],stderr = subprocess.DEVNULL)
+
+# print("Récupération des données depuis la BD..")
+
+# time.sleep(2)
+
+# os.system("sudo mysql -u root sys -e 'SELECT * FROM host_summary'")
+
+# sqlserver.terminate()
+
 import os
-import time
+import sys
 
-sqlserver = subprocess.Popen(["mysqld"],stderr = subprocess.DEVNULL)
+if sys.platform.startswith('darwin'):
+	
+	os.system("mysql.server start")
 
-print("Récupération des données depuis la BD..")
+	os.system("mysql -u root -e 'CREATE DATABASE cards;'")
 
-time.sleep(2)
+	print("Generating cards inside the database, please wait..")
 
-os.system("sudo mysql -u root sys -e 'SELECT * FROM host_summary'")
+	os.system("mysql -u root cards < ../resources/card_database.sql")
 
-sqlserver.terminate()
+	input("Press enter to print something")
+
+	os.system("mysql -u root cards -e 'SELECT * FROM mag_card'")
+
+	os.system("mysql -u root -e 'DROP DATABASE cards;'")
+
+	os.system("mysql.server stop")
+
+elif sys.platform.startswith('linux'):
+
+	os.system("sudo /etc/init.d/mysql start")
+
+	os.system("sudo mysql -u root -e 'CREATE DATABASE cards;'")
+
+	print("Generating cards inside the database, please wait..")
+
+	os.system("sudo mysql -u root cards < ../resources/card_database.sql")
+
+	input("Press enter to print something")
+
+	os.system("sudo mysql -u root cards -e 'SELECT * FROM mag_card'")
+
+	os.system("sudo mysql -u root -e 'DROP DATABASE cards;'")
+
+	os.system("sudo /etc/init.d/mysql stop")
