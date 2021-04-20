@@ -37,7 +37,7 @@ class Server:
 		while True:
 			conn, address = socket_game.accept()
 			print('Connected by', address)
-	#			Thread(target=threaded_func, args=(conn,address)).start()
+#			Thread(target=threaded_func, args=(conn,address)).start()
 		socket_game.close()
 
 	def send_action():
