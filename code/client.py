@@ -5,90 +5,95 @@ from card import Card
 from network import TCPNetwork
 
 class Client:
-	def __innit__(self):
-		
-
-def menu():
-	print("1 - Rejoindre une partie")
-	print("2 - Démarrer une partie")
-	print("3 - Quitter")
-	return int(input("Choix : "))
+	def __init__(self, server_address, server_port, deck_manager):
+		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.__socket_game	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.__server_info	= (server_address, server_port)
+		self.__game_info	= None
+		self.__deck_manager	= deck_manager
 
 
+	def menu(self):
+		print("1 - Rejoindre une partie")
+		print("2 - Démarrer une partie")
+		print("3 - Quitter")
+		return int(input("Choix : "))
 
 
-########################################################################
-############			PROTOTYPES IN UML			####################
-########################################################################
 
-# communicate withe the server via udp
-# either asks to create a new game or for a list of existing ones to join
-def connect_server(host_server, port_server):
-	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-	sock.settimeout(10.0)
-	msg = "Hello Python!"
-	address_game = (host_server, port_server)
-	while True:
-		c = menu()
-		if c == 1:
-			msg = "join"
-			sock.sendto(msg.encode(),(host_server,port_server))
-			try:
-				data,addr = sock.recvfrom(1024)
-				print ("Received Messages:",pickle.loads(data)," from",addr)
-			except socket.timeout:
-				print('Request timed out')
-			break
-		elif c == 2:
-			msg = "ng"
-			sock.sendto(msg.encode(),(host_server,port_server))
-			try:
-				data,addr = sock.recvfrom(1024)
-				print ("Received Messages:",pickle.loads(data)," from",addr)
-			except socket.timeout:
-				print('Request timed out')
-			break
-		elif c == 3:
-			break
-		else :
-			pass
-	return address_game
 
-# connect to the chosen game
-def connect_game(address_game):
-	network = TCPNetwork(address_game)
-	network.connect()
-	card = Card("","","cardname","","",
-	[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
-	network.send(card)
+	########################################################################
+	############			PROTOTYPES IN UML			####################
+	########################################################################
 
-	print ('Data Sent to Server')
+	# communicate withe the server via udp
+	# either asks to create a new game or for a list of existing ones to join
+	def connect_server(self,):
+		self.__server_socket.settimeout(10.0)
+		msg = "Hello Python!"
+		address_game = self.__server_info
+		while True:
+			c = self.menu()
+			if c == 1:
+				msg = "join"
+				self.__server_socket.sendto(msg.encode(),self.__server_info)
+				try:
+					data,addr = self.__server_socket.recvfrom(1024)
+					print ("Received Messages:",pickle.loads(data)," from",addr)
+				except socket.timeout:
+					print('Request timed out')
+				break
+			elif c == 2:
+				msg = "ng"
+				self.__server_socket.sendto(msg.encode(),self.__server_info)
+				try:
+					data,addr = self.__server_socket.recvfrom(1024)
+					print ("Received Messages:",pickle.loads(data)," from",addr)
+				except socket.timeout:
+					print('Request timed out')
+				break
+			elif c == 3:
+				break
+			else :
+				pass
+		return address_game
 
-	rcard = network.recv(4096)
-		
-	print('Received', rcard)
-	print('Received', rcard.to_string())
+	# connect to the chosen game
+	def connect_game(self, address_game):
+		if self.__address_game != None:
+			self.__socket_game.connect()
+			
+			card = Card("","","cardname","","",
+			[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
+			self.__socket_game.send(pickle.dumps(card))
 
-def send_action():
-	pass
+			print ('Data Sent to Server')
 
-def receive_action():
-	pass
+			rcard = pickle.loads(self.__socket_game.recv(4096))
+			
+			print('Received', rcard)
+			print('Received', rcard.to_string())
 
-def play():
-	pass
+	def send_action():
+		pass
 
-def start_phase():
-	pass
+	def receive_action():
+		pass
 
-def main_phase():
-	pass
+	def play():
+		pass
 
-def battle_phase():
-	pass
+	def start_phase():
+		pass
 
-def end_phase():
-	pass
+	def main_phase():
+		pass
+
+	def battle_phase():
+		pass
+
+	def end_phase():
+		pass
 
 ########################################################################
 
@@ -108,7 +113,8 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
-	adress_game = connect_server(host_server, port_server)
+	client = Client(host_server, port_server, None)
+	client.connect_server()
 	print("YAY")
 	#connect_game(adress_game)
 

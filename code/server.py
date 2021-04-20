@@ -3,43 +3,48 @@
 import socket, pickle, sys
 from threading import Thread
 from card import Card
-
+#from game import Game
 
 ########################################################################
 ############			PROTOTYPES IN UML			####################
 ########################################################################
 
-def run(host_server, port_server):
-	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-	sock.bind((host_server,port_server))
-	while True:
-		print ("Waiting for client...")
-		data,addr = sock.recvfrom(1024)
-		print ("Received Messages:",data," from",addr)
-		if data.decode() == "ng":
-			#Thread(target=create_game, args=(host_server, port_server)).start()
-			sock.sendto(pickle.dumps((host_server, port_server)),addr)
-		else:
-			sock.sendto(pickle.dumps("come back when you wanna do someting"),addr)
-#		data,addr = sock.recvfrom(1024)
-#		print ("Received Messages:",data," from",addr)
-#		sock.sendto(data,addr)
+class Server:
+	def __init__(self, server_address, server_port):
+		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.__server_info	= (server_address, server_port)
 
-def create_game(host_server, port_server):
-	socket_game = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	socket_game.bind((host_server, port_server))
-	socket_game.listen(5)
-	while True:
-		conn, address = socket_game.accept()
-		print('Connected by', address)
-#			Thread(target=threaded_func, args=(conn,address)).start()
-	socket_game.close()
 
-def send_action():
-	pass
+	def run(self):
+		self.__server_socket.bind(self.__server_info)
+		while True:
+			print ("Waiting for client...")
+			data,addr = self.__server_socket.recvfrom(1024)
+			print ("Received Messages:",data," from",addr)
+			if data.decode() == "ng":
+				#Thread(target=create_game, args=(host_server, port_server)).start()
+				self.__server_socket.sendto(pickle.dumps((host_server, port_server)),addr)
+			else:
+				self.__server_socket.sendto(pickle.dumps("come back when you wanna do someting"),addr)
+	#		data,addr = self.__server_socket.recvfrom(1024)
+	#		print ("Received Messages:",data," from",addr)
+	#		self.__server_socket.sendto(data,addr)
 
-def receive_action():
-	pass
+	def create_game(host_server, port_server):
+		socket_game = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		socket_game.bind((host_server, port_server))
+		socket_game.listen(5)
+		while True:
+			conn, address = socket_game.accept()
+			print('Connected by', address)
+	#			Thread(target=threaded_func, args=(conn,address)).start()
+		socket_game.close()
+
+	def send_action():
+		pass
+
+	def receive_action():
+		pass
 
 ########################################################################
 
@@ -91,8 +96,9 @@ def main():
 	if port_server < 1024:
 		print("Port invalide")
 		sys.exit(-1)
-
-	run(host_server, port_server)
+	
+	server = Server(host_server, port_server)
+	server.run()
 
 #	Thread(target=udp_fct_serv, args=(host_server, port_server)).start()
 
