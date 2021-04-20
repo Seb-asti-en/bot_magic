@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Exécution du serveur : mysqld
 # Connexion en CLI : mysql -u root
 # Fermeture du serveur : killall -TERM mysqld
@@ -13,6 +14,6 @@ print("Récupération des données depuis la BD..")
 
 time.sleep(2)
 
-os.system("mysql -u root sys -e 'SELECT * FROM host_summary'")
+os.system("sudo mysql -u root sys -e 'SELECT * FROM host_summary'")
 
 sqlserver.terminate()

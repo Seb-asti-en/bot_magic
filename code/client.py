@@ -5,7 +5,8 @@ from card import Card
 from network import TCPNetwork
 
 class Client:
-	pass
+	def __innit__(self):
+		
 
 def menu():
 	print("1 - Rejoindre une partie")
@@ -14,19 +15,14 @@ def menu():
 	return int(input("Choix : "))
 
 
-def join_game():
-	pass
-
-def create_game():
-	pass
-
-
 
 
 ########################################################################
 ############			PROTOTYPES IN UML			####################
 ########################################################################
 
+# communicate withe the server via udp
+# either asks to create a new game or for a list of existing ones to join
 def connect_server(host_server, port_server):
 	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 	sock.settimeout(10.0)
@@ -58,6 +54,7 @@ def connect_server(host_server, port_server):
 			pass
 	return address_game
 
+# connect to the chosen game
 def connect_game(address_game):
 	network = TCPNetwork(address_game)
 	network.connect()
