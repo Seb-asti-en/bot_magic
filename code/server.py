@@ -32,7 +32,7 @@ class Server:
 			print ("Waiting for client...")
 			data,addr = self.__server_socket.recvfrom(1024)
 			print ("Received Messages:",data," from",addr)
-			if data.decode() == "load":
+			if data.decode() == "join":
 				host_game, port_game = "localhost", 4444+i
 				self.create_game(host_game, port_game)
 				self.__server_socket.sendto(pickle.dumps((host_game, port_game)),addr)
