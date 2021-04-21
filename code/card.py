@@ -1,60 +1,71 @@
 #!/usr/bin/env python3
 
-#### PARTIE SQL ####
-# Connexion localhost via wamp/phpmyadmin
 import os
 import sys
 import pymysql # Installer le module avec pip
 
-status = None
+def main():
 
-# Lancement du serveur MySQL local
-if sys.platform.startswith('darwin'):
+	privilege 		= ""
+	status			= None
+	db 				= None
+	curs 			= None
+	row_count 		= None
+	all_db_cards 	= None
+	card 			= []
 
-	os.system("mysql.server start")
+	# Lancement du serveur MySQL local
+	if sys.platform.startswith('darwin'):
+		os.system("mysql.server start")
+	elif sys.platform.startswith('linux'):
+		os.system("sudo /etc/init.d/mysql start")
+		privilege = "sudo"
 
-	status = os.system("mysql -u root -e \"use card_database\" 2> /dev/null")
+	# Création de l'utilisateur avec les droits d'accès à la DB
+	os.system(privilege + "mysql -u root -e \"CREATE USER 'card_manager'@'localhost'\"")
+	os.system(privilege + "mysql -u root -e \"GRANT ALL ON card_database.* TO 'card_manager'@'localhost'\"")
+
+	# Génération de la DB si elle n'existe pas
+	status = os.system("mysql -u card_manager -e \"use card_database\" 2> /dev/null")
 	if (status != 0):
-		os.system("mysql -u root -e \"CREATE DATABASE card_database\"")
+		os.system("mysql -u card_manager -e \"CREATE DATABASE card_database\"")
 		print("Generating cards inside the database, please wait..")
-		os.system("mysql -u root card_database < ../resources/card_database.sql")
+		os.system("mysql -u card_manager card_database < ../resources/card_database.sql")
 
-elif sys.platform.startswith('linux'):
-	
-	os.system("sudo /etc/init.d/mysql start")
+	# Connexion à la DB via l'API en python
+	db = pymysql.connect(host="localhost", user="card_manager", password="", db="card_database")
+	curs = db.cursor()
 
-	status = os.system("sudo mysql -u root -e \"use card_database\" 2> /dev/null")
-	if (status != 0):
-		os.system("sudo mysql -u root -e \"CREATE DATABASE card_database\"")
-		print("Generating cards inside the database, please wait..")
-		os.system("sudo mysql -u root card_database < ../resources/card_database.sql")
+	# Récupération des cartes (45 premières)
+	curs.execute("""
+				 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT
+				 FROM MAG_SETCARD, MAG_SET, MAG_CARD
+				 WHERE SET_ID = SCA_SET 
+				 AND SCA_CARD = CAR_ID
+				 ORDER BY CAR_ID
+				 """)
+	row_count = 45
+	all_db_cards = curs.fetchmany(row_count)
 
-db = pymysql.connect(host="127.0.0.1", user="root", password="", db="card_database")
+	# Deconnexion de la DB
+	db.close()
 
-curs = db.cursor()
+	# Suppression de l'utilisateur (vérifier son existence au départ pour une implémentation plus légère)
+	os.system(privilege + "mysql -u root -e \"DROP USER 'card_manager'@'localhost'\"")
 
-curs.execute("""
-			 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT
-			 FROM MAG_SETCARD, MAG_SET, MAG_CARD
-			 WHERE SET_ID = SCA_SET 
-			 AND SCA_CARD = CAR_ID
-			 ORDER BY CAR_ID
-			 """)
+	# Fermeture du serveur MySQL local
+	if sys.platform.startswith('darwin'):
+		os.system("mysql.server stop")
+	elif sys.platform.startswith('linux'):
+		os.system("sudo /etc/init.d/mysql stop")
 
-row_count = 45
-all_db_cards = curs.fetchmany(row_count)	
-db.close()
-
-# Fermeture du serveur MySQL local
-if sys.platform.startswith('darwin'):
-
-	os.system("mysql.server stop")
-
-elif sys.platform.startswith('linux'):
-	
-	os.system("sudo /etc/init.d/mysql stop")
-
-#### FIN SQL ####
+	# Créations des objets Card
+	for x in all_db_cards:
+		card.append(Card(x))
+		
+	# Affichage
+	for i in card:
+		print(i.to_string())
 
 class Card:
 
@@ -231,12 +242,4 @@ class InstantCard(Card):
 
 		super().__init__(**kwargs)
 
-
-
-#### TEST D'UNE CARTE ####
-card = []
-for x in all_db_cards:
-	card.append(Card(x))
-	
-for i in card:
-	print(i.to_string())
+main()
