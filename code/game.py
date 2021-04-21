@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from card import Card
+#from card import Card
 import socket, pickle
 #from player import Player
 class Game:
