@@ -19,7 +19,7 @@ def main():
 		os.system("mysql.server start")
 	elif sys.platform.startswith('linux'):
 		os.system("sudo /etc/init.d/mysql start")
-		privilege = "sudo"
+		privilege = "sudo "
 
 	# Création de l'utilisateur avec les droits d'accès à la DB
 	os.system(privilege + "mysql -u root -e \"CREATE USER 'card_manager'@'localhost'\"")
