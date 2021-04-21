@@ -59,6 +59,13 @@ class Client:
 				print(self.__game_info)
 			elif c == 3:
 				break
+			elif c == 4:
+				print ("this is intended for debugging")
+				a = str(input("adress"))
+				b = int(input("port"))
+				self.__game_info = (a, b)
+				print(self.__game_info)
+				break
 			else :
 				pass
 

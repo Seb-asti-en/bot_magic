@@ -1,90 +1,166 @@
 #!/usr/bin/env python3
 
+#### PARTIE SQL ####
+# Connexion localhost via wamp/phpmyadmin 
+
+import pymysql
+
+db = pymysql.connect(host="127.0.0.1", user="root", password="", db="card_database")
+
+curs = db.cursor()
+
+curs.execute("""
+			 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT
+			 FROM MAG_SETCARD, MAG_SET, MAG_CARD
+			 WHERE SET_ID = SCA_SET 
+			 AND SCA_CARD = CAR_ID
+			 ORDER BY CAR_ID
+			 """)
+
+row_count = 45
+all_db_cards = curs.fetchmany(row_count)	
+db.close()
+#### FIN SQL ####
+
 class Card:
 
-	def __init__(self, card_id, collection, name, supertype, subtype, colors, mana_cost, identity, text, quote, effects):
+	def __init__(self,card):
 
-		self._id			= card_id
-		self._collection 	= collection
-		self._name			= name
-		self._supertype		= supertype
-		self._subtype		= subtype
-		self._colors		= colors
-		self._mana_cost		= mana_cost
-		self._identity		= identity
-		self._text			= text
-		self._quote			= quote
-		self._effects		= effects
+		self._id			= card[0]
+		self._collection 	= ''
+		self._name			= card[1]
+		self._supertype		= ''
+		self._subtype		= ''
+		self._init_colors(card)
+		self._init_mana_cost(card)
+		self._init_identity(card)
+		self._text			= ''
+		self._effects		= ''
+		
+	def get_id(self):
+		return self._id
+	
 
+	def _init_mana_cost(self, card):
+		#Initialise le cout en mana à 0
+		self._mana_cost = {'X' : 0,'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		#Récup le cout en string | card[3] == mana cost dans la table mag_card
+		temp = card[3]
+		#Transforme le string en liste
+		res = temp.strip('}{').split('}{')
+		#Si il a un cout X de base
+		if(res[0].isnumeric()):
+			self._mana_cost['X'] = int(res[0])
+			res.remove(res[0])
+		#Incrémente le cout de chaque couleur
+		for x in res:
+			try:
+				self._mana_cost[x] = self._mana_cost[x] + 1
+			except:
+				self._mana_cost[x] = 1
+	
+	def _init_colors(self, card):
+		self._colors = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		temp = card[2]
+		res = temp.split(';')
+		for x in res:
+			self._colors[x] = self._colors[x] + 1
+	
+	def _init_identity(self, card):
+		self._identity = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		temp = card[4]
+		res = temp.split(';')
+		for x in res:
+			self._identity[x] = self._identity[x] + 1
+		
+	def print_colors(self):
+		print(self._colors)
+		
+	def print_mana_cost(self):
+		print(self._mana_cost)
+		
+	def print_identity(self):
+		print(self._identity)
+	
 	def to_string(self):
 
 		string = ""
 
-		string += self._id + " " + self._collection + "\n"
-		string += self._name + "\n"
-		string += self._supertype + " " + self._subtype + "\n"
+		string += "Id : " + str(self._id) + " \n" 
+		string += "Collection : " + str(self._collection) + "\n"
+		string += "Name : " + self._name + "\n"
+		string += "Supertype and subtype : " + self._supertype + " " + self._subtype + "\n"
 		
-		if (self._colors[0] == 1):
+		string += "Color : "
+		if (self._colors['C'] == 1):
 			string += "Incolore"
 		else :
-			if (self._colors[1] == 1):
+			if (self._colors['W'] == 1):
 				string += "Blanc "
 			
-			if (self._colors[2] == 1):
+			if (self._colors['R'] == 1):
 				string += "Rouge "
 			
-			if (self._colors[3] == 1):
+			if (self._colors['G'] == 1):
 				string += "Vert "
 			
-			if (self._colors[4] == 1):
+			if (self._colors['U'] == 1):
 				string += "Bleu "
 			
-			if (self._colors[5] == 1):
+			if (self._colors['B'] == 1):
 				string += "Noir"
 
 		string += "\n"
+		
+		string += "Mana cost : "
+		if (self._mana_cost['X'] > 0):
+			string += str(self._mana_cost['X']) + "(Mana) "
+			
+		if (self._mana_cost['C'] > 0):
+			string += str(self._mana_cost['C']) + "(Incolore) "
 
-		if (self._mana_cost[0] > 0):
-			string += self._mana_cost[0] + "(Incolore) "
+		if (self._mana_cost['W'] > 0):
+			string += str(self._mana_cost['W']) + "(Blanc) "
 
-		if (self._mana_cost[1] > 0):
-			string += self._mana_cost[1] + "(Blanc) "
+		if (self._mana_cost['R'] > 0):
+			string += str(self._mana_cost['R']) + "(Rouge) "
 
-		if (self._mana_cost[2] > 0):
-			string += self._mana_cost[2] + "(Rouge) "
+		if (self._mana_cost['G'] > 0):
+			string += str(self._mana_cost['G']) + "(Vert) "
 
-		if (self._mana_cost[3] > 0):
-			string += self._mana_cost[3] + "(Vert) "
+		if (self._mana_cost['U'] > 0):
+			string += str(self._mana_cost['U']) + "(Bleu) "
 
-		if (self._mana_cost[4] > 0):
-			string += self._mana_cost[4] + "(Bleu) "
-
-		if (self._mana_cost[5] > 0):
-			string += self._mana_cost[5] + "(Noir)"
+		if (self._mana_cost['B'] > 0):
+			string += str(self._mana_cost['B']) + "(Noir)"
 		
 		string += "\n"
 		
-		if (self._identity[0] == 1):
+		
+		string += "Identity : "
+		if (self._identity['C'] == 1):
 			string += "Incolore"
 		else :
-			if (self._identity[1] == 1):
+			if (self._identity['W'] == 1):
 				string += "Blanc "
 			
-			if (self._identity[2] == 1):
+			if (self._identity['R'] == 1):
 				string += "Rouge "
 			
-			if (self._identity[3] == 1):
+			if (self._identity['G'] == 1):
 				string += "Vert "
 			
-			if (self._identity[4] == 1):
+			if (self._identity['U'] == 1):
 				string += "Bleu "
 			
-			if (self._identity[5] == 1):
+			if (self._identity['B'] == 1):
 				string += "Noir"
 
-		string += self._text + "\n"
-		string += self._quote + "\n"
+		string += "\n"
+		
+		string += "Text : " + self._text + "\n"
 		return string
+
 
 
 
@@ -121,3 +197,12 @@ class InstantCard(Card):
 
 		super().__init__(**kwargs)
 
+
+
+#### TEST D'UNE CARTE ####
+card = []
+for x in all_db_cards:
+	card.append(Card(x))
+	
+for i in card:
+	print(i.to_string())
