@@ -20,7 +20,7 @@ class Server:
 	def threaded_func(self, game):
 		print ("hello thread started: ")
 		print (game.get_socket())
-		game.wait_client();
+		game.wait_client()
 		game.start()
 
 
@@ -52,11 +52,7 @@ class Server:
 		Thread(target=self.threaded_func, args = (game,)).start()
 		print ("thead created")
 
-	def send_action():
-		pass
 
-	def receive_action():
-		pass
 
 ########################################################################
 
