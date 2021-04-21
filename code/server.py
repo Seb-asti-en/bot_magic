@@ -22,6 +22,7 @@ class Server:
 		print (game.get_socket())
 		game.wait_client()
 		game.start()
+		sys.exit() 
 
 
 	def run(self):

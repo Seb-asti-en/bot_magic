@@ -33,5 +33,6 @@ class Game:
 				print('Data received from client :')
 				print(data_variable)
 				self.__conn[i].send(data)
+			break
 
 

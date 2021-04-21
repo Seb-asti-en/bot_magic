@@ -75,8 +75,7 @@ class Client:
 			print(self.__game_info)
 			self.__socket_game.connect(self.__game_info)
 			
-			card = ("","","cardname","","",
-			[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
+			card = ("cardname","test","haha")
 			self.__socket_game.send(pickle.dumps(card))
 
 			print ('Data Sent to Server')
