@@ -1,9 +1,33 @@
 #!/usr/bin/env python3
 
 #### PARTIE SQL ####
-# Connexion localhost via wamp/phpmyadmin 
+# Connexion localhost via wamp/phpmyadmin
+import os
+import sys
+import pymysql # Installer le module avec pip
 
-import pymysql
+status = None
+
+# Lancement du serveur MySQL local
+if sys.platform.startswith('darwin'):
+
+	os.system("mysql.server start")
+
+	status = os.system("mysql -u root -e \"use card_database\" 2> /dev/null")
+	if (status != 0):
+		os.system("mysql -u root -e \"CREATE DATABASE card_database\"")
+		print("Generating cards inside the database, please wait..")
+		os.system("mysql -u root card_database < ../resources/card_database.sql")
+
+elif sys.platform.startswith('linux'):
+	
+	os.system("sudo /etc/init.d/mysql start")
+
+	status = os.system("sudo mysql -u root -e \"use card_database\" 2> /dev/null")
+	if (status != 0):
+		os.system("sudo mysql -u root -e \"CREATE DATABASE card_database\"")
+		print("Generating cards inside the database, please wait..")
+		os.system("sudo mysql -u root card_database < ../resources/card_database.sql")
 
 db = pymysql.connect(host="127.0.0.1", user="root", password="", db="card_database")
 
@@ -20,6 +44,16 @@ curs.execute("""
 row_count = 45
 all_db_cards = curs.fetchmany(row_count)	
 db.close()
+
+# Fermeture du serveur MySQL local
+if sys.platform.startswith('darwin'):
+
+	os.system("mysql.server stop")
+
+elif sys.platform.startswith('linux'):
+	
+	os.system("sudo /etc/init.d/mysql stop")
+
 #### FIN SQL ####
 
 class Card:
