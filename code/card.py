@@ -19,7 +19,7 @@ def main():
 		os.system("mysql.server start")
 	elif sys.platform.startswith('linux'):
 		os.system("sudo /etc/init.d/mysql start")
-		privilege = "sudo"
+		privilege = "sudo "
 
 	# Création de l'utilisateur avec les droits d'accès à la DB
 	os.system(privilege + "mysql -u root -e \"CREATE USER 'card_manager'@'localhost'\"")
@@ -39,7 +39,7 @@ def main():
 	# Récupération des cartes (45 premières)
 	curs.execute("""
 				 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT, CAR_POWER, CAR_TOUGHNESS, CTY_ID, CTY_NAME
-				 FROM MAG_SETCARD, MAG_SET, MAG_CARD, MAG_CARDTYPELI, MAG_CARDTYPE
+				 FROM mag_setcard, mag_set, mag_card, mag_cardtypeli, mag_cardtype
 				 WHERE SET_ID = SCA_SET 
 				 AND SCA_CARD = CAR_ID
 				 AND CTYL_CARD = CAR_ID
