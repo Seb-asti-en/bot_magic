@@ -34,8 +34,6 @@ class Server:
 			print ("Received Messages:",data," from",addr)
 			if data.decode() == "game":
 				if len(self.__list_games)==0:
-					i+=1
-					host_game, port_game = "localhost", 4444+i
 					g = self.create_game()
 					self.__server_socket.sendto(pickle.dumps(g.get_info()),addr)
 				else:
@@ -44,10 +42,9 @@ class Server:
 #				host_game, port_game = "localhost", 4444+i
 #				self.create_game(host_game, port_game)
 #				self.__server_socket.sendto(pickle.dumps((host_game, port_game)),addr)
-#			elif data.decode() == "ng":
-#				host_game, port_game = "localhost", 4444+i
-#				self.create_game(host_game, port_game)
-#				self.__server_socket.sendto(pickle.dumps((host_game, port_game)),addr)
+			elif data.decode() == "ng":
+				g = self.create_game()
+				self.__server_socket.sendto(pickle.dumps(g.get_info()),addr)
 			else:
 				self.__server_socket.sendto(pickle.dumps("come back when you wanna do someting"),addr)
 	#		data,addr = self.__server_socket.recvfrom(1024)

@@ -14,9 +14,11 @@ class Client:
 
 
 	def menu(self):
-		print("1 - Rejoindre une partie")
+		print("0 - Launch a random match")
+		print("1 - Rejoindre une partie (unavailabe for now)")
 		print("2 - Démarrer une partie")
 		print("3 - Quitter")
+		print("4 - Debug ")
 		return int(input("Choix : "))
 
 
@@ -58,17 +60,17 @@ class Client:
 #				break
 #				
 #				
-#			elif c == 2:
-#				msg = "ng"
-#				self.__server_socket.sendto(msg.encode(),self.__server_info)
-#				try:
-#					data,addr = self.__server_socket.recvfrom(1024)
-#					print ("Received Messages:",pickle.loads(data)," from",addr)
-#					self.__game_info = pickle.loads(data)
-#				except socket.timeout:
-#					print('Request timed out')
-#				break
-#				print(self.__game_info)
+			elif c == 2:
+				msg = "ng"
+				self.__server_socket.sendto(msg.encode(),self.__server_info)
+				try:
+					data,addr = self.__server_socket.recvfrom(1024)
+					print ("Received Messages:",pickle.loads(data)," from",addr)
+					self.__game_info = pickle.loads(data)
+				except socket.timeout:
+					print('Request timed out')
+				break
+				print(self.__game_info)
 
 			elif c == 3:
 				break
