@@ -259,4 +259,9 @@ class InstantCard(Card):
 		string = super().to_string()
 		return string
 
-main()
+if __name__ == "__main__":
+	try:
+		main()
+	except KeyboardInterrupt:
+		print ('Interrupted')
+		sys.exit(0)
