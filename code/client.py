@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import socket, pickle, sys
-from card import Card
+#from card import Card
 from network import TCPNetwork
 
 class Client:
@@ -34,8 +34,9 @@ class Client:
 		address_game = self.__server_info
 		while True:
 			c = self.menu()
-			if c == 1:
-				msg = "join"
+			
+			if c == 0:
+				msg = "game"
 				self.__server_socket.sendto(msg.encode(),self.__server_info)
 				try:
 					data,addr = self.__server_socket.recvfrom(1024)
@@ -44,19 +45,31 @@ class Client:
 				except socket.timeout:
 					print('Request timed out')
 				break
-				
-				
-			elif c == 2:
-				msg = "ng"
-				self.__server_socket.sendto(msg.encode(),self.__server_info)
-				try:
-					data,addr = self.__server_socket.recvfrom(1024)
-					print ("Received Messages:",pickle.loads(data)," from",addr)
-					self.__game_info = pickle.loads(data)
-				except socket.timeout:
-					print('Request timed out')
-				break
-				print(self.__game_info)
+			
+#			if c == 1:
+#				msg = "join"
+#				self.__server_socket.sendto(msg.encode(),self.__server_info)
+#				try:
+#					data,addr = self.__server_socket.recvfrom(1024)
+#					print ("Received Messages:",pickle.loads(data)," from",addr)
+#					self.__game_info = pickle.loads(data)
+#				except socket.timeout:
+#					print('Request timed out')
+#				break
+#				
+#				
+#			elif c == 2:
+#				msg = "ng"
+#				self.__server_socket.sendto(msg.encode(),self.__server_info)
+#				try:
+#					data,addr = self.__server_socket.recvfrom(1024)
+#					print ("Received Messages:",pickle.loads(data)," from",addr)
+#					self.__game_info = pickle.loads(data)
+#				except socket.timeout:
+#					print('Request timed out')
+#				break
+#				print(self.__game_info)
+
 			elif c == 3:
 				break
 			elif c == 4:
@@ -75,8 +88,7 @@ class Client:
 			print(self.__game_info)
 			self.__socket_game.connect(self.__game_info)
 			
-			card = Card("","","cardname","","",
-			[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
+			card = ("cardname","test","haha")
 			self.__socket_game.send(pickle.dumps(card))
 
 			print ('Data Sent to Server')
@@ -84,7 +96,7 @@ class Client:
 			rcard = pickle.loads(self.__socket_game.recv(4096))
 			
 			print('Received', rcard)
-			print('Received', rcard.to_string())
+			#print('Received', rcard.to_string())
 
 	def send_action():
 		pass
