@@ -4,9 +4,9 @@
 import socket, pickle
 #from player import Player
 class Game:
-	def __init__(self, server_address, server_port, nb_client=2):
-		self.__socket	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.__info		= (server_address, server_port)
+	def __init__(self, socket, info, nb_client=2):
+		self.__socket	= socket
+		self.__info		= info
 		self.__nb_client= nb_client
 		self.__conn 	= None
 
@@ -18,7 +18,6 @@ class Game:
 		return self.__info
 
 	def wait_client(self):
-		self.__socket.bind(self.__info)
 		self.__socket.listen(5)
 		self.__conn = [0]*self.__nb_client
 		address 	= [0]*self.__nb_client
