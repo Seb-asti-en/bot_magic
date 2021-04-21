@@ -2,7 +2,7 @@
 
 import socket, pickle, sys
 from threading import Thread
-from card import Card
+#from card import Card
 from game import Game
 
 ########################################################################
@@ -22,6 +22,7 @@ class Server:
 		print (game.get_socket())
 		game.wait_client()
 		game.start()
+		sys.exit() 
 
 
 	def run(self):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from card import Card
+#from card import Card
 import socket, pickle
 #from player import Player
 class Game:
@@ -33,5 +33,6 @@ class Game:
 				print('Data received from client :')
 				print(data_variable)
 				self.__conn[i].send(data)
+			break
 
 

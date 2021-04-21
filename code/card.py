@@ -38,10 +38,12 @@ def main():
 
 	# Récupération des cartes (45 premières)
 	curs.execute("""
-				 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT
-				 FROM MAG_SETCARD, MAG_SET, MAG_CARD
+				 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT, CAR_POWER, CAR_TOUGHNESS, CTY_ID, CTY_NAME
+				 FROM MAG_SETCARD, MAG_SET, MAG_CARD, MAG_CARDTYPELI, MAG_CARDTYPE
 				 WHERE SET_ID = SCA_SET 
 				 AND SCA_CARD = CAR_ID
+				 AND CTYL_CARD = CAR_ID
+				 AND CTYL_TYPE = CTY_ID
 				 ORDER BY CAR_ID
 				 """)
 	row_count = 45
@@ -61,7 +63,14 @@ def main():
 
 	# Créations des objets Card
 	for x in all_db_cards:
-		card.append(Card(x))
+		if(x[8] == 3):
+			card.append(CreatureCard(x))
+		if(x[8] == 14):
+			card.append(SorceryCard(x))
+		if(x[8] == 8):
+			card.append(LandCard(x))
+		if(x[8] == 7):
+			card.append(InstantCard(x))
 		
 	# Affichage
 	for i in card:
@@ -81,6 +90,7 @@ class Card:
 		self._init_identity(card)
 		self._text			= ''
 		self._effects		= ''
+		self._type 		= card[9]
 		
 	def get_id(self):
 		return self._id
@@ -131,10 +141,11 @@ class Card:
 
 		string = ""
 
+		string += "CARD TYPE : " + self._type + " \n" 
 		string += "Id : " + str(self._id) + " \n" 
-		string += "Collection : " + str(self._collection) + "\n"
+		#string += "Collection : " + str(self._collection) + "\n"
 		string += "Name : " + self._name + "\n"
-		string += "Supertype and subtype : " + self._supertype + " " + self._subtype + "\n"
+		#string += "Supertype and subtype : " + self._supertype + " " + self._subtype + "\n"
 		
 		string += "Color : "
 		if (self._colors['C'] == 1):
@@ -203,43 +214,49 @@ class Card:
 
 		string += "\n"
 		
-		string += "Text : " + self._text + "\n"
+		#string += "Text : " + self._text + "\n"
 		return string
-
-
-
 
 
 class CreatureCard(Card):
 
-	def __init__(self, power, toughness, **kwargs):
-
-		super().__init__(**kwargs)
-		self.__power = power
-		self.__toughness = toughness
+	def __init__(self, card):
+		super().__init__(card)
+		self.__power = card[6]
+		self.__toughness = card[7]
+		
+	def to_string(self):
+		string = super().to_string()
+		string += "Power : " + str(self.__power) + " \n" 
+		string += "Toughness : " + str(self.__toughness) + "\n"
+		return string
 
 class SorceryCard(Card):
 
-	def __init__(self, **kwargs):
-
-		super().__init__(**kwargs)
-
-	def print(self):
-
-		super().print()
-		print(self.__power + "/" + self.__toughness)
+	def __init__(self, card):
+		super().__init__(card)
+		
+	def to_string(self):
+		string = super().to_string()
+		return string
 		
 
 class LandCard(Card):
 
-	def __init__(self, **kwargs):
-
-		super().__init__(**kwargs)
+	def __init__(self, card):
+		super().__init__(card)
+	
+	def to_string(self):
+		string = super().to_string()
+		return string
 
 class InstantCard(Card):
 
-	def __init__(self, **kwargs):
-
-		super().__init__(**kwargs)
+	def __init__(self, card):
+		super().__init__(card)
+	
+	def to_string(self):
+		string = super().to_string()
+		return string
 
 main()
