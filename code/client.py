@@ -34,8 +34,9 @@ class Client:
 		address_game = self.__server_info
 		while True:
 			c = self.menu()
-			if c == 1:
-				msg = "join"
+			
+			if c == 0:
+				msg = "game"
 				self.__server_socket.sendto(msg.encode(),self.__server_info)
 				try:
 					data,addr = self.__server_socket.recvfrom(1024)
@@ -44,19 +45,31 @@ class Client:
 				except socket.timeout:
 					print('Request timed out')
 				break
-				
-				
-			elif c == 2:
-				msg = "ng"
-				self.__server_socket.sendto(msg.encode(),self.__server_info)
-				try:
-					data,addr = self.__server_socket.recvfrom(1024)
-					print ("Received Messages:",pickle.loads(data)," from",addr)
-					self.__game_info = pickle.loads(data)
-				except socket.timeout:
-					print('Request timed out')
-				break
-				print(self.__game_info)
+			
+#			if c == 1:
+#				msg = "join"
+#				self.__server_socket.sendto(msg.encode(),self.__server_info)
+#				try:
+#					data,addr = self.__server_socket.recvfrom(1024)
+#					print ("Received Messages:",pickle.loads(data)," from",addr)
+#					self.__game_info = pickle.loads(data)
+#				except socket.timeout:
+#					print('Request timed out')
+#				break
+#				
+#				
+#			elif c == 2:
+#				msg = "ng"
+#				self.__server_socket.sendto(msg.encode(),self.__server_info)
+#				try:
+#					data,addr = self.__server_socket.recvfrom(1024)
+#					print ("Received Messages:",pickle.loads(data)," from",addr)
+#					self.__game_info = pickle.loads(data)
+#				except socket.timeout:
+#					print('Request timed out')
+#				break
+#				print(self.__game_info)
+
 			elif c == 3:
 				break
 			elif c == 4:

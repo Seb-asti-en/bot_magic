@@ -9,8 +9,13 @@ class Game:
 		self.__info		= (server_address, server_port)
 		self.__nb_client= nb_client
 		self.__conn 	= None
+
 	def get_socket(self):
 		return self.__socket
+		
+	
+	def get_info(self):
+		return self.__info
 
 	def wait_client(self):
 		self.__socket.bind(self.__info)
