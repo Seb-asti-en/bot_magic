@@ -5,7 +5,7 @@ import socket
 #from player import Player
 class Game:
 	def __init__(self, server_address, server_port):
-		self.__socket	= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.__socket	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.__info		= (server_address, server_port)
 
 	def get_socket(self):
