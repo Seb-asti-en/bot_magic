@@ -125,9 +125,9 @@ class Card:
 
 		string += "CARD TYPE : " + self._type + " \n" 
 		string += "Id : " + str(self._id) + " \n" 
-		string += "Collection : " + str(self._collection) + "\n"
+		#string += "Collection : " + str(self._collection) + "\n"
 		string += "Name : " + self._name + "\n"
-		string += "Supertype and subtype : " + self._supertype + " " + self._subtype + "\n"
+		#string += "Supertype and subtype : " + self._supertype + " " + self._subtype + "\n"
 		
 		string += "Color : "
 		if (self._colors['C'] == 1):
@@ -196,7 +196,7 @@ class Card:
 
 		string += "\n"
 		
-		string += "Text : " + self._text + "\n"
+		#string += "Text : " + self._text + "\n"
 		return string
 
 
@@ -254,8 +254,5 @@ for x in all_db_cards:
 	if(x[8] == 7):
 		card.append(InstantCard(x))
 	
-creature = CreatureCard(all_db_cards[0])
-	
 for i in card:
 	print(i.to_string())
-	
