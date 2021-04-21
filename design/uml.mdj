@@ -4992,7 +4992,7 @@
 											"top": 882,
 											"width": 106.58984375,
 											"height": 13,
-											"text": "-collection: String",
+											"text": "-collection: str",
 											"horizontalAlignment": 0
 										},
 										{
@@ -5009,7 +5009,7 @@
 											"top": 897,
 											"width": 106.58984375,
 											"height": 13,
-											"text": "-name: String",
+											"text": "-name: str",
 											"horizontalAlignment": 0
 										},
 										{
@@ -5026,7 +5026,7 @@
 											"top": 912,
 											"width": 106.58984375,
 											"height": 13,
-											"text": "-supertype: String",
+											"text": "-supertype: str",
 											"horizontalAlignment": 0
 										},
 										{
@@ -5043,7 +5043,7 @@
 											"top": 927,
 											"width": 106.58984375,
 											"height": 13,
-											"text": "-subtype: String",
+											"text": "-subtype: str",
 											"horizontalAlignment": 0
 										},
 										{
@@ -5111,7 +5111,7 @@
 											"top": 987,
 											"width": 106.58984375,
 											"height": 13,
-											"text": "-text: String",
+											"text": "-text: str",
 											"horizontalAlignment": 0
 										},
 										{
@@ -5128,7 +5128,7 @@
 											"top": 1002,
 											"width": 106.58984375,
 											"height": 13,
-											"text": "-quote: String",
+											"text": "-quote: str",
 											"horizontalAlignment": 0
 										},
 										{
@@ -11217,7 +11217,24 @@
 											"top": 622,
 											"width": 182.80615234375,
 											"height": 13,
-											"text": "-socket: Socket",
+											"text": "-server_socket: Socket",
+											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLAttributeView",
+											"_id": "AAAAAAF47odG2j0Dbis=",
+											"_parent": {
+												"$ref": "AAAAAAF4255Q7Ldsf1M="
+											},
+											"model": {
+												"$ref": "AAAAAAF47odGuDzlLZk="
+											},
+											"font": "Arial;13;0",
+											"left": 1325,
+											"top": 637,
+											"width": 182.80615234375,
+											"height": 13,
+											"text": "-game_socket: Socket",
 											"horizontalAlignment": 0
 										},
 										{
@@ -11231,10 +11248,10 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 637,
+											"top": 652,
 											"width": 182.80615234375,
 											"height": 13,
-											"text": "-udp_port: int",
+											"text": "-server_info: { str ; int }",
 											"horizontalAlignment": 0
 										},
 										{
@@ -11248,10 +11265,10 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 652,
+											"top": 667,
 											"width": 182.80615234375,
 											"height": 13,
-											"text": "-tcp_port: int",
+											"text": "-game_info: { str ; int }",
 											"horizontalAlignment": 0
 										},
 										{
@@ -11265,7 +11282,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 667,
+											"top": 682,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "-player: Player",
@@ -11282,7 +11299,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 682,
+											"top": 697,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "-deck_manager: DeckManager",
@@ -11293,7 +11310,7 @@
 									"left": 1320,
 									"top": 617,
 									"width": 192.80615234375,
-									"height": 83
+									"height": 98
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -11316,7 +11333,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 705,
+											"top": 720,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "+connect_server()",
@@ -11333,7 +11350,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 720,
+											"top": 735,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "+connect_game()",
@@ -11350,7 +11367,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 735,
+											"top": 750,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "+send_action()",
@@ -11367,7 +11384,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 750,
+											"top": 765,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "+receive_action()",
@@ -11384,7 +11401,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 765,
+											"top": 780,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "+play()",
@@ -11401,7 +11418,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 780,
+											"top": 795,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "-start_phase()",
@@ -11418,7 +11435,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 795,
+											"top": 810,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "-main_phase()",
@@ -11435,7 +11452,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 810,
+											"top": 825,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "-battle_phase()",
@@ -11452,7 +11469,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 1325,
-											"top": 825,
+											"top": 840,
 											"width": 182.80615234375,
 											"height": 13,
 											"text": "-end_phase()",
@@ -11461,7 +11478,7 @@
 									],
 									"font": "Arial;13;0",
 									"left": 1320,
-									"top": 700,
+									"top": 715,
 									"width": 192.80615234375,
 									"height": 143
 								},
@@ -11503,7 +11520,7 @@
 							"left": 1320,
 							"top": 592,
 							"width": 192.80615234375,
-							"height": 251,
+							"height": 266,
 							"nameCompartment": {
 								"$ref": "AAAAAAF4255Q7Ldn8WA="
 							},
@@ -11542,7 +11559,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1401,
-									"top": 862,
+									"top": 869,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -11563,7 +11580,7 @@
 									"visible": null,
 									"font": "Arial;13;0",
 									"left": 1386,
-									"top": 862,
+									"top": 869,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 30,
@@ -11584,7 +11601,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1430,
-									"top": 863,
+									"top": 870,
 									"height": 13,
 									"alpha": -1.5707963267948966,
 									"distance": 15,
@@ -11669,7 +11686,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1401,
-									"top": 861,
+									"top": 876,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -11689,7 +11706,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 1387,
-									"top": 864,
+									"top": 879,
 									"height": 13,
 									"alpha": -0.7853981633974483,
 									"distance": 40,
@@ -11708,7 +11725,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 1425,
-									"top": 857,
+									"top": 872,
 									"width": 7.22998046875,
 									"height": 13,
 									"alpha": 0.5235987755982988,
@@ -11755,7 +11772,7 @@
 								"$ref": "AAAAAAF4z8BiRtA4BVk="
 							},
 							"lineStyle": 2,
-							"points": "1416:896;1416:842",
+							"points": "1416:896;1416:857",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAF426FNjM19cjE="
@@ -13076,7 +13093,7 @@
 							},
 							"name": "collection",
 							"visibility": "private",
-							"type": "String"
+							"type": "str"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -13086,7 +13103,7 @@
 							},
 							"name": "name",
 							"visibility": "private",
-							"type": "String"
+							"type": "str"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -13096,7 +13113,7 @@
 							},
 							"name": "supertype",
 							"visibility": "private",
-							"type": "String"
+							"type": "str"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -13106,7 +13123,7 @@
 							},
 							"name": "subtype",
 							"visibility": "private",
-							"type": "String"
+							"type": "str"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -13149,7 +13166,7 @@
 							},
 							"name": "text",
 							"visibility": "private",
-							"type": "String"
+							"type": "str"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -13159,7 +13176,7 @@
 							},
 							"name": "quote",
 							"visibility": "private",
-							"type": "String"
+							"type": "str"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -14786,7 +14803,17 @@
 							"_parent": {
 								"$ref": "AAAAAAF4255Q67dkh9g="
 							},
-							"name": "socket",
+							"name": "server_socket",
+							"visibility": "private",
+							"type": "Socket"
+						},
+						{
+							"_type": "UMLAttribute",
+							"_id": "AAAAAAF47odGuDzlLZk=",
+							"_parent": {
+								"$ref": "AAAAAAF4255Q67dkh9g="
+							},
+							"name": "game_socket",
 							"visibility": "private",
 							"type": "Socket"
 						},
@@ -14796,9 +14823,9 @@
 							"_parent": {
 								"$ref": "AAAAAAF4255Q67dkh9g="
 							},
-							"name": "udp_port",
+							"name": "server_info",
 							"visibility": "private",
-							"type": "int"
+							"type": "{ str ; int }"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -14806,9 +14833,9 @@
 							"_parent": {
 								"$ref": "AAAAAAF4255Q67dkh9g="
 							},
-							"name": "tcp_port",
+							"name": "game_info",
 							"visibility": "private",
-							"type": "int"
+							"type": "{ str ; int }"
 						},
 						{
 							"_type": "UMLAttribute",

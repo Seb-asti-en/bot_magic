@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import socket, pickle, sys
-from card import Card
+#from card import Card
 from network import TCPNetwork
 
 class Client:
@@ -75,7 +75,7 @@ class Client:
 			print(self.__game_info)
 			self.__socket_game.connect(self.__game_info)
 			
-			card = Card("","","cardname","","",
+			card = ("","","cardname","","",
 			[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],"","","")
 			self.__socket_game.send(pickle.dumps(card))
 
@@ -84,7 +84,7 @@ class Client:
 			rcard = pickle.loads(self.__socket_game.recv(4096))
 			
 			print('Received', rcard)
-			print('Received', rcard.to_string())
+			#print('Received', rcard.to_string())
 
 	def send_action():
 		pass
