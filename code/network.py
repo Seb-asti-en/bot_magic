@@ -4,9 +4,9 @@ import pickle
 class TCPNetwork:
 	# create static method
 	@staticmethod
-	def connect(self):
+	def connect(self, info):
 		try:
-			self.client.connect((host, port))
+			self.client.connect(info)
 		except:
 			pass
 	@staticmethod
