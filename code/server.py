@@ -29,29 +29,38 @@ class Server:
 		self.__server_socket.bind(self.__server_info)
 		i=0
 		while True:
-			i+=1
 			print ("Waiting for client...")
 			data,addr = self.__server_socket.recvfrom(1024)
 			print ("Received Messages:",data," from",addr)
-			if data.decode() == "join":
-				host_game, port_game = "localhost", 4444+i
-				self.create_game(host_game, port_game)
-				self.__server_socket.sendto(pickle.dumps((host_game, port_game)),addr)
-			if data.decode() == "ng":
-				host_game, port_game = "localhost", 4444+i
-				self.create_game(host_game, port_game)
-				self.__server_socket.sendto(pickle.dumps((host_game, port_game)),addr)
+			if data.decode() == "game":
+				if len(self.__list_games)==0:
+					g = self.create_game()
+					self.__server_socket.sendto(pickle.dumps(g.get_info()),addr)
+				else:
+					self.__server_socket.sendto(pickle.dumps((self.__list_games.pop().get_info())),addr)
+#			elif data.decode() == "join":
+#				host_game, port_game = "localhost", 4444+i
+#				self.create_game(host_game, port_game)
+#				self.__server_socket.sendto(pickle.dumps((host_game, port_game)),addr)
+			elif data.decode() == "ng":
+				g = self.create_game()
+				self.__server_socket.sendto(pickle.dumps(g.get_info()),addr)
 			else:
 				self.__server_socket.sendto(pickle.dumps("come back when you wanna do someting"),addr)
 	#		data,addr = self.__server_socket.recvfrom(1024)
 	#		print ("Received Messages:",data," from",addr)
 	#		self.__server_socket.sendto(data,addr)
 
-	def create_game(self, host_server, port_server):
+	def create_game(self):
 		print ("create_game")
-		game = Game(host_server, port_server)
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.bind(('', 0))
+		info = s.getsockname()
+		game = Game(s, info)
 		Thread(target=self.threaded_func, args = (game,)).start()
+		self.__list_games.append(game)
 		print ("thead created")
+		return game
 
 
 

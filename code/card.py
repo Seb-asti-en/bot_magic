@@ -9,9 +9,9 @@ def main():
 	privilege 		= ""
 	status			= None
 	db 				= None
-	curs			= None
+	curs 			= None
+	row_count 		= None
 	all_db_cards 	= None
-	row_count       = None
 	card 			= []
 
 	# Lancement du serveur MySQL local
@@ -22,8 +22,8 @@ def main():
 		privilege = "sudo "
 
 	# Création de l'utilisateur avec les droits d'accès à la DB
-	os.system(privilege + "mysql -u root -p -e \"CREATE USER 'card_manager'@'localhost'\"")
-	os.system(privilege + "mysql -u root -p -e \"GRANT ALL ON card_database.* TO 'card_manager'@'localhost'\"")
+	os.system(privilege + "mysql -u root -e \"CREATE USER 'card_manager'@'localhost'\"")
+	os.system(privilege + "mysql -u root -e \"GRANT ALL ON card_database.* TO 'card_manager'@'localhost'\"")
 
 	# Génération de la DB si elle n'existe pas
 	status = os.system("mysql -u card_manager -e \"use card_database\" 2> /dev/null")
@@ -53,7 +53,7 @@ def main():
 	db.close()
 
 	# Suppression de l'utilisateur (vérifier son existence au départ pour une implémentation plus légère)
-	os.system(privilege + "mysql -u root -p -e \"DROP USER 'card_manager'@'localhost'\"")
+	os.system(privilege + "mysql -u root -e \"DROP USER 'card_manager'@'localhost'\"")
 
 	# Fermeture du serveur MySQL local
 	if sys.platform.startswith('darwin'):
@@ -61,24 +61,20 @@ def main():
 	elif sys.platform.startswith('linux'):
 		os.system("sudo /etc/init.d/mysql stop")
 
-		
 	# Créations des objets Card
 	for x in all_db_cards:
 		if(x[8] == 3):
 			card.append(CreatureCard(x))
-		elif(x[8] == 7):
-			card.append(InstantCard(x))
-		elif(x[8] == 8):
-			card.append(LandCard(x))
-		elif(x[8] == 14):
+		if(x[8] == 14):
 			card.append(SorceryCard(x))
-		#Pour l'instant on créer encore des cartes de la classe Carte
-		else:
-			card.append(Card(x))
-			
+		if(x[8] == 8):
+			card.append(LandCard(x))
+		if(x[8] == 7):
+			card.append(InstantCard(x))
+		
+	# Affichage
 	for i in card:
 		print(i.to_string())
-		print("ATTENTION ! : Les cartes autres que Creature, Instant, Land et Sorcery sont créer a partir de la classe Card")
 
 class Card:
 
@@ -89,12 +85,12 @@ class Card:
 		self._name			= card[1]
 		self._supertype		= ''
 		self._subtype		= ''
-		self._colors 		= self._init_colors(card)
-		self._mana_cost 	= self._init_mana_cost(card)
-		self._identity 		= self._init_identity(card)
+		self._init_colors(card)
+		self._init_mana_cost(card)
+		self._init_identity(card)
 		self._text			= ''
 		self._effects		= ''
-		self._type 			= card[9]
+		self._type 		= card[9]
 		
 	def get_id(self):
 		return self._id
@@ -117,29 +113,20 @@ class Card:
 				self._mana_cost[x] = self._mana_cost[x] + 1
 			except:
 				self._mana_cost[x] = 1
-		return self._mana_cost
 	
 	def _init_colors(self, card):
 		self._colors = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
 		temp = card[2]
 		res = temp.split(';')
 		for x in res:
-			if(x == ''):
-				self._colors['C'] = self._colors['C'] + 1
-			else:
-				self._colors[x] = self._colors[x] + 1
-		return self._colors
+			self._colors[x] = self._colors[x] + 1
 	
 	def _init_identity(self, card):
 		self._identity = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
 		temp = card[4]
 		res = temp.split(';')
 		for x in res:
-			if(x == ''):
-				self._identity['C'] = self._identity['C'] + 1
-			else:
-				self._identity[x] = self._identity[x] + 1
-		return self._identity
+			self._identity[x] = self._identity[x] + 1
 		
 	def print_colors(self):
 		print(self._colors)
@@ -158,7 +145,7 @@ class Card:
 		string += "Id : " + str(self._id) + " \n" 
 		#string += "Collection : " + str(self._collection) + "\n"
 		string += "Name : " + self._name + "\n"
-		string += "subtype : " + self._subtype + "\n"
+		#string += "Supertype and subtype : " + self._supertype + " " + self._subtype + "\n"
 		
 		string += "Color : "
 		if (self._colors['C'] == 1):
@@ -272,4 +259,9 @@ class InstantCard(Card):
 		string = super().to_string()
 		return string
 
-main()
+if __name__ == "__main__":
+	try:
+		main()
+	except KeyboardInterrupt:
+		print ('Interrupted')
+		sys.exit(0)
