@@ -3,14 +3,16 @@
 import socket, pickle, sys
 #from card import Card
 from network import TCPNetwork
+from deck_manager import DeckManager
+from player import Player
 
 class Client:
-	def __init__(self, server_address, server_port, deck_manager):
+	def __init__(self, server_address, server_port):
 		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.__socket_game	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.__server_info	= (server_address, server_port)
 		self.__game_info	= None
-		self.__deck_manager	= deck_manager
+		self.__deck_manager	= DeckManager()
 
 
 	def menu(self):
@@ -144,25 +146,10 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
-	client = Client(host_server, port_server, None)
+	client = Client(host_server, port_server)
 	client.connect_server()
 	client.connect_game()
 	print("YAY")
-	#connect_game(adress_game)
-
-#	network = TCPNetwork(host_server, port_server)
-#	network.connect(host_server, port_server)
-#	
-#	loop = True
-
-#	while loop:
-#		while True:
-#			choix = menu()
-#			if choix >= 1 and choix <= 3:
-#				break
-#		loop = contact_server(network, choix)
-
-
 
 
 if __name__ == "__main__":
