@@ -70,7 +70,6 @@ class Database:
 			print("Generating cards inside the database, please wait..")
 			os.system(privilege + "mysql -u root " + self.__dbname + " < " + sql_filepath)
 
-
 	# Création de l'utilisateur avec les droits d'accès au serveur
 	def set_logins(self):
 

@@ -3,20 +3,20 @@
 import socket, pickle, sys
 #from card import Card
 from network import TCPNetwork
-from deck_manager import DeckManager
+from deckmanager import DeckManager
 from player import Player
 
 #to remove
 from deck import Deck
 
 class Client:
-	def __init__(self, server_address, server_port):
+	def __init__(self, server_address = "localhost", server_port = 3000):
 		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.__socket_game	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.__server_info	= (server_address, server_port)
 		self.__game_info	= None
-		self.__deck_manager	= DeckManager()
-
+		self.__deckmanager	= DeckManager()
+		self.__player 		= None
 
 	def menu(self):
 		print("0 - Launch a random match")
@@ -25,9 +25,6 @@ class Client:
 		print("3 - Quitter")
 		print("4 - Debug ")
 		return int(input("Choix : "))
-
-
-
 
 	########################################################################
 	############			PROTOTYPES IN UML			####################
@@ -137,30 +134,56 @@ class Client:
 	def end_phase():
 		pass
 
+	def test(self):
+
+		deck = None
+
+		self.__deckmanager.add()
+		self.__deckmanager.add()
+
+		self.__deckmanager.remove(0)
+
+		deck = self.__deckmanager.get_deck(0)
+
+		for card in deck.get_cards():
+			print(card.to_string())
+
+		self.__player = Player(20,deck)
+
+		
+
+
 ########################################################################
 
 
 def main():
-	if len(sys.argv) != 3:
-		print("Usage : %s host_server port_server" % sys.argv[0])
-		print("Où :")
-		print("  host_server : adresse IPv4 du serveur")
-		print("  port_server : numéro de port d'écoute du serveur")
-		sys.exit(-1)
 
-	host_server = str(sys.argv[1])
-	port_server = int(sys.argv[2])
+	client = None
 
-	if port_server < 1024:
-		print("Port invalide")
-		sys.exit(-1)
+	# if len(sys.argv) != 3:
+	# 	print("Usage : %s host_server port_server" % sys.argv[0])
+	# 	print("Où :")
+	# 	print("  host_server : adresse IPv4 du serveur")
+	# 	print("  port_server : numéro de port d'écoute du serveur")
+	# 	sys.exit(-1)
 
-	client = Client(host_server, port_server)
-	client.connect_server()
-	client.connect_game()
-	print("YAY")
-	deck	= Deck("default")
-	player	= Player(20, deck)
+	# host_server = str(sys.argv[1])
+	# port_server = int(sys.argv[2])
+
+	# if port_server < 1024:
+	# 	print("Port invalide")
+	# 	sys.exit(-1)
+
+	# client = Client(host_server, port_server)
+
+	client = Client()
+	client.test()
+
+	# client.connect_server()
+	# client.connect_game()
+	# print("YAY")
+	# deck	= Deck("default")
+	# player	= Player(20, deck)
 
 
 if __name__ == "__main__":
