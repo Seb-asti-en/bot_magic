@@ -29,7 +29,6 @@ class Client:
 	########################################################################
 
 	# communicate with the server via udp
-	# either asks to create a new game or for a list of existing ones to join
 	def connect_server(self,):
 		self.__server_socket.settimeout(10.0)
 		msg = "Hello Python!"
@@ -37,6 +36,7 @@ class Client:
 		while True:
 			c = self.menu()
 			
+			# asks to join a game
 			if c == 0:
 				msg = "game"
 				self.__server_socket.sendto(msg.encode(),self.__server_info)
@@ -47,7 +47,8 @@ class Client:
 				except socket.timeout:
 					print('Request timed out')
 				break
-			
+				
+#			# asks for a list of existing games to join
 #			if c == 1:
 #				msg = "join"
 #				self.__server_socket.sendto(msg.encode(),self.__server_info)
@@ -60,6 +61,7 @@ class Client:
 #				break
 #				
 #				
+			# asks to create a new game
 			elif c == 2:
 				msg = "ng"
 				self.__server_socket.sendto(msg.encode(),self.__server_info)
@@ -71,9 +73,12 @@ class Client:
 					print('Request timed out')
 				break
 				print(self.__game_info)
-
+				
+			# quit
 			elif c == 3:
 				break
+				
+			# connect to a game directly through it's port
 			elif c == 4:
 				print ("this is intended for debugging")
 				a = str(input("adress"))
