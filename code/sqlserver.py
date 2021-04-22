@@ -35,37 +35,37 @@ import os
 import sys
 
 if sys.platform.startswith('darwin'):
-	
-	os.system("mysql.server start")
+    
+    os.system("mysql.server start")
 
-	os.system("mysql -u root -e 'CREATE DATABASE cards;'")
+    os.system("mysql -u root -e 'CREATE DATABASE cards;'")
 
-	print("Generating cards inside the database, please wait..")
+    print("Generating cards inside the database, please wait..")
 
-	os.system("mysql -u root cards < ../resources/card_database.sql")
+    os.system("mysql -u root cards < ../resources/card_database.sql")
 
-	input("Press enter to print something")
+    input("Press enter to print something")
 
-	os.system("mysql -u root cards -e 'SELECT * FROM mag_card'")
+    os.system("mysql -u root cards -e 'SELECT * FROM mag_card'")
 
-	os.system("mysql -u root -e 'DROP DATABASE cards;'")
+    os.system("mysql -u root -e 'DROP DATABASE cards;'")
 
-	os.system("mysql.server stop")
+    os.system("mysql.server stop")
 
 elif sys.platform.startswith('linux'):
 
-	os.system("sudo /etc/init.d/mysql start")
+    os.system("sudo service mysql start")
 
-	os.system("sudo mysql -u root -e 'CREATE DATABASE cards;'")
+    os.system("sudo mysql -u root -e 'CREATE DATABASE cards;'")
 
-	print("Generating cards inside the database, please wait..")
+    print("Generating cards inside the database, please wait..")
 
-	os.system("sudo mysql -u root cards < ../resources/card_database.sql")
+    os.system("sudo mysql -u root cards < ../resources/card_database.sql")
 
-	input("Press enter to print something")
+    input("Press enter to print something")
 
-	os.system("sudo mysql -u root cards -e 'SELECT * FROM mag_card'")
+    os.system("sudo mysql -u root cards -e 'SELECT * FROM mag_card'")
 
-	os.system("sudo mysql -u root -e 'DROP DATABASE cards;'")
+    os.system("sudo mysql -u root -e 'DROP DATABASE cards;'")
 
-	os.system("sudo /etc/init.d/mysql stop")
+    os.system("sudo service mysql stop")
