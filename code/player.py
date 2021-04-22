@@ -36,3 +36,9 @@ class HumanPlayer(Player):
 
 class BotPlayer(Player):
 	pass
+
+, mag_cardsubtype, mag_cardsubtypeli, mag_cardsupertypeli, mag_cardsupertype
+			 AND cstl_card = car_id
+			 AND cstl_subtype = cst_id
+			 AND csul_card = car_id 
+			 AND csul_supertype = csu_id
