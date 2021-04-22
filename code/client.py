@@ -6,6 +6,9 @@ from network import TCPNetwork
 from deck_manager import DeckManager
 from player import Player
 
+#to remove
+from deck import Deck
+
 class Client:
 	def __init__(self, server_address, server_port):
 		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -31,6 +34,7 @@ class Client:
 	########################################################################
 
 	# communicate with the server via udp
+	# sets the game socket and infos
 	def connect_server(self,):
 		self.__server_socket.settimeout(10.0)
 		msg = "Hello Python!"
@@ -91,11 +95,14 @@ class Client:
 			else :
 				pass
 
+
 	# connect to the chosen game
 	def connect_game(self):
 		if self.__game_info != None:
 			print(self.__game_info)
 			self.__socket_game.connect(self.__game_info)
+			
+			
 			
 			card = ("cardname","test","haha")
 			self.__socket_game.send(pickle.dumps(card))
@@ -106,6 +113,8 @@ class Client:
 			
 			print('Received', rcard)
 			#print('Received', rcard.to_string())
+
+
 
 	def send_action():
 		pass
@@ -150,6 +159,8 @@ def main():
 	client.connect_server()
 	client.connect_game()
 	print("YAY")
+	deck	= Deck("default")
+	player	= Player(20, deck)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ class Game:
 		self.__socket	= socket
 		self.__info		= info
 		self.__nb_client= nb_client
-		self.__conn 	= None
+		self.__conn 	= []
 
 	def get_socket(self):
 		return self.__socket

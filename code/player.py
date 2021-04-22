@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
+from board import Board
+
 class Player:
-	def __init__(self, life, deck, graveyard, hand, battleground):
-		self._life			 = life
-		self._deck			 = deck
-		self._graveyard	     = graveyard
-		self._hand			 = hand
-		self._battleground	 = battleground
+	def __init__(self, life, deck):
+		self._life	= life
+		self._board	= Board(deck)
 	
 	def draw_card():
 		pass

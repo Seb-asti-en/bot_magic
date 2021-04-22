@@ -4,3 +4,4 @@ class DeckManager:
 		self.__decks = []
 
 	def add(self):
+		pass
