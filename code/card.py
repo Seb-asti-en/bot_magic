@@ -38,13 +38,13 @@ def main():
 
 	# Récupération des cartes (45 premières)
 	curs.execute("""
-				 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT, CAR_POWER, CAR_TOUGHNESS, CTY_ID, CTY_NAME
+				 SELECT DISTINCT car_id, car_name, car_colors, car_manacost, car_coloridentity, car_text, car_power, car_toughness, cty_id, cty_name
 				 FROM mag_setcard, mag_set, mag_card, mag_cardtypeli, mag_cardtype
-				 WHERE SET_ID = SCA_SET 
-				 AND SCA_CARD = CAR_ID
-				 AND CTYL_CARD = CAR_ID
-				 AND CTYL_TYPE = CTY_ID
-				 ORDER BY CAR_ID
+				 WHERE set_id = sca_set 
+				 AND sca_card = car_id
+				 AND ctyl_card = car_id
+				 AND ctyl_type = cty_id
+				 ORDER BY car_id
 				 """)
 	row_count = 45
 	all_db_cards = curs.fetchmany(row_count)
