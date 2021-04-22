@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 
-class Player:
-	def __init__(self, life, deck, graveyard, hand, battleground):
-		self._life			 = life
-		self._deck			 = deck
-		self._graveyard	     = graveyard
-		self._hand			 = hand
-		self._battleground	 = battleground
+from abc import ABC
+from board import Board
+
+class Player(ABC):
+
+	#Constructeur
+	def __init__(self, life, deck):
+		self.__life = life
+		self.__board = Board(deck)
 	
+	#Methodes
 	def draw_card():
 		pass
 	
@@ -29,10 +32,12 @@ class Player:
 	def concede():
 		pass
 
-
 class HumanPlayer(Player):
-	pass
 
+	def __init__(self, life, deck):
+		super().__init__(life, deck)
 
 class BotPlayer(Player):
-	pass
+
+	def __init__(self, life, deck):
+		super().__init__(life, deck)

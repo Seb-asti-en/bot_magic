@@ -3,14 +3,19 @@
 import socket, pickle, sys
 #from card import Card
 from network import TCPNetwork
+from deck_manager import DeckManager
+from player import Player
+
+#to remove
+from deck import Deck
 
 class Client:
-	def __init__(self, server_address, server_port, deck_manager):
+	def __init__(self, server_address, server_port):
 		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.__socket_game	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.__server_info	= (server_address, server_port)
 		self.__game_info	= None
-		self.__deck_manager	= deck_manager
+		self.__deck_manager	= DeckManager()
 
 
 	def menu(self):
@@ -29,7 +34,7 @@ class Client:
 	########################################################################
 
 	# communicate with the server via udp
-	# either asks to create a new game or for a list of existing ones to join
+	# sets the game socket and infos
 	def connect_server(self,):
 		self.__server_socket.settimeout(10.0)
 		msg = "Hello Python!"
@@ -37,6 +42,7 @@ class Client:
 		while True:
 			c = self.menu()
 			
+			# asks to join a game
 			if c == 0:
 				msg = "game"
 				self.__server_socket.sendto(msg.encode(),self.__server_info)
@@ -47,7 +53,8 @@ class Client:
 				except socket.timeout:
 					print('Request timed out')
 				break
-			
+				
+#			# asks for a list of existing games to join
 #			if c == 1:
 #				msg = "join"
 #				self.__server_socket.sendto(msg.encode(),self.__server_info)
@@ -60,6 +67,7 @@ class Client:
 #				break
 #				
 #				
+			# asks to create a new game
 			elif c == 2:
 				msg = "ng"
 				self.__server_socket.sendto(msg.encode(),self.__server_info)
@@ -71,9 +79,12 @@ class Client:
 					print('Request timed out')
 				break
 				print(self.__game_info)
-
+				
+			# quit
 			elif c == 3:
 				break
+				
+			# connect to a game directly through it's port
 			elif c == 4:
 				print ("this is intended for debugging")
 				a = str(input("adress"))
@@ -84,11 +95,14 @@ class Client:
 			else :
 				pass
 
+
 	# connect to the chosen game
 	def connect_game(self):
 		if self.__game_info != None:
 			print(self.__game_info)
 			self.__socket_game.connect(self.__game_info)
+			
+			
 			
 			card = ("cardname","test","haha")
 			self.__socket_game.send(pickle.dumps(card))
@@ -99,6 +113,8 @@ class Client:
 			
 			print('Received', rcard)
 			#print('Received', rcard.to_string())
+
+
 
 	def send_action():
 		pass
@@ -139,25 +155,12 @@ def main():
 		print("Port invalide")
 		sys.exit(-1)
 
-	client = Client(host_server, port_server, None)
+	client = Client(host_server, port_server)
 	client.connect_server()
 	client.connect_game()
 	print("YAY")
-	#connect_game(adress_game)
-
-#	network = TCPNetwork(host_server, port_server)
-#	network.connect(host_server, port_server)
-#	
-#	loop = True
-
-#	while loop:
-#		while True:
-#			choix = menu()
-#			if choix >= 1 and choix <= 3:
-#				break
-#		loop = contact_server(network, choix)
-
-
+	deck	= Deck("default")
+	player	= Player(20, deck)
 
 
 if __name__ == "__main__":
