@@ -40,13 +40,18 @@ class DeckManager:
 		# Récupération des cartes (45 premières)
 		number_of_rows = 45
 		db_cursor.execute("""
-				 SELECT DISTINCT CAR_ID, CAR_NAME, CAR_COLORS, CAR_MANACOST, CAR_COLORIDENTITY, CAR_TEXT, CAR_POWER, CAR_TOUGHNESS, CTY_ID, CTY_NAME
-				 FROM mag_setcard, mag_set, mag_card, mag_cardtypeli, mag_cardtype
-				 WHERE SET_ID = SCA_SET 
-				 AND SCA_CARD = CAR_ID
-				 AND CTYL_CARD = CAR_ID
-				 AND CTYL_TYPE = CTY_ID
-				 ORDER BY CAR_ID
+				 SELECT DISTINCT car_id, car_name, car_colors, car_manacost, car_coloridentity, car_text, car_power, car_toughness, cty_name, cst_name, csu_name, set_name
+				 FROM mag_card
+				 LEFT JOIN mag_cardtypeli ON ctyl_card = car_id
+				 LEFT JOIN mag_cardtype ON cty_id = ctyl_type
+				 LEFT JOIN mag_cardsubtypeli ON cstl_card = car_id
+				 LEFT JOIN mag_cardsubtype ON cst_id = cstl_subtype
+				 LEFT JOIN mag_cardsupertypeli ON csul_card = car_id
+				 LEFT JOIN mag_cardsupertype ON csu_id = csul_supertype
+				 INNER JOIN mag_setcard ON sca_card = car_id
+				 INNER JOIN mag_set ON set_id = sca_set
+				 WHERE set_name = "Arena Beginner Set"
+				 ORDER BY car_id 
 				 """)
 		sql_request = db_cursor.fetchmany(number_of_rows)
 
