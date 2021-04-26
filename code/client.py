@@ -122,6 +122,28 @@ class Client:
 	def play():
 		pass
 
+	def mulligan(self):
+		#counter mulligan
+		c = 0
+		while c<=7:
+			# pioche
+			self.__player.draw_card(7-c)
+			#choose to mulligan
+			m = str(input("mulligan ? y/n"))
+			if m=='y' :
+				c+=1
+				# vider la main
+				# empty_hand()
+				# shuffle deck
+				self.__player.get_board().get_deck().shuffle()
+			else :
+				break
+		
+
+
+
+
+
 	def start_phase():
 		pass
 
