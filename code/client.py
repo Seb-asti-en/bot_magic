@@ -111,8 +111,6 @@ class Client:
 			print('Received', rcard)
 			#print('Received', rcard.to_string())
 
-
-
 	def send_action():
 		pass
 
@@ -170,11 +168,15 @@ class Client:
 		for card in deck.get_cards():
 			print(card.to_string())
 
+	
 		self.__player = Player(20,deck)
+		self.__player.draw_card(3)
+		self.__player.debug_print_hand()
+		self.__player.get_board().empty_hand()
+		self.__player.debug_print_hand()
+
 
 		
-
-
 ########################################################################
 
 
