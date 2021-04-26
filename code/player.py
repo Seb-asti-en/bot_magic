@@ -3,6 +3,8 @@
 from abc import ABC
 from board import Board
 
+
+
 class Player(ABC):
 
 	#Constructeur
@@ -10,10 +12,20 @@ class Player(ABC):
 		self.__life = life
 		self.__board = Board(deck)
 	
-	#Methodes
-	def draw_card():
-		pass
+
+	#Getters
+	def get_board(self):
+		return self.__board
 	
+	def get_life(self):
+		return self.__life
+
+	#Methodes
+	def draw_card(self,nb_card=1):
+		for i in range(nb_card):
+			self.__board.add_hand(self.__board.get_deck().get_cards().pop(0)) 
+	
+		
 	def play_card():
 		pass
 	
@@ -31,6 +43,15 @@ class Player(ABC):
 	
 	def concede():
 		pass
+
+	def choice_card(self):
+		pass
+	
+	def debug_print_hand(self):
+		for card in self.__board.get_hand():
+			print(card)
+		if len(self.__board.get_hand()) == 0:
+			print("vide")
 
 class HumanPlayer(Player):
 

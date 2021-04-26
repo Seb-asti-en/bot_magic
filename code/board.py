@@ -46,3 +46,15 @@ class Board:
 
     def set_exile(self,exile):
        self.__exile = exile
+
+
+    def add_hand(self,Card):
+       if len(self.__hand) < 7:
+            self.__hand.append(Card)
+
+    def empty_hand(self):
+        while len(self.__hand) > 0:
+            self.__hand.pop(0)
+           
+    def discard_hand_card(self,index_card):
+        self.__hand.pop(index_card)
