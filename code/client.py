@@ -126,12 +126,13 @@ class Client:
 		while c<=7:
 			# pioche
 			self.__player.draw_card(7-c)
+			self.__player.debug_print_hand()
 			#choose to mulligan
 			m = str(input("mulligan ? y/n"))
 			if m=='y' :
 				c+=1
 				# vider la main
-				empty_hand()
+				self.__player.get_board().empty_hand()
 				# shuffle deck
 				self.__player.get_board().get_deck().shuffle()
 			else :
@@ -165,16 +166,23 @@ class Client:
 
 		deck = self.__deckmanager.get_deck(0)
 
-		for card in deck.get_cards():
-			print(card.to_string())
+#		for card in deck.get_cards():
+#			print(card.to_string())
 
 		print("BREAKPOINT")
 	
+		
 		self.__player = Player(20,deck)
-		self.__player.draw_card(3)
+		
 		self.__player.debug_print_hand()
-		self.__player.get_board().empty_hand()
+		self.mulligan()
 		self.__player.debug_print_hand()
+		
+		
+#		self.__player.draw_card(3)
+#		self.__player.debug_print_hand()
+#		self.__player.get_board().empty_hand()
+#		self.__player.debug_print_hand()
 
 
 		

@@ -84,7 +84,7 @@ def main():
 	elif sys.platform.startswith('linux'):
 		os.system("sudo /etc/init.d/mysql stop")
 		
-	Rentre les cartes sorti de la BD dans une liste, gère à moitié les double (problème niveau collection)
+	#Rentre les cartes sorti de la BD dans une liste, gère à moitié les double (problème niveau collection)
 	for buffer_card in all_db_cards:
 		if(cardlen > 0):
 			if(card[cardlen-1]._id == buffer_card[ID]):
