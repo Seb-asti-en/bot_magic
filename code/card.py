@@ -131,9 +131,9 @@ class Card:
 		self._name			= card[NAME]
 		self._supertype		= card[SUPERTYPE]
 		self._subtype		= card[SUBTYPE]
-		self._init_colors(card)
-		self._init_mana_cost(card)
-		self._init_identity(card)
+		self._colors		= self._init_colors(card)
+		self._mana_cost 	= self._init_mana_cost(card)
+		self._identity		= self._init_identity(card)
 		self._text			= card[TEXT]
 		self._effects		= ''
 		self._type 			= card[TYPE]
@@ -159,6 +159,7 @@ class Card:
 				self._mana_cost[x] = self._mana_cost[x] + 1
 			except:
 				self._mana_cost[x] = 1
+		return self._mana_cost
 	
 	def _init_colors(self, card):
 		self._colors = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
@@ -169,6 +170,7 @@ class Card:
 				self._colors['C'] = 1
 			else:
 				self._colors[x] = 1
+		return self._colors
 	
 	def _init_identity(self, card):
 		self._identity = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
@@ -179,6 +181,7 @@ class Card:
 				self._identity['C'] = 1
 			else:
 				self._identity[x] = 1
+		return self._identity
 		
 	def add_subtype(self, subtype):
 		if(subtype == None):
