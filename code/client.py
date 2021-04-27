@@ -168,6 +168,7 @@ class Client:
 		for card in deck.get_cards():
 			print(card.to_string())
 
+		print("BREAKPOINT")
 	
 		self.__player = Player(20,deck)
 		self.__player.draw_card(3)
