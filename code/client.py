@@ -5,7 +5,7 @@ import socket, pickle, sys
 from network import TCPNetwork
 from deckmanager import DeckManager
 from player import Player
-
+import json
 #to remove
 from deck import Deck
 
@@ -120,6 +120,28 @@ class Client:
 	def play():
 		pass
 
+	def mulligan(self):
+		#counter mulligan
+		c = 0
+		while c<=7:
+			# pioche
+			self.__player.draw_card(7-c)
+			#choose to mulligan
+			m = str(input("mulligan ? y/n"))
+			if m=='y' :
+				c+=1
+				# vider la main
+				empty_hand()
+				# shuffle deck
+				self.__player.get_board().get_deck().shuffle()
+			else :
+				break
+		
+
+
+
+
+
 	def start_phase():
 		pass
 
@@ -146,6 +168,7 @@ class Client:
 		for card in deck.get_cards():
 			print(card.to_string())
 
+		print("BREAKPOINT")
 	
 		self.__player = Player(20,deck)
 		self.__player.draw_card(3)
@@ -162,15 +185,25 @@ def main():
 
 	client = None
 
-	if len(sys.argv) != 3:
-		print("Usage : %s host_server port_server" % sys.argv[0])
-		print("Où :")
-		print("  host_server : adresse IPv4 du serveur")
-		print("  port_server : numéro de port d'écoute du serveur")
-		sys.exit(-1)
+#	if len(sys.argv) != 3:
+#		print("Usage : %s host_server port_server" % sys.argv[0])
+#		print("Où :")
+#		print("  host_server : adresse IPv4 du serveur")
+#		print("  port_server : numéro de port d'écoute du serveur")
+#		sys.exit(-1)
 
-	host_server = str(sys.argv[1])
-	port_server = int(sys.argv[2])
+
+	try:
+		with open("ip_config.json") as file:
+			json_string = json.load(file)
+			host_server = json_string['host_server']
+			port_server = int(json_string['port_server'])
+	except OSError:
+		#sys.exit("Impossible d'ouvrir le fichier JSON")
+		print("the ip_config file could not be loaded")
+		host_server = str(input("host_server"))
+		port_server = int(input("port_server"))
+
 
 	if port_server < 1024:
 		print("Port invalide")
