@@ -121,10 +121,14 @@ def main():
 	for i in card:
 		print(i.to_string())
 	print("\nNombre de cartes obtenu : " + str(len(card)))
+	print("\n") 
+	print(type(all_db_cards))
+	print("\n") 
+	print(type(all_db_cards[0]))
 
 class Card:
 
-	def __init__(self,card):
+	def __init__(self,card, effect = []):
 
 		self._id			= card[ID]
 		self._collection 	= card[COLLECTION]
@@ -135,7 +139,7 @@ class Card:
 		self._mana_cost 	= self._init_mana_cost(card)
 		self._identity		= self._init_identity(card)
 		self._text			= card[TEXT]
-		self._effects		= ''
+		self._effects		= effect
 		self._type 			= card[TYPE]
 		
 	def get_id(self):
@@ -286,11 +290,33 @@ class CreatureCard(Card):
 		super().__init__(card)
 		self.__power = card[POWER]
 		self.__toughness = card[TOUGHNESS]
+		self.__damage = card[POWER]
+		self.__life = card[TOUGHNESS]
+		
+	def get_damage(self):
+		return self.__damage 
+		
+	def get_life(self):
+		return self.__life 
+		
+	def buf_damage(self, quantity):
+		self.__damage = self.__damage + quantity
+		
+	def reduce_damage(self, quantity):
+		self.__damage = self.__damage - quantity
+		
+	def buf_life(self, quantity):
+		self.__life = self.__life + quantity
+		
+	def reduce_life(self, quantity):
+		self.__life = self.__life - quantity
 		
 	def to_string(self):
 		string = super().to_string()
 		string += "POWER : " + str(self.__power) + " \n" 
 		string += "TOUGHNESS : " + str(self.__toughness) + "\n"
+		string += "DAMAGE DEAL : " + str(self.__damage) + " \n" 
+		string += "LIFE : " + str(self.__life) + "\n"
 		return string
 
 class SorceryCard(Card):
