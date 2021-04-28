@@ -1,230 +1,155 @@
 #!/usr/bin/env python3
 
-import socket, pickle, sys
-#from card import Card
-from network import TCPNetwork
+import socket, pickle, sys, json
 from deckmanager import DeckManager
-from player import Player
-import json
-#to remove
 from deck import Deck
 
-class Client:
-	def __init__(self, server_address, server_port):
-		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.__socket_game	= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.__server_info	= (server_address, server_port)
-		self.__game_info	= None
-		self.__deckmanager	= DeckManager()
-		self.__player 		= None
-
-	def menu(self):
-		print("0 - Launch a random match")
-		print("1 - Rejoindre une partie (unavailabe for now)")
-		print("2 - Démarrer une partie")
-		print("3 - Quitter")
-		print("4 - Debug ")
-		return int(input("Choix : "))
-
-	########################################################################
-	############			PROTOTYPES IN UML			####################
-	########################################################################
-
-	# communicate with the server via udp
-	# sets the game socket and infos
-	def connect_server(self,):
-		self.__server_socket.settimeout(10.0)
-		msg = "Hello Python!"
-		address_game = self.__server_info
-		while True:
-			c = self.menu()
-			
-			# asks to join a game
-			if c == 0:
-				msg = "game"
-				self.__server_socket.sendto(msg.encode(),self.__server_info)
-				try:
-					data,addr = self.__server_socket.recvfrom(1024)
-					print ("Received Messages:",pickle.loads(data)," from",addr)
-					self.__game_info = pickle.loads(data)
-				except socket.timeout:
-					print('Request timed out')
-				break
-				
-#			# asks for a list of existing games to join
-#			if c == 1:
-#				msg = "join"
-#				self.__server_socket.sendto(msg.encode(),self.__server_info)
-#				try:
-#					data,addr = self.__server_socket.recvfrom(1024)
-#					print ("Received Messages:",pickle.loads(data)," from",addr)
-#					self.__game_info = pickle.loads(data)
-#				except socket.timeout:
-#					print('Request timed out')
-#				break
-#				
-#				
-			# asks to create a new game
-			elif c == 2:
-				msg = "ng"
-				self.__server_socket.sendto(msg.encode(),self.__server_info)
-				try:
-					data,addr = self.__server_socket.recvfrom(1024)
-					print ("Received Messages:",pickle.loads(data)," from",addr)
-					self.__game_info = pickle.loads(data)
-				except socket.timeout:
-					print('Request timed out')
-				break
-				print(self.__game_info)
-				
-			# quit
-			elif c == 3:
-				break
-				
-			# connect to a game directly through it's port
-			elif c == 4:
-				print ("this is intended for debugging")
-				a = str(input("adress"))
-				b = int(input("port"))
-				self.__game_info = (a, b)
-				print(self.__game_info)
-				break
-			else :
-				pass
-
-
-	# connect to the chosen game
-	def connect_game(self):
-		if self.__game_info != None:
-			print(self.__game_info)
-			self.__socket_game.connect(self.__game_info)
-			
-			
-			
-			card = ("cardname","test","haha")
-			self.__socket_game.send(pickle.dumps(card))
-
-			print ('Data Sent to Server')
-
-			rcard = pickle.loads(self.__socket_game.recv(4096))
-			
-			print('Received', rcard)
-			#print('Received', rcard.to_string())
-
-	def send_action():
-		pass
-
-	def receive_action():
-		pass
-
-	def play():
-		pass
-
-	def mulligan(self):
-		#counter mulligan
-		c = 0
-		while c<=7:
-			# pioche
-			self.__player.draw_card(7-c)
-			self.__player.debug_print_hand()
-			#choose to mulligan
-			m = str(input("mulligan ? y/n"))
-			if m=='y' :
-				c+=1
-				# vider la main
-				self.__player.get_board().empty_hand()
-				# shuffle deck
-				self.__player.get_board().get_deck().shuffle()
-			else :
-				break
-		
-
-
-
-
-
-	def start_phase():
-		pass
-
-	def main_phase():
-		pass
-
-	def battle_phase():
-		pass
-
-	def end_phase():
-		pass
-
-	def test(self):
-
-		deck = None
-
-		self.__deckmanager.add()
-		self.__deckmanager.add()
-
-		self.__deckmanager.remove(0)
-
-		deck = self.__deckmanager.get_deck(0)
-
-#		for card in deck.get_cards():
-#			print(card.to_string())
-
-		print("BREAKPOINT")
-	
-		
-		self.__player = Player(20,deck)
-		
-		self.__player.debug_print_hand()
-		self.mulligan()
-		self.__player.debug_print_hand()
-		
-		
-#		self.__player.draw_card(3)
-#		self.__player.debug_print_hand()
-#		self.__player.get_board().empty_hand()
-#		self.__player.debug_print_hand()
-
-
-		
-########################################################################
-
+PACKET_SIZE = 1024
+SEGMENT_SIZE = 65536
 
 def main():
 
 	client = None
 
-#	if len(sys.argv) != 3:
-#		print("Usage : %s host_server port_server" % sys.argv[0])
-#		print("Où :")
-#		print("  host_server : adresse IPv4 du serveur")
-#		print("  port_server : numéro de port d'écoute du serveur")
-#		sys.exit(-1)
-
-
-	try:
-		with open("ip_config.json") as file:
-			json_string = json.load(file)
-			host_server = json_string['host_server']
-			port_server = int(json_string['port_server'])
-	except OSError:
-		#sys.exit("Impossible d'ouvrir le fichier JSON")
-		print("the ip_config file could not be loaded")
-		host_server = str(input("host_server"))
-		port_server = int(input("port_server"))
-
-
-	if port_server < 1024:
-		print("Port invalide")
-		sys.exit(-1)
-
-	client = Client(host_server, port_server)
-
-	client.test()
+	client = Client()
 
 	client.connect_server()
-	client.connect_game()
-	print("YAY")
 
+	client.connect_game()
+
+	print("YAY")
+	
+
+class Client:
+
+	def __init__(self):
+
+		self.__server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.__game_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.__server_netconfig = None
+		self.__game_netconfig = None
+
+		try:
+			with open("JSON/ip_config.json") as file:
+				json_string = json.load(file)
+		except Exception:
+			sys.exit("Impossible d'ouvrir le fichier JSON")
+
+		# Récupération des informations réseaux du serveur
+		self.__server_netconfig = (json_string['host_server'], int(json_string['port_server']))
+
+		# Définition du timeout UDP
+		self.__server_socket.settimeout(10.0)
+
+	def menu(self):
+
+		print("[      Nouvelle partie (1)     ]")
+		print("[   Rejoindre une partie (2)   ]")
+		print("[         Quitter (3)          ]")
+
+		return input(">")
+
+	# Connexion au serveur UDP
+	def connect_server(self):
+
+		user_input = ""
+		request = ""
+		raw_data = None
+		data = None
+		server_address = None
+
+		while True:
+
+			user_input = self.menu()
+			
+			# Demande de lancement d'une nouvelle partie
+			if user_input == "1":
+
+				request = "NEW_GAME"
+
+				# Envoi vers le serveur : requête initiale (1)
+				self.__server_socket.sendto(request.encode(),self.__server_netconfig)
+
+				# Réception depuis le serveur : réponse (2)
+				try:
+
+					raw_data,server_address = self.__server_socket.recvfrom(PACKET_SIZE)
+					data = pickle.loads(raw_data)
+				
+				except socket.timeout:
+					
+					print("Temps d'attente dépassé")
+					continue
+
+				print("Message reçu :", data, "de", server_address)
+
+				if(data[0] == "ACCEPT"):
+					
+					self.__game_netconfig = data[1]
+					break
+
+				elif(data[0] == "DECLINE"):
+
+					print(data[1])
+					continue
+
+			# Demande de rejoindre une partie
+			elif user_input == "2":
+
+				request = "JOIN_GAME"
+
+				# Envoi vers le serveur : requête initiale (1)
+				self.__server_socket.sendto(request.encode(),self.__server_netconfig)
+
+				# Réception depuis le serveur : réponse (2)
+				try:
+
+					raw_data,server_address = self.__server_socket.recvfrom(PACKET_SIZE)
+					data = pickle.loads(raw_data)
+				
+				except socket.timeout:
+					
+					print("Temps d'attente dépassé")
+					continue
+
+				print("Message reçu :", data, "de", server_address)
+
+				if(data[0] == "ACCEPT"):
+					
+					self.__game_netconfig = data[1]
+					break
+
+				elif(data[0] == "DECLINE"):
+
+					print(data[1])
+					continue
+				
+			# Demande de quitter
+			elif user_input == "3":
+				
+				sys.exit(0)
+
+	# Connexion à la partie
+	def connect_game(self):
+
+		deck = None
+		raw_data = None
+		data = None
+	
+		# Connexion au serveur de jeu
+		self.__game_socket.connect(self.__game_netconfig)
+			
+		deck = DeckManager().get_deck()
+
+		# Envoi vers le client : Deck (TCP)(1)
+		self.__game_socket.send(pickle.dumps(deck))
+
+		# Réception depuis le serveur : Deck (TCP)(2)
+		raw_data = self.__game_socket.recv(SEGMENT_SIZE)
+
+		data = pickle.loads(raw_data)
+		
+		print('Données recues :', data.get_cards()[0].to_string())
 
 if __name__ == "__main__":
 	try:
@@ -233,29 +158,10 @@ if __name__ == "__main__":
 		print ('Interrupted')
 		sys.exit(0)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# # Apparently safe user-input
+# while True:
+# 	try:
+# 		user_input = input()
+# 		break
+# 	except ValueError:
+# 		continue

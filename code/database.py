@@ -23,7 +23,7 @@ class Database:
 		json_string = None
 
 		try:
-			with open("db_config.json") as file:
+			with open("JSON/db_config.json") as file:
 				json_string = json.load(file)
 		except OSError:
 			sys.exit("Impossible d'ouvrir le fichier JSON")

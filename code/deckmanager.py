@@ -29,6 +29,19 @@ class DeckManager:
 
 		self.__decks = []
 
+	def get_deck(self, index = 0):
+
+		if(index < len(self.__decks)):
+			return self.__decks[index]
+
+		else:
+			if(len(self.__decks) == 0) :
+				self.add()
+			
+			print("Il n'y a pas de deck à cet index, récupération du deck de base")
+			
+			return self.__decks[0]
+
 	def add(self):
 
 		file = None
@@ -41,7 +54,7 @@ class DeckManager:
 		duplicates = 0
 
 		try:
-			with open("db_config.json") as file:
+			with open("JSON/db_config.json") as file:
 				json_s = json.load(file)
 		except OSError:
 			sys.exit("Impossible d'ouvrir le fichier JSON")
@@ -135,20 +148,23 @@ class DeckManager:
 		else:
 			print("Il n'y a pas de deck à cet index")
 
-	def get_deck(self, index):
-
-		if(index < len(self.__decks)):
-			return self.__decks[index]
-
-		else:
-			if(len(self.__decks) == 0) :
-				self.add()
-			
-			print("Il n'y a pas de deck à cet index, récupération du deck de base")
-			
-			return self.__decks[0]
-
 	def size(self):
 
 		return len(self.__decks)
+
+	def copy_deck(self, index):
+
+		src_deck = None
+		src_cards = []
+		dest_deck = None
+
+		if((index < 0) or (index > len(self.__decks))):
+			return None
+
+		src_deck = self.get_deck(index)
+		src_cards = src_deck.get_cards()
+
+		dest_deck = Deck(src_deck.get_name(),src_cards[:])
+
+		return dest_deck
 

@@ -41,6 +41,15 @@
 	"type" : "DISCARD",
 	"card" : "hand_pos"
 }
+
+{
+	"player" : 1,
+	"type" : "MOVE",
+	"src" : "BATTLE_ZONE",
+	"dest" : "GRAVEYARD",
+	"src_index" : 2,
+	"dest_index" : -1
+}
 		
 {
 	"player" : 1,

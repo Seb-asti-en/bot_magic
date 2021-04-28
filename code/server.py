@@ -1,135 +1,127 @@
 #!/usr/bin/env python3
 
-import socket, pickle, sys
+import socket, pickle, sys, json
 from threading import Thread
-#from card import Card
 from game import Game
-import json
 
-########################################################################
-############			PROTOTYPES IN UML			####################
-########################################################################
-
-
-
-class Server:
-	def __init__(self, server_address, server_port):
-		self.__server_socket= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.__server_info	= (server_address, server_port)
-		self.__list_games	= []
-
-	def threaded_func(self, game):
-		print ("hello thread started: ")
-		print (game.get_socket())
-		game.wait_client()
-		game.start()
-		sys.exit() 
-
-
-	def run(self):
-		self.__server_socket.bind(self.__server_info)
-		i=0
-		while True:
-			print ("Waiting for client...")
-			data,addr = self.__server_socket.recvfrom(1024)
-			print ("Received Messages:",data," from",addr)
-			if data.decode() == "game":
-				if len(self.__list_games)==0:
-					g = self.create_game()
-					self.__server_socket.sendto(pickle.dumps(g.get_info()),addr)
-				else:
-					self.__server_socket.sendto(pickle.dumps((self.__list_games.pop().get_info())),addr)
-#			elif data.decode() == "join":
-#				host_game, port_game = "localhost", 4444+i
-#				self.create_game(host_game, port_game)
-#				self.__server_socket.sendto(pickle.dumps((host_game, port_game)),addr)
-			elif data.decode() == "ng":
-				g = self.create_game()
-				self.__server_socket.sendto(pickle.dumps(g.get_info()),addr)
-			else:
-				self.__server_socket.sendto(pickle.dumps("come back when you wanna do someting"),addr)
-	#		data,addr = self.__server_socket.recvfrom(1024)
-	#		print ("Received Messages:",data," from",addr)
-	#		self.__server_socket.sendto(data,addr)
-
-	def create_game(self):
-		print ("create_game")
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.bind(('', 0))
-		info = s.getsockname()
-		game = Game(s, info)
-		Thread(target=self.threaded_func, args = (game,)).start()
-		self.__list_games.append(game)
-		print ("thead created")
-		return game
-
-
-
-########################################################################
-
-#def udp_fct_serv(host_server, port_server):
-#	sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-#	msg = "Hello Python!"
-#	sock.bind((host_server,port_server))
-#	while True:
-#		print ("Waiting for client...")
-#		data,addr = sock.recvfrom(1024)
-#		print ("Received Messages:",data," from",addr)
-#		sock.sendto(data,addr)
-#		create_game(host_server, port_server)
-##		data,addr = sock.recvfrom(1024)
-#		print ("Received Messages:",data," from",addr)
-#		sock.sendto(data,addr)
-
-#	socket.socket(socket.AF_INET, socket.SOCK_STREAM) as socket_server:
-#	socket_server.bind((host_server, port_server))
-#	socket_server.listen(5)
-#	conn, address = socket_server.accept()
-#	conn.close()
-#	socket_server.close()
+PACKET_SIZE = 1024
 
 def main():
-#	if len(sys.argv) != 3:
-#		print("Usage : %s host_server port_server" % sys.argv[0])
-#		print("Où :")
-#		print("  host_server : adresse IPv4 du serveur")
-#		print("  port_server : numéro de port d'écoute du serveur")
-#		sys.exit(-1)
-
-#	
-##	socket.gethostname()
-#	host_server = str(sys.argv[1])
-#	port_server = int(sys.argv[2])
-
-	try:
-		with open("ip_config.json") as file:
-			json_string = json.load(file)
-			host_server = json_string['host_server']
-			port_server = int(json_string['port_server'])
-	except OSError:
-		#sys.exit("Impossible d'ouvrir le fichier JSON")
-		print("the ip_config file could not be loaded")
-		host_server = str(input("host_server"))
-		port_server = int(input("port_server"))
-
-	if port_server < 1024:
-		print("Port invalide")
-		sys.exit(-1)
 	
-	server = Server(host_server, port_server)
+	server = Server()
 	server.run()
 
-#	Thread(target=udp_fct_serv, args=(host_server, port_server)).start()
+class Server:
 
+	def __init__(self):
 
+		self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.__gamelist	= []
 
+		try:
+			with open("JSON/ip_config.json") as file:
+				json_string = json.load(file)
+		except Exception:
+			sys.exit("Impossible d'ouvrir le fichier JSON")
+
+		# Nommage de la socket UDP
+		self.__socket.bind((json_string['host_server'], int(json_string['port_server'])))
+
+	def run(self):
+
+		request = ""
+		client_netconfig = None
+		game_netconfig = None
+		available_games = []
+
+		while True:
+
+			# Attente de connexion d'un client
+			print("En attente de clients...")
+
+			# Réception depuis le serveur : requête initiale (1)
+			request,client_netconfig = self.__socket.recvfrom(PACKET_SIZE)
+
+			print("Message reçu :", request, "de", client_netconfig)
+
+			# Traitement de l'information reçue
+
+			# Demande de rejoindre une partie
+			if request.decode() == "JOIN_GAME":
+
+				# Vérification de la disponibilité des serveurs
+				available_games.clear()
+				for game in self.__gamelist:
+					if not game.is_full():
+						available_games.append(game)
+
+				# Si au moins un serveur de jeu est ouvert
+				if len(available_games) > 0:
+
+					# Envoi vers le serveur : réponse (2)
+					self.__socket.sendto(pickle.dumps(("ACCEPT",available_games[0].netconfig())),client_netconfig)
+
+				# Le cas échéant, refus
+				else:
+
+					# Envoi vers le serveur : réponse (2)
+					self.__socket.sendto(pickle.dumps(("DECLINE","Pas de partie disponible")),client_netconfig)
+
+			# Demande de création d'une partie
+			elif request.decode() == "NEW_GAME":
+				game_netconfig = self.create_game()
+
+				# Envoi vers le serveur : réponse (2)
+				self.__socket.sendto(pickle.dumps(("ACCEPT",game_netconfig)),client_netconfig)
+			
+			else:
+
+				# Envoi vers le serveur : réponse (2)
+				self.__socket.sendto(pickle.dumps(("DECLINE","Requête invalide")),client_netconfig)
+
+	def create_game(self):
+
+		tcp_socket = None
+		game_thread = None
+
+		print("create_game")
+
+		# Création de la socket pour le serveur de jeu
+		tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		tcp_socket.bind(('', 0))
+
+		# Création de l'objet Game à passer au thread du serveur de jeu
+		game = Game(tcp_socket)
+
+		# Création du thread
+		game_thread = Thread(target = self.game_thread, args = (game,))
+		print("Le thread a été créé")
+
+		# Lancement du thread
+		game_thread.start()
+
+		# Ajout du serveur de jeu à la liste de parties
+		self.__gamelist.append(game)
 		
+		return game.netconfig()	
+
+	def game_thread(self, game):
+
+		print("Lancement du thread (", game.get_socket(), ")")
+
+		game.wait_client()
+
+		game.choose_deck()
+		
+		game.start()
+		
+		sys.exit() 
 
 if __name__ == "__main__":
 	try:
 		main()
 	except KeyboardInterrupt:
-		print ('Interrupted')
+		print('Interrupted')
 		sys.exit(0)
 
 
