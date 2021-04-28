@@ -113,4 +113,3 @@ class Game:
 				player[SOCKET].send(raw_data)
 
 			break
-

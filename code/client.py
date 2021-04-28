@@ -165,3 +165,44 @@ if __name__ == "__main__":
 # 		break
 # 	except ValueError:
 # 		continue
+
+# 	def test(self):
+
+# 		deck = None
+
+# 		self.__deckmanager.add()
+# 		self.__deckmanager.add()
+
+# 		self.__deckmanager.remove(0)
+
+# 		deck = self.__deckmanager.get_deck(0)
+
+# #		for card in deck.get_cards():
+# #			print(card.to_string())
+
+# 		print("BREAKPOINT")
+	
+		
+# 		self.__player = Player(20,deck)
+		
+# 		#self.__player.debug_print_hand()
+# 		#self.mulligan()
+# 		#self.__player.debug_print_hand()
+		
+		
+# 		self.__player.draw_card(7)
+# 		self.__player.debug_print_hand()
+# 		self.__player.play_card(0)
+# 		print("------------")
+# 		print("|battlezone|")
+# 		print("------------")
+# 		self.__player.debug_print_battle_zone()
+
+# 		self.__player.to_graveyard("BATTLE_ZONE", 0)
+
+# 		self.__player.debug_print_battle_zone()
+
+# 		print("------")
+# 		print("|hand|")
+# 		print("------")
+# 		self.__player.debug_print_hand()

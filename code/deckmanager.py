@@ -167,4 +167,3 @@ class DeckManager:
 		dest_deck = Deck(src_deck.get_name(),src_cards[:])
 
 		return dest_deck
-
