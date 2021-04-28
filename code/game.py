@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import socket, pickle
 from player import Player
 from deckmanager import DeckManager
