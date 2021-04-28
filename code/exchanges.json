@@ -1,0 +1,70 @@
+// Client -> Server
+
+{
+	"player" : 1,
+	"type" : "DRAW_CARD",
+	"amount" : 1,
+}
+
+{
+	"player" : 1,
+	"type" : "ATTACK",
+	"target" : 2,
+	"attackers" : [
+		"battle_zone_pos1",
+		"battle_zone_pos2",
+		"battle_zone_pos3",
+		"..."
+	]
+}
+
+{
+	"player" : 1,
+	"type" : "BLOCK",
+	"blockers" : {
+		"blockers1" : "battle_zone_pos2",
+		"blockers2" : "battle_zone_pos1",
+		"blockers3" : "battle_zone_pos2",
+		"blockers4" : "battle_zone_pos3",
+		"..." : "..."
+	}	
+}
+
+{
+	"player" : 1,
+	"type" : "PLAY_CARD",
+	"card" : "hand_pos"
+}
+
+{
+	"player" : 1,
+	"type" : "DISCARD",
+	"card" : "hand_pos"
+}
+		
+{
+	"player" : 1,
+	"type" : "CONCEDE"	
+}
+
+{
+	"player" : 1,
+	"type" : "MULLIGAN"
+}
+
+// Server -> Client
+
+{
+	"players_life" : {
+		"player1" : 20,
+		"player2" : 17,
+		"player3" : 3,
+		"player4" : 10
+	},
+	"deck" : "List",
+	"hand" : "List",
+	"battle_zone" : "List",
+	"land_zone" : "List",
+	"graveyard" : "List",
+	"exile" : "List"
+} // valeurs vides si pas de changements sur la partie du board concernée
