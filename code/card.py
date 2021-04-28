@@ -287,6 +287,22 @@ class CreatureCard(Card):
 		self.__power = card[POWER]
 		self.__toughness = card[TOUGHNESS]
 		
+
+	#Getter
+	def get_power(self):
+		return self.__power
+
+	def get_toughness(self):
+		return self.__toughness
+
+	#Setter
+	def set_power(self,nb_power):
+		self.__power = nb_power
+
+	def set_toughness(self,nb_toughness):
+		 self.__toughness = nb_toughness
+
+
 	def to_string(self):
 		string = super().to_string()
 		string += "POWER : " + str(self.__power) + " \n" 

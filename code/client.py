@@ -6,6 +6,7 @@ from network import TCPNetwork
 from deckmanager import DeckManager
 from player import Player
 import json
+import time
 #to remove
 from deck import Deck
 
@@ -174,15 +175,27 @@ class Client:
 		
 		self.__player = Player(20,deck)
 		
-		self.__player.debug_print_hand()
-		self.mulligan()
-		self.__player.debug_print_hand()
+		#self.__player.debug_print_hand()
+		#self.mulligan()
+		#self.__player.debug_print_hand()
 		
 		
-#		self.__player.draw_card(3)
-#		self.__player.debug_print_hand()
-#		self.__player.get_board().empty_hand()
-#		self.__player.debug_print_hand()
+		self.__player.draw_card(7)
+		self.__player.debug_print_hand()
+		self.__player.play_card(0)
+		print("------------")
+		print("|battlezone|")
+		print("------------")
+		self.__player.debug_print_battle_zone()
+
+		self.__player.to_graveyard("BATTLE_ZONE", 0)
+
+		self.__player.debug_print_battle_zone()
+
+		print("------")
+		print("|hand|")
+		print("------")
+		self.__player.debug_print_hand()
 
 
 		

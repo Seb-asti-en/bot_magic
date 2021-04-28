@@ -49,8 +49,14 @@ class Board:
 
 
     def add_hand(self,Card):
-       if len(self.__hand) < 7:
-            self.__hand.append(Card)
+        self.__hand.append(Card)
+
+    def add_battle_zone(self,Card):
+        self.__battle_zone.append(Card)
+
+    def add_graveyard(self,Card):
+        self.__graveyard.append(Card)
+
 
     def empty_hand(self):
         while len(self.__hand) > 0:
