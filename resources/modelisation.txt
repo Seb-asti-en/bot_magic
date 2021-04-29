@@ -1,0 +1,88 @@
+Modélisation des cartes Magic
+Ce document présente les problématiques liées à la modélisation des cartes Magic.
+    I. Représentation d’une carte
+Une carte est caractérisée par les attributs suivants :
+    • l’identifiant (multiverseid)
+    • le nom de la carte
+    • les super-types de la carte 
+    • les types de la carte
+    • les sous-types de la carte
+    • le coût de la carte en mana
+    • le coût additionnel de la carte
+    • la couleur de la carte
+    • la liste des capacités statiques, activées ou déclenchées
+    II. Coût
+Un coût correspond à ce qu’un utilisateur doit faire pour lancer un sort, activer une capacité ou payer un coût d’entretien. Le coût est un tableau car il peut combiner plusieurs types de coûts (par exemple, payer un coût de mana et sacrifier une créature, perdre un point de vie et se défausser d’une carte, etc.). 
+    1) Coût en mana
+Un coût en mana correspond à une quantité de mana nécessaire. Il peut contenir les éléments suivants :
+    • Couleurs classiques : « W » (while), « U » (blUe), « B » (black), « R » (red), « G » (green)
+    • Sans couleur : chiffre/nombre ; non coloré : « C » (colorless)
+    • Hybride : « W/B » (white or black), « 2/W » (white or 2 uncolored), « W/P » (white or 2 points of life)
+    • Demi-mana : h[WUBRG] (utilisé dans des collections humoristiques ; non nécessaire)
+    • Nombre quelconque : X (n’importe quelle couleur ou sans couleur)
+Le coût en mana a évolué au cours de l’histoire de Magic. Par exemple, le « sans couleur » n’était pas présent dans les premières éditions. De même, des éditions spécifiques ont ajouté des coûts en points de vie, des demi-manas, etc.
+    2) Défausse
+La défausse correspond au fait de placer une carte de la main d’un joueur dans son cimetière. Il peut s’agir :
+    • D’une carte quelconque (associée à un nombre)
+    • D’une carte aléatoire (associée à un nombre)
+    • De la main entière
+    • D’un type de carte spécifique, etc.
+Il y a donc des conditions qui peuvent être associées.
+    3) Engagement
+Le coût de la carte peut être d’engager la carte, ou bien d’engager une autre carte (sous certaines conditions).
+    III. Evènements
+Un évènement entraîne le déclenchement d’un effet.
+    1) Changement de zone
+Un évènement peut se produire lorsqu’une carte change de zone (par exemple de la main d’un joueur au champ de bataille). Il est caractérisé par :
+    • la zone de départ : n’importe laquelle, le champ de bataille, le cimetière, l’exil
+    • la zone d’arrivée : n’importe laquelle, le champ de bataille, le cimetière, l’exil
+    • la carte ciblée : la carte elle-même, une carte avec des conditions spécifiques, etc.
+    2) Blessure
+L’évènement est déclenché lorsqu’une source subit des blessures. La caractéristique est une cible qui peut être associée à des conditions.
+    IV. Effets
+Un effet correspond au résultat d’une capacité, par exemple. Il possède les caractéristiques suivantes :
+    • Type d’effet : exil, création d’un jeton, modification de la force ou l’endurance de créatures, annulation
+    • Cible
+    • Conditions
+    • La fin de l’effet : jusqu’à la fin de la partie, jusqu’à ce qu’une carte change de zone, etc.
+    1) Exile
+Une carte est exilée lorsqu’elle sort de la partie. Elle n’est donc pas en jeu.
+    2) Création d’un jeton
+La création d’un jeton correspond à la création d’un permanent sur le terrain possédant un ensemble de caractéristiques :
+    • La cible : l’adversaire choisi, etc.
+    • Les propriétés du jeton :
+        ◦ Couleurs : combinaisons de U, C, W, U, B, R, G
+        ◦ Types : le type du jeton
+        ◦ Sous-types
+        ◦ Capacités : celles d’une carte quelconque
+    3) Modification force/endurance
+Des effets permettent de modifier la force et/ou l’endurance d’une créature. 
+    • La cible
+    • La puissance : une valeur, la puissance ou l’endurance d’une cible
+    • L’endurance : une valeur, la puissance ou l’endurance d’une cible
+    • Les conditions
+    4) Annulation
+L’annulation consiste simplement à annuler l’évènement qui se produit.
+    5) Capacité statique
+Une capacité statique correspond à une capacité non activée et non déclenchée, valable tout le temps. Il existe de multiples capacités qui peuvent être combinées :
+    • Piétinement
+    • Vol
+    • Portée
+    • Initiative
+    • Double-initiative
+    • Peur
+    • etc.
+Les capacités statiques apparaissent régulièrement dans les nouvelles éditions, parfois n’existent que dans une édition particulière.
+    V. Conditions
+Les conditions permettent de restreindre les cibles.
+    1) Créature
+Lorsqu’une cible est une créature, les conditions peuvent être les suivantes :
+    • Le propriétaire
+    • La zone
+    • La puissance : une valeur et un opérateur
+    • Le sous-type
+    • L’état : attaque, bloque, engagée, non engagée, etc.
+    • Le coût en mana
+    • etc.
+
+À suivre…
