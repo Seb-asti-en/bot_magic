@@ -128,7 +128,7 @@ def main():
 
 class Card:
 
-	def __init__(self,card, effect = []):
+	def __init__(self, card, effect):
 
 		self._id			= card[ID]
 		self._collection 	= card[COLLECTION]
@@ -141,10 +141,45 @@ class Card:
 		self._text			= card[TEXT]
 		self._effects		= effect
 		self._type 			= card[TYPE]
-		
+		self._isblocked 	= False
+		self._isattack 		= False
+		self._isengaged 	= False
+		self._istarget		= False	
+
+
+	#getter
 	def get_id(self):
 		return self._id
 	
+	def get_isblocked(self):
+		return self._isblocked
+
+	def get_isattack(self):
+		return self._isattack 
+
+	def get_isengaged(self):
+		return self._isengaged 
+	
+	def get_istarget(self):
+		return self._istarget
+	#setter
+	def set_isattack(self,bool):
+		self._isattack = bool
+
+	def set_isblocked(self,bool):
+		self._isblocked = bool
+	
+	def set_isengaged(self,bool):
+		self._isengaged = bool
+
+	def set_istarget(self,bool):
+		self._istarget = bool
+
+	def reset_bool(self):
+		self._isblocked 	= False
+		self._isattack 		= False
+		self._isengaged 	= False
+		self._istarget		= False	
 
 	def _init_mana_cost(self, card):
 		#Initialise le cout en mana à 0
@@ -286,8 +321,8 @@ class Card:
 
 class CreatureCard(Card):
 
-	def __init__(self, card):
-		super().__init__(card)
+	def __init__(self, card, effect):
+		super().__init__(card, effect)
 		self.__power = card[POWER]
 		self.__toughness = card[TOUGHNESS]
 		self.__damage = card[POWER]
@@ -319,8 +354,8 @@ class CreatureCard(Card):
 		self.__life = self.__life - quantity
 	
 	#Setter
-	def set_power(self,nb_power):
-		self.__power = nb_power
+	def set_damage(self,nb_damage):
+		self.__damage = nb_damage
 
 	def set_toughness(self,nb_toughness):
 		 self.__toughness = nb_toughness
@@ -335,8 +370,8 @@ class CreatureCard(Card):
 
 class SorceryCard(Card):
 
-	def __init__(self, card):
-		super().__init__(card)
+	def __init__(self, card, effect):
+		super().__init__(card, effect)
 		
 	def to_string(self):
 		string = super().to_string()
@@ -345,8 +380,8 @@ class SorceryCard(Card):
 
 class LandCard(Card):
 
-	def __init__(self, card):
-		super().__init__(card)
+	def __init__(self, card, effect):
+		super().__init__(card, effect)
 	
 	def to_string(self):
 		string = super().to_string()
@@ -354,8 +389,8 @@ class LandCard(Card):
 
 class InstantCard(Card):
 
-	def __init__(self, card):
-		super().__init__(card)
+	def __init__(self, card, effect):
+		super().__init__(card, effect)
 	
 	def to_string(self):
 		string = super().to_string()

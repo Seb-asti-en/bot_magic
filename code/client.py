@@ -173,9 +173,6 @@ class Client:
 		# Désérialisation
 		player = pickle.loads(serialized_data)
 
-		# DEBUG
-		print(player.get_board().get_deck().get_cards()[25].to_string())
-
 		return player
 
 	def play(self, player):

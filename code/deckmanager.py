@@ -1,4 +1,4 @@
-import json, pymysql, sys
+import json, pymysql, sys, copy
 from deck import Deck
 from card import Card, CreatureCard, SorceryCard, LandCard, InstantCard
 
@@ -30,16 +30,14 @@ class DeckManager:
 
 	def get_deck(self, index = 0):
 
-		if(index < len(self.__decks)):
+		if(abs(index) < len(self.__decks)):
 			return self.__decks[index]
 
 		else:
-			if(len(self.__decks) == 0) :
-				self.add()
-			
+
 			print("Il n'y a pas de deck à cet index, récupération du deck de base")
 			
-			return self.__decks[0]
+			sys.exit(0)
 
 	def add(self):
 
@@ -83,7 +81,7 @@ class DeckManager:
 		sql_request = db_cursor.fetchmany(number_of_rows)
 
 		# Créations du deck
-		deck = Deck("Deck de démarrage")
+		deck = Deck("Deck de démarrage",[])
 		for card in sql_request:
 
 			if(duplicates > 0):
@@ -96,44 +94,44 @@ class DeckManager:
 					
 					if(card[TYPE] == "Creature"):
 					
-						deck.add_card(CreatureCard(card))
+						deck.add_card(CreatureCard(card,[]))
 						duplicates += 1
 					
 					elif(card[TYPE] == "Instant"):
 					
-						deck.add_card(InstantCard(card))
+						deck.add_card(InstantCard(card,[]))
 						duplicates += 1
 
 					elif(card[TYPE] == "Land"):
 						
-						deck.add_card(LandCard(card))
+						deck.add_card(LandCard(card,[]))
 						duplicates += 1
 					
 					elif(card[TYPE] == "Sorcery"):
 					
-						deck.add_card(SorceryCard(card))
+						deck.add_card(SorceryCard(card,[]))
 						duplicates += 1
 			
 			else:
 				
 				if(card[TYPE] == "Creature"):
 				
-					deck.add_card(CreatureCard(card))
+					deck.add_card(CreatureCard(card,[]))
 					duplicates += 1
 				
 				elif(card[TYPE] == "Instant"):
 				
-					deck.add_card(InstantCard(card))
+					deck.add_card(InstantCard(card,[]))
 					duplicates += 1
 				
 				elif(card[TYPE] == "Land"):
 				
-					deck.add_card(LandCard(card))
+					deck.add_card(LandCard(card,[]))
 					duplicates += 1
 				
 				elif(card[TYPE] == "Sorcery"):
 				
-					deck.add_card(SorceryCard(card))
+					deck.add_card(SorceryCard(card,[]))
 					duplicates += 1
 
 		# Ajout du deck dans le deckmanager
@@ -153,16 +151,4 @@ class DeckManager:
 
 	def copy_deck(self, index):
 
-		src_deck = None
-		src_cards = []
-		dest_deck = None
-
-		if((index < 0) or (index > len(self.__decks))):
-			return None
-
-		src_deck = self.get_deck(index)
-		src_cards = src_deck.get_cards()
-
-		dest_deck = Deck(src_deck.get_name(),src_cards[:])
-
-		return dest_deck
+		return copy.deepcopy(self.get_deck(index))
