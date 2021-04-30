@@ -115,6 +115,8 @@ class Server:
 		
 		game.start()
 		
+		print("Fermeture du serveur de jeu")
+
 		sys.exit() 
 
 if __name__ == "__main__":

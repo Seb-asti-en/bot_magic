@@ -6,10 +6,13 @@ from board import Board
 class Player(ABC):
 
 	#Constructeur
-	def __init__(self, life, deck):
+	def __init__(self, player_id, life, deck):
+		self.__id = player_id
 		self.__life = life
 		self.__board = Board(deck)
-		
+
+	def get_id(self):
+		return self.__id
 	
 	#Getters
 	def get_board(self):
@@ -30,6 +33,7 @@ class Player(ABC):
 			print("none")
 			return None
 		print()
+
 		for i in range(nb_card):
 			self.__board.add_hand(self.__board.get_deck().get_cards().pop(0)) 
 	
@@ -104,11 +108,15 @@ class Player(ABC):
 		pass
 
 	def debug_print_hand(self):
+		print("Hand (" + str(len(self.__board.get_hand())) + "):")
+		
 		for card in self.__board.get_hand():
-			print("|",card._name,"|",end='  ')
-		print("")
+			print("[" + card._name, end="] ")
+
+		print()
+		
 		if len(self.__board.get_hand()) == 0:
-			print("vide")
+			print("La main est vide")
 
 	def debug_print_battle_zone(self):
 		for card in self.__board.get_battle_zone():

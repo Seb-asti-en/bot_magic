@@ -1,6 +1,4 @@
-import json
-import pymysql
-import copy
+import json, pymysql, sys, copy
 from deck import Deck
 from card import Card, CreatureCard, SorceryCard, LandCard, InstantCard
 
@@ -32,17 +30,15 @@ class DeckManager:
 
 	def get_deck(self, index = 0):
 
-		if(index < len(self.__decks)):
-			
+		if(abs(index) < len(self.__decks)):
+
 			return self.__decks[index]
 
 		else:
-			if(len(self.__decks) == 0) :
-				self.add()
-			
+
 			print("Il n'y a pas de deck à cet index, récupération du deck de base")
 			
-			return self.__decks[0]
+			sys.exit(0)
 
 	def add(self):
 		file = None
@@ -98,44 +94,44 @@ class DeckManager:
 					
 					if(card[TYPE] == "Creature"):
 					
-						deck.add_card(CreatureCard(card))
+						deck.add_card(CreatureCard(card,[]))
 						duplicates += 1
 					
 					elif(card[TYPE] == "Instant"):
 					
-						deck.add_card(InstantCard(card))
+						deck.add_card(InstantCard(card,[]))
 						duplicates += 1
 
 					elif(card[TYPE] == "Land"):
 						
-						deck.add_card(LandCard(card))
+						deck.add_card(LandCard(card,[]))
 						duplicates += 1
 					
 					elif(card[TYPE] == "Sorcery"):
 					
-						deck.add_card(SorceryCard(card))
+						deck.add_card(SorceryCard(card,[]))
 						duplicates += 1
 			
 			else:
 				
 				if(card[TYPE] == "Creature"):
 				
-					deck.add_card(CreatureCard(card))
+					deck.add_card(CreatureCard(card,[]))
 					duplicates += 1
 				
 				elif(card[TYPE] == "Instant"):
 				
-					deck.add_card(InstantCard(card))
+					deck.add_card(InstantCard(card,[]))
 					duplicates += 1
 				
 				elif(card[TYPE] == "Land"):
 				
-					deck.add_card(LandCard(card))
+					deck.add_card(LandCard(card,[]))
 					duplicates += 1
 				
 				elif(card[TYPE] == "Sorcery"):
 				
-					deck.add_card(SorceryCard(card))
+					deck.add_card(SorceryCard(card,[]))
 					duplicates += 1
 
 		# Ajout du deck dans le deckmanager
@@ -151,8 +147,10 @@ class DeckManager:
 			print("Il n'y a pas de deck à cet index")
 
 	def size(self):
+		
 		return len(self.__decks)
 
 	def copy_deck(self, index):
-		return  copy.deepcopy(self.get_deck(index))
-		
+
+		return copy.deepcopy(self.get_deck(index))
+
