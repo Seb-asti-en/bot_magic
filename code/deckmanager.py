@@ -33,6 +33,7 @@ class DeckManager:
 	def get_deck(self, index = 0):
 
 		if(index < len(self.__decks)):
+			
 			return self.__decks[index]
 
 		else:
@@ -44,7 +45,6 @@ class DeckManager:
 			return self.__decks[0]
 
 	def add(self):
-
 		file = None
 		json_s = None
 		database = None
@@ -85,7 +85,7 @@ class DeckManager:
 		sql_request = db_cursor.fetchmany(number_of_rows)
 
 		# Créations du deck
-		deck = Deck("Deck de démarrage")
+		deck = Deck("Deck de démarrage",[])
 		for card in sql_request:
 
 			if(duplicates > 0):
@@ -139,6 +139,7 @@ class DeckManager:
 					duplicates += 1
 
 		# Ajout du deck dans le deckmanager
+		
 		self.__decks.append(deck)
 
 	def remove(self, index):
@@ -150,36 +151,8 @@ class DeckManager:
 			print("Il n'y a pas de deck à cet index")
 
 	def size(self):
-
 		return len(self.__decks)
 
 	def copy_deck(self, index):
-
-		src_deck = None
-		src_cards = []
-		dest_deck = None
-
-		if((index < 0) or (index > len(self.__decks))):
-			return None
-
-		src_deck = self.get_deck(index)
-		src_cards = copy.deepcopy(src_deck.get_cards())
-		dest_deck = Deck(src_deck.get_name(),src_cards[:])
-
-		return dest_deck
-
-	def copy_card(self, index):
-
-		src_deck = None
-		src_cards = []
-		dest_deck = None
-
-		if((index < 0) or (index > len(self.__decks))):
-			return None
-
-		src_deck = self.get_deck(index)
-		src_cards = src_deck.get_cards()
-
-		dest_deck = Deck(src_deck.get_name(),src_cards[:])
-
-		return dest_deck
+		return  copy.deepcopy(self.get_deck(index))
+		

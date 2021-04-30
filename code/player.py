@@ -25,14 +25,33 @@ class Player(ABC):
 
 	#Methodes
 	def draw_card(self,nb_card=1):
-		print("Vous piocher ",nb_card," carte")
+		print("Vous piocher ",nb_card," carte taille ")
+		if len(self.__board.get_deck().get_cards()) == 0:
+			print("none")
+			return None
+		print()
 		for i in range(nb_card):
 			self.__board.add_hand(self.__board.get_deck().get_cards().pop(0)) 
 	
 		
 	def play_card(self,index_card):
-		self.__board.add_battle_zone(self.__board.get_hand().pop(index_card))
-	
+		if index_card < 0 or index_card >  len(self.__board.get_hand()) :
+			print("index trop grand ou trop petit")
+		else:
+
+			if self.__board.get_hand()[index_card].get_type() =="Land":
+				print("itsss lannnd")
+				self.__board.add_land_zone(self.__board.get_hand().pop(index_card))
+
+			elif self.__board.get_hand()[index_card].get_type() =="Creature" or self.__board.get_hand()[index_card].get_type() =="Artifact" :
+				print("itsss creature")
+				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
+			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
+				print("itsss INSTANT")
+				print(self.__board.get_hand()[index_card].to_string())
+				
+		
+
 	def use_card():
 		pass
 
@@ -49,7 +68,10 @@ class Player(ABC):
 			 Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
 		
 	def choice_attack(self,index):
-		self.__board.get_battle_zone()[index].set_isattack(True)
+		if index > len(self.__board.get_battle_zone()) :
+			self.__board.get_battle_zone()[index].set_isattack(True)
+		else:
+			print("l'index est trop grand", index)
 
 	def attack(self,index_source,Player_target):
 		deal_damage_to_player(index_source,Player_target)
@@ -57,6 +79,11 @@ class Player(ABC):
 	def defense(self,Player_target,index_target,index_source):
 		self.deal_damage_to_card(index_target, index_source, Player_target)
 
+
+
+	def delete_deck(self):
+		for i in range( len(self.get_board().get_deck().get_cards())):
+			self.get_board().get_deck().get_cards().pop(0)
 
 	def deal_damage_to_player(self,index_source,Player):
 		source_dps = self.__board.get_battle_zone()[index_source]

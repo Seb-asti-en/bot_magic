@@ -48,8 +48,8 @@ class Board:
        self.__exile = exile
 
 
-    def add_hand(self,Card):
-        self.__hand.append(Card)
+    def add_land_zone(self,Card):
+        self.__land_zone.append(Card)
 
     def add_battle_zone(self,Card):
         self.__battle_zone.append(Card)
@@ -57,7 +57,9 @@ class Board:
     def add_graveyard(self,Card):
         self.__graveyard.append(Card)
 
-
+    def add_hand(self,Card):
+        self.__hand.append(Card)
+        
     def empty_hand(self):
         while len(self.__hand) > 0:
             self.__hand.pop(0)

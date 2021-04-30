@@ -40,16 +40,24 @@ class Game:
 
 	def choose_deck(self):
 
-		deck = None
 
-		for player in self.__players:
+		self.__deckmanager.add()
+		deck1 = self.__deckmanager.copy_deck(0)
+		
+		self.__players[0][PLAYER] = Player(20, deck1)
+		self.__deckmanager.add()
+		deck2 = self.__deckmanager.copy_deck(0)
+		self.__players[1][PLAYER] = Player(20, deck2)
 
-			# Création automatique du deck sans demander au client
-			self.__deckmanager.add()
-			deck = self.__deckmanager.copy_deck(0)
 
-			# Création de l'objet Player en lui passant le deck
-			player[PLAYER] = Player(LIFE,deck)
+	#	for player in self.__players:
+	#
+	#		# Création automatique du deck sans demander au client
+	#		self.__deckmanager.add()
+	#		deck = self.__deckmanager.copy_deck(0)
+#
+	#		# Création de l'objet Player en lui passant le deck
+	#		player[PLAYER] = Player(LIFE,deck)
 
 	def mulligan(self, index):
 
@@ -91,10 +99,10 @@ class Game:
 	#	for i in range(len(Player2.get_board().get_hand())):
 	#		print("|",i,"|",end='  ')
 		Player2.debug_print_hand()
-		print("")
 		print("          hand")
 		print("")
-		print("")
+		print("|",len(Player2.get_board().get_land_zone()),"|")
+		print("land_zone")
 		print("")
 		#battlezone j2
 		for card in Player2.get_board().get_battle_zone():
@@ -126,43 +134,45 @@ class Game:
 			
 		print("")
 		print("")
+		print("land_zone")
+		print("|",len(Player1.get_board().get_land_zone()),"|")
 		print("")
 		#hand j1
 		print("          hand")
 	#	for i in range(len(Player1.get_board().get_hand())):
 	#		print("|",i,"|",end='  ')
-		Player2.debug_print_hand()
+		Player1.debug_print_hand()
 		print("")
+
 		print("")
 		print("graveyard","    ","vie","       ","deck")
 		print("|",len(Player2.get_board().get_graveyard()),"|","      ","|",Player2.get_life(),"|","      ","|",len(Player2.get_board().get_deck().get_cards()),"|")
-		
 		print("__________________________________________________________________________________________")
 
 	
 
-	def test(self,Player1,Player2):
+	def test(self):
 
 		print('|'+BLEU+'BLEU'+RESET+'|')
 		print('|'+ROUGE+'ROUGE'+RESET+'|')
 
-		Player1  = Player(20,Player1.get_board().get_deck())
-		Player2  = Player(20,Player2.get_board().get_deck())
+		
+		Player2  = Player(20,self.__deckmanager.copy_deck(0))
+		Player1  = Player(20,self.__deckmanager.copy_deck(0))
 
-
-		print(Player1.get_life())
-		print(Player2.get_life())
 		#pioche
 		Player1.draw_card(3)
-		Player2.draw_card(3)
+		Player2.draw_card(2)
 		self.debug_print_all(Player1,Player2)
 	
 		#jouer
+		print("player",len(Player1.get_board().get_hand()))
 		Player1.play_card(0)
 		Player2.play_card(0)
 
-		Player2.choice_attack(0)
-		Player1.choice_block(Player2,0,0)
+	
+		#Player2.choice_attack(0)
+	#	Player1.choice_block(Player2,0,0)
 
 
 	#	Player2.to_graveyard("BATTLE_ZONE", 0)
@@ -216,7 +226,8 @@ class Game:
 
 				# Envoi vers le client : Deck (TCP)(2)
 				player[SOCKET].send(raw_data)
-				self.test(self.__players[0][PLAYER],self.__players[1][PLAYER])
+				
 			break
+		self.test()
 
 

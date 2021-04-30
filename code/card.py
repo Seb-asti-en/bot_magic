@@ -150,6 +150,9 @@ class Card:
 	#getter
 	def get_id(self):
 		return self._id
+		
+	def get_type(self):
+		return self._type
 	
 	def get_isblocked(self):
 		return self._isblocked
