@@ -354,8 +354,8 @@ class CreatureCard(Card):
 		self.__life = self.__life - quantity
 	
 	#Setter
-	def set_power(self,nb_power):
-		self.__power = nb_power
+	def set_damage(self,nb_damage):
+		self.__damage = nb_damage
 
 	def set_toughness(self,nb_toughness):
 		 self.__toughness = nb_toughness
