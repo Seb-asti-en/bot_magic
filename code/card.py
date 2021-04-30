@@ -141,11 +141,46 @@ class Card:
 		self._text			= card[TEXT]
 		self._effects		= effect
 		self._type 			= card[TYPE]
-		
+		self.__isblocked 	= False
+		self.__isattack 	= False
+		self.__isengaged 	= False
+		self.__istarget		= False	
+
+
+	#getter
 	def get_id(self):
 		return self._id
 	
+	def get_isblocked(self):
+		return self.__isblocked
 
+	def get_isattack(self):
+		return self.__isattack 
+
+	def get_isengaged(self):
+		return self.__isengaged 
+	
+	def get_istarget(self):
+		return self.__istarget
+	#setter
+	def set_isattack(self,bool):
+		self.__isattack = bool
+
+	def set_isblocked(self,bool):
+		self.__isblocked = bool
+	
+	def set_isengaged(self,bool):
+		self.__isengaged = bool
+
+	def set_istarget(self,bool):
+		self.__istarget = bool
+
+	def reset_bool(self):
+		self.__isblocked 	= False
+		self.__isattack 	= False
+		self.__isengaged 	= False
+		self.__istarget		= False	
+		
 	def _init_mana_cost(self, card):
 		#Initialise le cout en mana à 0
 		self._mana_cost = {'X' : 0,'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}

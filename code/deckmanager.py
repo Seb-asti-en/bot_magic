@@ -1,5 +1,6 @@
 import json
 import pymysql
+import copy
 from deck import Deck
 from card import Card, CreatureCard, SorceryCard, LandCard, InstantCard
 
@@ -153,6 +154,21 @@ class DeckManager:
 		return len(self.__decks)
 
 	def copy_deck(self, index):
+
+		src_deck = None
+		src_cards = []
+		dest_deck = None
+
+		if((index < 0) or (index > len(self.__decks))):
+			return None
+
+		src_deck = self.get_deck(index)
+		src_cards = copy.deepcopy(src_deck.get_cards())
+		dest_deck = Deck(src_deck.get_name(),src_cards[:])
+
+		return dest_deck
+
+	def copy_card(self, index):
 
 		src_deck = None
 		src_cards = []
