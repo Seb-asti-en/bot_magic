@@ -6,9 +6,13 @@ from board import Board
 class Player(ABC):
 
 	#Constructeur
-	def __init__(self, life, deck):
+	def __init__(self, player_id, life, deck):
+		self.__id = player_id
 		self.__life = life
 		self.__board = Board(deck)
+
+	def get_id(self):
+		return self.__id
 	
 	#Getters
 	def get_board(self):
@@ -64,9 +68,13 @@ class Player(ABC):
 		pass
 
 	def debug_print_hand(self):
+		print("Hand (" + str(len(self.__board.get_hand())) + "):")
+		
 		for card in self.__board.get_hand():
-			print(card._name,end=' ')
-		print("")
+			print("[" + card._name, end="] ")
+
+		print()
+		
 		if len(self.__board.get_hand()) == 0:
 			print("vide")
 

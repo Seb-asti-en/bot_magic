@@ -1,24 +1,38 @@
 #!/usr/bin/env python3
 
-import socket, pickle, sys, json
-from deckmanager import DeckManager
-from deck import Deck
+import socket, pickle, sys, json, os
+from player import Player
 
 PACKET_SIZE = 1024
 SEGMENT_SIZE = 65536
 
+MULLIGAN = "1"
+DRAW_CARD = "2"
+PLAY_CARD = "3"
+ATTACK = "4"
+BLOCK = "5"
+DISCARD = "6"
+SKIP_PHASE = "7"
+CONCEDE = "8"
+
 def main():
 
 	client = None
+	player = None
 
 	client = Client()
 
+	# Connexion au serveur principal
 	client.connect_server()
 
-	client.connect_game()
+	# Connexion au serveur de jeu
+	player = client.connect_game()
 
-	print("YAY")
+	# Lancement de la partie
+	client.play(player)
 	
+	# Nettoyage en sortie
+	client.clear_terminal()
 
 class Client:
 
@@ -41,13 +55,24 @@ class Client:
 		# Définition du timeout UDP
 		self.__server_socket.settimeout(10.0)
 
-	def menu(self):
+	def main_menu(self):
+
+		self.clear_terminal()
 
 		print("[      Nouvelle partie (1)     ]")
 		print("[   Rejoindre une partie (2)   ]")
 		print("[         Quitter (3)          ]")
 
 		return input(">")
+
+	def clear_terminal(self):
+
+		command = "clear"
+
+		if os.name == "nt":
+			command = "cls"
+
+		os.system(command)
 
 	# Connexion au serveur UDP
 	def connect_server(self):
@@ -60,7 +85,11 @@ class Client:
 
 		while True:
 
-			user_input = self.menu()
+			# Menu principal
+			user_input = self.main_menu()
+
+			# Rafraichissement de l'écran
+			self.clear_terminal()
 			
 			# Demande de lancement d'une nouvelle partie
 			if user_input == "1":
@@ -132,24 +161,137 @@ class Client:
 	# Connexion à la partie
 	def connect_game(self):
 
-		deck = None
-		raw_data = None
-		data = None
+		player = None
+		serialized_data = None
 	
 		# Connexion au serveur de jeu
 		self.__game_socket.connect(self.__game_netconfig)
-			
-		deck = DeckManager().get_deck()
 
-		# Envoi vers le client : Deck (TCP)(1)
-		self.__game_socket.send(pickle.dumps(deck))
+		# Réception depuis le serveur de jeu : Objet Player (1)
+		serialized_data = self.__game_socket.recv(SEGMENT_SIZE)
 
-		# Réception depuis le serveur : Deck (TCP)(2)
-		raw_data = self.__game_socket.recv(SEGMENT_SIZE)
+		# Désérialisation
+		player = pickle.loads(serialized_data)
 
-		data = pickle.loads(raw_data)
-		
-		print('Données recues :', data.get_cards()[0].to_string())
+		# DEBUG
+		print(player.get_board().get_deck().get_cards()[25].to_string())
+
+		return player
+
+	def play(self, player):
+
+		request = None
+		serialized_request = None
+		response = None
+		serialized_response = None
+		gamestate = None
+
+		while True:
+
+			print("En attente de la fin du tour ennemi")
+
+			# Réception depuis le serveur de jeu : Démarrage de la phase (2)
+			serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
+
+			# Déserialisation
+			response = pickle.loads(serialized_response)
+
+			if(response == "PHASE_START"):
+				break
+
+		while True:
+
+			# Choix de l'action
+			request = self.action_menu(player)
+
+			# Sérialisation
+			serialized_request = pickle.dumps(request)
+
+			# Envoi vers le serveur de jeu : Requête d'action (3)
+			self.__game_socket.send(serialized_request)
+
+			# Réception depuis le serveur de jeu : Acceptation / Refus (4)
+			serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
+
+			# Déserialisation
+			response = pickle.loads(serialized_response)
+
+			# En cas de refus, on recommence
+			if(response == "DECLINE"):
+				continue
+
+			# Réception depuis le serveur de jeu : Etat de la partie (5)
+			serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
+
+			# Déserialisation
+			gamestate = pickle.loads(serialized_response)
+
+			# Mise à jour des informations de jeu
+			self.update(player,gamestate)
+
+	def action_menu(self, player):
+
+		request = ""
+
+		while True :
+
+			# Rafraichissement de l'écran
+			self.clear_terminal()
+
+			# Affichage initial
+			print("[  MULLIGAN   (1)  ]")
+			print("[  DRAW_CARD  (2)  ]")
+			print("[  PLAY_CARD  (3)  ]")
+			print("[  ATTACK     (4)  ]")
+			print("[  BLOCK      (5)  ]")
+			print("[  DISCARD    (6)  ]")
+			print("[  SKIP_PHASE (7)  ]")
+			print("[  CONCEDE    (8)  ]")
+
+			# Récupération de l'entrée utilisateur
+			user_input = input(">")
+
+			if(user_input == MULLIGAN):
+
+				request = { 
+					"player" : player.get_id(),
+					"type" : "MULLIGAN"
+				}
+
+				break
+
+			elif(user_input == DRAW_CARD):
+				
+				request = { 
+					"player" : player.get_id(),
+					"type" : "DRAW_CARD"
+				}
+
+				break
+
+			elif(user_input == PLAY_CARD):
+				
+				break
+
+			elif(user_input == SKIP_PHASE):
+
+				request = { 
+					"player" : player.get_id(),
+					"type" : "SKIP_PHASE"
+				}
+
+				break				
+
+			else:
+
+				input("Erreur lors de la saisie, appuyez sur Entrée pour revenir au menu")
+
+		#input(request)
+
+		return request
+
+	def update(self, player, gamestate):
+		pass
 
 if __name__ == "__main__":
 	try:
@@ -165,44 +307,3 @@ if __name__ == "__main__":
 # 		break
 # 	except ValueError:
 # 		continue
-
-# 	def test(self):
-
-# 		deck = None
-
-# 		self.__deckmanager.add()
-# 		self.__deckmanager.add()
-
-# 		self.__deckmanager.remove(0)
-
-# 		deck = self.__deckmanager.get_deck(0)
-
-# #		for card in deck.get_cards():
-# #			print(card.to_string())
-
-# 		print("BREAKPOINT")
-	
-		
-# 		self.__player = Player(20,deck)
-		
-# 		#self.__player.debug_print_hand()
-# 		#self.mulligan()
-# 		#self.__player.debug_print_hand()
-		
-		
-# 		self.__player.draw_card(7)
-# 		self.__player.debug_print_hand()
-# 		self.__player.play_card(0)
-# 		print("------------")
-# 		print("|battlezone|")
-# 		print("------------")
-# 		self.__player.debug_print_battle_zone()
-
-# 		self.__player.to_graveyard("BATTLE_ZONE", 0)
-
-# 		self.__player.debug_print_battle_zone()
-
-# 		print("------")
-# 		print("|hand|")
-# 		print("------")
-# 		self.__player.debug_print_hand()

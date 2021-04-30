@@ -2,8 +2,7 @@
 
 {
 	"player" : 1,
-	"type" : "DRAW_CARD",
-	"amount" : 1,
+	"type" : "DRAW_CARD"
 }
 
 {

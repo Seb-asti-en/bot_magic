@@ -1,4 +1,4 @@
-import socket, pickle
+import socket, pickle, sys, os
 from player import Player
 from deckmanager import DeckManager
 
@@ -24,6 +24,15 @@ class Game:
 	def is_full(self):
 		return len(self.__players) >=  self.__slots
 
+	def clear_terminal(self):
+
+		command = "clear"
+
+		if os.name == "nt":
+			command = "cls"
+
+		os.system(command)
+
 	def wait_client(self):
 
 		# Mise en écoute de la socket TCP
@@ -35,6 +44,7 @@ class Game:
 
 	def choose_deck(self):
 
+		player_id = 0
 		deck = None
 
 		for player in self.__players:
@@ -44,28 +54,79 @@ class Game:
 			deck = self.__deckmanager.copy_deck(0)
 
 			# Création de l'objet Player en lui passant le deck
-			player[PLAYER] = Player(LIFE,deck)
+			player[PLAYER] = Player(player_id,LIFE,deck)
+			print(sys.getsizeof(pickle.dumps(player[PLAYER])))
+
+			# Incrémentation du compteur définissant l'identifiant du joueur
+			player_id += 1
+
+	def start(self):
+
+		data = None
+		serialized_data = None
+
+		# Initialisation de la partie
+		for player in self.__players:
+
+			# Sérialisation
+			serialized_data = pickle.dumps(player[PLAYER])
+
+			# Envoi vers le player : Objet Player (1)
+			player[SOCKET].send(serialized_data)
+
+		# Phase Mulligan
+		for player in self.__players:
+
+			# Réponse
+			data = "PHASE_START"
+
+			# Rafraichissement de l'écran
+			self.clear_terminal()			
+
+			# Sérialisation
+			serialized_data = pickle.dumps(data)
+
+			# Envoi vers le player : Démarrage de la phase (2)
+			player[SOCKET].send(serialized_data)
+		
+			# Exécution de la phase
+			self.mulligan(player[PLAYER].get_id())
 
 	def mulligan(self, index):
 
 		mulligan_count = 0
-		user_input = ""
+		data = None
+		serialized_data = None
+		response = ""
 
 		# Mélange initial du deck
 		self.__players[index][PLAYER].get_board().get_deck().shuffle()
 
+		# Pioche 7 cartes
+		self.__players[index][PLAYER].draw_card(7)
+
 		while mulligan_count <= 7:
 
-			# Pioche (7-n) cartes
-			self.__players[index][PLAYER].draw_card(7 - mulligan_count)
-
+			# DEBUG
 			self.__players[index][PLAYER].debug_print_hand()
 
-			# Demande à l'utilisateur
-			user_input = input("Voulez-vous mulligan ? (oui/non) \n>")
-			
-			# Traitement de l'entrée
-			if user_input == "oui":
+			# Réception depuis le client : Requête d'action (3)
+			serialized_data = self.__players[index][SOCKET].recv(SEGMENT_SIZE)
+
+			# Désérialisation
+			data = pickle.loads(serialized_data)
+
+			# Continuer à mulligan ?
+			if(data.get("type") == "MULLIGAN"):
+
+				# Réponse
+				response = "ACCEPT"
+
+				# Sérialisation
+				serialized_data = pickle.dumps(response)
+
+				# Envoi vers le client : Acceptation (4)
+				self.__players[index][SOCKET].send(serialized_data)
 
 				# Défausse de la main
 				self.__players[index][PLAYER].get_board().empty_hand()
@@ -73,41 +134,47 @@ class Game:
 				# Mélange du deck
 				self.__players[index][PLAYER].get_board().get_deck().shuffle()
 
+				# Sérialisation 
+				# TODO : (à modifier plus tard selon le format JSON)
+				serialized_data = pickle.dumps(self.__players[index][PLAYER])
+
+				# Envoi vers le client : Etat de la partie (5)
+				self.__players[index][SOCKET].send(serialized_data)
+
 				mulligan_count += 1
+
+				# Pioche (7-n) cartes
+				self.__players[index][PLAYER].draw_card(7 - mulligan_count)
 			
-			else:
+			elif(data.get("type") == "SKIP_PHASE"):
+
+				# Réponse
+				response = "ACCEPT"
+
+				# Sérialisation
+				serialized_data = pickle.dumps(response)
+
+				# Envoi vers le client : Acceptation (4)
+				self.__players[index][SOCKET].send(serialized_data)
+
+				# Sérialisation 
+				# TODO : (à modifier plus tard selon le format JSON)
+				serialized_data = pickle.dumps(self.__players[index][PLAYER])
+
+				# Envoi vers le client : Etat de la partie (5)
+				self.__players[index][SOCKET].send(serialized_data)
+
 				break
 
-	def start(self):
+			else:
 
-		raw_data = None
-		data = None
+				# Réponse
+				response = "DECLINE"
 
-		# # Debug : Affichage des cartes du deck
-		# for card in self.__players[0][PLAYER].get_board().get_deck().get_cards():
-		# 	print(card.to_string())
-		
-		# input("Appuyez sur la touche Entrée")
+				# Sérialisation
+				serialized_data = pickle.dumps(response)
 
-		# self.__players[0][PLAYER].debug_print_hand()
-		# self.mulligan(0)
-		# self.__players[0][PLAYER].debug_print_hand()
+				# Envoi vers le client : Refus (4)
+				self.__players[index][SOCKET].send(serialized_data)
 
-		while True:
-
-			for player in self.__players:
-				
-				# Réception depuis le client : Deck (TCP)(1)
-				raw_data = player[SOCKET].recv(SEGMENT_SIZE)
-				
-				if not raw_data:
-					break
-				
-				data = pickle.loads(raw_data)
-
-				print('Données recues :', data.get_cards()[0].to_string())
-
-				# Envoi vers le client : Deck (TCP)(2)
-				player[SOCKET].send(raw_data)
-
-			break
+				continue 

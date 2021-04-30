@@ -1,5 +1,4 @@
-import json
-import pymysql
+import json, pymysql, sys
 from deck import Deck
 from card import Card, CreatureCard, SorceryCard, LandCard, InstantCard
 
