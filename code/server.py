@@ -4,6 +4,7 @@ import socket, pickle, sys, json
 from threading import Thread
 from game import Game
 
+
 PACKET_SIZE = 1024
 
 def main():

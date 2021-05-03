@@ -28,54 +28,67 @@ class Player(ABC):
 
 	#Methodes
 	def draw_card(self,nb_card=1):
-		print("Vous piocher ",nb_card," carte taille ")
-		if len(self.__board.get_deck().get_cards()) == 0:
-			print("none")
-			return None
-		print()
+		#print("Eugneugneu vous piocheZ",nb_card,"carte(s) TAILLE")
+		if len(self.__board.get_deck().get_cards()) > 0:
 
-		for i in range(nb_card):
-			self.__board.add_hand(self.__board.get_deck().get_cards().pop(0)) 
+			for i in range(nb_card):
+
+				self.__board.add_hand(self.__board.get_deck().get_cards().pop(0))
+
+		else:
+
+			print("ça marche pas")
 	
 		
 	def play_card(self,index_card):
-		if index_card < 0 or index_card >  len(self.__board.get_hand()) :
+		print("taille",len(self.__board.get_hand()),index_card)
+		if index_card < 0 or index_card >=  len(self.__board.get_hand()) :
 			print("index trop grand ou trop petit")
 		else:
 
 			if self.__board.get_hand()[index_card].get_type() =="Land":
-				print("itsss lannnd")
+				print("itsss lannnd",self.__board.get_hand()[index_card]._name)
 				self.__board.add_land_zone(self.__board.get_hand().pop(index_card))
 
 			elif self.__board.get_hand()[index_card].get_type() =="Creature" or self.__board.get_hand()[index_card].get_type() =="Artifact" :
-				print("itsss creature")
+	
+				print("itsss creature",self.__board.get_hand()[index_card]._name)
 				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
+
 			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
 				print("itsss INSTANT")
 				print(self.__board.get_hand()[index_card].to_string())
 				
 		
 
-	def use_card():
-		pass
+	def use_card(self,index_source):
+		self.__board.get_battle_zone()[index_source].get
 
 
 	def to_graveyard(self,source_list,index_card):
 		if source_list == "HAND":
-			self.__board.add_graveyard(self.__board.get_hand().pop(index_card))
+			if len(self.__board.get_hand()) != 0 :
+				self.__board.add_graveyard(self.__board.get_hand().pop(index_card))
 		elif source_list == "BATTLE_ZONE":
-			self.__board.add_graveyard(self.__board.get_battle_zone().pop(index_card))
+			if len(self.__board.get_battle_zone()) != 0 :
+				self.__board.add_graveyard(self.__board.get_battle_zone().pop(index_card))
 
 	def choice_block(self,Player_target,index_target,index_src):
-		self.__board.get_battle_zone()[index_src].set_isblocked(True)
-		if Player_target.get_board().get_battle_zone()[index_target].get_isattack() == True:
-			 Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
+		if self.__board.isempty_battle_zone() or index_src >= len(self.__board.get_battle_zone()) or index_src < 0:
+				print("l'index source est trop grand ou trop petit", index_src)
+		else:
+			self.__board.get_battle_zone()[index_src].set_isblocked(True)
+			if Player_target.get_board().get_battle_zone()[index_target].get_isattack() == True:
+				Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
+			else:
+				print("selectioner un attaquant")
 		
 	def choice_attack(self,index):
-		if index > len(self.__board.get_battle_zone()) :
-			self.__board.get_battle_zone()[index].set_isattack(True)
+		print("index",index,len(self.__board.get_battle_zone()))
+		if self.__board.isempty_battle_zone() or index >= len(self.__board.get_battle_zone()) or index < 0 :
+			print("l'index est trop grand ou trop petit", index)
 		else:
-			print("l'index est trop grand", index)
+			self.__board.get_battle_zone()[index].set_isattack(True)
 
 	def attack(self,index_source,Player_target):
 		deal_damage_to_player(index_source,Player_target)
@@ -95,12 +108,15 @@ class Player(ABC):
 
 		Player.set_life(ennemi_life - source_dps)
 
-	def deal_damage_to_card(self,index_target,index_source,Player):
-		source_dps = self.__board.get_battle_zone()[index_source]
-		ennemi_life = Player.get_board()[index_target].get_life()
+	def deal_damage_to_card(self,index_target,index_source,Player_target):
+		source_dps = self.__board.get_battle_zone()[index_source].get_damage()
+		source_life = self.__board.get_battle_zone()[index_source].get_life()
 
-		Player.get_board()[index_target].set_toughness(ennemi_life - source_dps)
-	
+		ennemi_dps = Player_target.get_board().get_battle_zone()[index_target].get_damage()
+		ennemi_life = Player_target.get_board().get_battle_zone()[index_target].get_life()
+
+		Player_target.get_board().get_battle_zone()[index_target].set_life(ennemi_life - source_dps)
+		self.__board.get_battle_zone()[index_source].set_life(source_life - ennemi_dps)
 
 	
 	
@@ -113,7 +129,7 @@ class Player(ABC):
 		for card in self.__board.get_hand():
 			print("[" + card._name, end="] ")
 
-		print()
+		print("\n")
 		
 		if len(self.__board.get_hand()) == 0:
 			print("La main est vide")

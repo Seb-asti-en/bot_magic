@@ -165,6 +165,9 @@ class Card:
 	
 	def get_istarget(self):
 		return self._istarget
+
+	def get_effect(self):
+		return self._effects
 	#setter
 	def set_isattack(self,bool):
 		self._isattack = bool
@@ -322,86 +325,5 @@ class Card:
 		return string
 
 
-class CreatureCard(Card):
 
-	def __init__(self, card, effect):
-		super().__init__(card, effect)
-		self.__power = card[POWER]
-		self.__toughness = card[TOUGHNESS]
-		self.__damage = card[POWER]
-		self.__life = card[TOUGHNESS]
 
-	#Getter
-	def get_power(self):
-		return self.__power
-
-	def get_toughness(self):
-		return self.__toughness
-
-	def get_damage(self):
-		return self.__damage 
-		
-	def get_life(self):
-		return self.__life
-		
-	def buf_damage(self, quantity):
-		self.__damage = self.__damage + quantity
-
-	def reduce_damage(self, quantity):
-		self.__damage = self.__damage - quantity
-		
-	def buf_life(self, quantity):
-		self.__life = self.__life + quantity
-		
-	def reduce_life(self, quantity):
-		self.__life = self.__life - quantity
-	
-	#Setter
-	def set_damage(self,nb_damage):
-		self.__damage = nb_damage
-
-	def set_toughness(self,nb_toughness):
-		 self.__toughness = nb_toughness
-
-	def to_string(self):
-		string = super().to_string()
-		string += "POWER : " + str(self.__power) + " \n" 
-		string += "TOUGHNESS : " + str(self.__toughness) + "\n"
-		string += "DAMAGE DEAL : " + str(self.__damage) + " \n" 
-		string += "LIFE : " + str(self.__life) + "\n"
-		return string
-
-class SorceryCard(Card):
-
-	def __init__(self, card, effect):
-		super().__init__(card, effect)
-		
-	def to_string(self):
-		string = super().to_string()
-		return string
-		
-
-class LandCard(Card):
-
-	def __init__(self, card, effect):
-		super().__init__(card, effect)
-	
-	def to_string(self):
-		string = super().to_string()
-		return string
-
-class InstantCard(Card):
-
-	def __init__(self, card, effect):
-		super().__init__(card, effect)
-	
-	def to_string(self):
-		string = super().to_string()
-		return string
-
-if __name__ == "__main__":
-	try:
-		main()
-	except KeyboardInterrupt:
-		print ('Interrupted')
-		sys.exit(0)

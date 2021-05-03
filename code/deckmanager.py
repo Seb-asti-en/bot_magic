@@ -1,7 +1,10 @@
 import json, pymysql, sys, copy
 from deck import Deck
-from card import Card, CreatureCard, SorceryCard, LandCard, InstantCard
-
+from card import Card
+from creaturecard  import CreatureCard
+from sorcerycard import SorceryCard
+from landcard import LandCard
+from instantcard import InstantCard
 TYPE = 8
 
 CREATURE_CARD = 3

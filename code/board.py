@@ -48,6 +48,9 @@ class Board:
        self.__exile = exile
 
 
+    def isempty_battle_zone(self):
+        return (len(self.__battle_zone) == 0)
+
     def add_land_zone(self,Card):
         self.__land_zone.append(Card)
 
