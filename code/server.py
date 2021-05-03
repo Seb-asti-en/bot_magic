@@ -114,6 +114,8 @@ class Server:
 		game.choose_deck()
 		
 		game.start()
+
+		game.turn()
 		
 		print("Fermeture du serveur de jeu")
 

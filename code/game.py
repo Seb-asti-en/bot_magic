@@ -38,6 +38,19 @@ class Game:
 
 		os.system(command)
 
+	# Retourne le nombre de joueurs en vie
+	def players_alive(self):
+
+		alive = 0
+
+		for player in self.__players:
+
+			if(player[PLAYER].get_life() > 0): 
+
+				alive += 1
+
+		return alive
+
 	def wait_client(self):
 
 		# Mise en écoute de la socket TCP
@@ -65,9 +78,12 @@ class Game:
 			player_id += 1
 
 	def start(self):
-		self.test()
+
 		data = None
 		serialized_data = None
+
+		# # Tristan, jarte ça stp
+		# self.test()
 
 		# Initialisation de la partie
 		for player in self.__players:
@@ -95,9 +111,83 @@ class Game:
 		
 			# Exécution de la phase
 			self.mulligan(player[PLAYER].get_id())
-			
-		
 
+	def turn(self): 
+
+		return
+
+		data = None
+		serialized_data = None
+
+		while self.players_alive() > 1:
+
+			for player in self.__players:
+
+				# Vérification si le joueur est encore en vie
+				if player[PLAYER].get_life() > 0:
+
+					# # Dégagement des cartes
+					# player[PLAYER].untap()
+
+					# Réception depuis le client : Requête d'action (3)
+					serialized_data = player[SOCKET].recv(SEGMENT_SIZE)
+
+					# Désérialisation
+					data = pickle.loads(serialized_data)
+
+					if(data.get("type") == "USE_EFFECT"):
+
+						# Activation d'une ou plusieurs capacités (peut boucler)
+						self.effect_phase(player[PLAYER].get_id(),data)
+
+						serialized_data = player[SOCKET].recv(SEGMENT_SIZE)
+
+						# Désérialisation
+						data = pickle.loads(serialized_data)
+
+					if(data.get("type") == "INSTANT"):
+
+						# Engager éphémère (peut boucler)
+						self.instant_phase(player[PLAYER].get_id(),data)
+
+						serialized_data = player[SOCKET].recv(SEGMENT_SIZE)
+
+						# Désérialisation
+						data = pickle.loads(serialized_data)
+
+					# Pioche
+					self.draw_phase(player[PLAYER].get_id(),data)
+
+					# Ennemi activation d'une ou plusieurs capacités (peut boucler)
+					for ennemy in self.__players:
+
+						if(ennemy[PLAYER].get_id() != player[PLAYER].get_id()):
+
+							serialized_data = ennemy[SOCKET].recv(SEGMENT_SIZE)
+
+							# Désérialisation
+							data = pickle.loads(serialized_data)
+
+							self.effect_phase(ennemy[PLAYER].get_id(),data)
+
+					# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
+					self.main_phase(player[PLAYER].get_id(),data)
+
+					# Attaque ?
+
+						# Déclaration des monstres attaquants
+
+						# Ennemi engage éphémère (peut boucler)
+
+						# Ennemi déclare les monstres bloquants
+
+				 		# Activation d'une ou plusieurs capacités (peut boucler)
+
+				 		# Engager éphémère (peut boucler)
+
+				 		# Appliquer les dommages de combat
+
+				 	# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
 
 	def mulligan(self, index):
 
@@ -112,7 +202,7 @@ class Game:
 		# Pioche 7 cartes
 		self.__players[index][PLAYER].draw_card(7)
 
-		while mulligan_count <= 7:
+		while True:
 
 			# DEBUG
 			self.__players[index][PLAYER].debug_print_hand()
@@ -124,7 +214,7 @@ class Game:
 			data = pickle.loads(serialized_data)
 
 			# Continuer à mulligan ?
-			if(data.get("type") == "MULLIGAN"):
+			if( (data.get("type") == "MULLIGAN") and (mulligan_count < 7) ):
 
 				# Réponse
 				response = "ACCEPT"
@@ -184,7 +274,20 @@ class Game:
 				# Envoi vers le client : Refus (4)
 				self.__players[index][SOCKET].send(serialized_data)
 
-				continue 
+				continue
+
+	def effect_phase(self, index, request):
+		pass
+
+	def instant_phase(self, index, request):
+		pass
+
+	def draw_phase(self, index, request):
+		pass
+
+	def main_phase(self, index, request):
+		pass
+
 
 	def debug_print_all(self,Player1,Player2):
 		print("___________________________________________________________________________________________")
@@ -270,7 +373,7 @@ class Game:
 
 	
 		#Player2.choice_attack(0)
-	#	Player1.choice_block(Player2,0,0)
+		#	Player1.choice_block(Player2,0,0)
 
 
 		#	Player2.to_graveyard("BATTLE_ZONE", 0)
@@ -285,7 +388,5 @@ class Game:
 	
 
 		#detruire
-
-
 
 

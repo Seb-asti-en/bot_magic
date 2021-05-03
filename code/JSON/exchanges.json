@@ -21,10 +21,10 @@
 	"player" : 1,
 	"type" : "BLOCK",
 	"blockers" : {
-		"blockers1" : "battle_zone_pos2",
-		"blockers2" : "battle_zone_pos1",
-		"blockers3" : "battle_zone_pos2",
-		"blockers4" : "battle_zone_pos3",
+		"blockers1" : "ennemy_battle_zone_pos2",
+		"blockers2" : "ennemy_battle_zone_pos2",
+		"blockers3" : "ennemy_battle_zone_pos2",
+		"blockers4" : "ennemy_battle_zone_pos2",
 		"..." : "..."
 	}	
 }
