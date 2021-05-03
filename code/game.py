@@ -69,32 +69,32 @@ class Game:
 		data = None
 		serialized_data = None
 
-		# Initialisation de la partie
-		for player in self.__players:
+		# # Initialisation de la partie
+		# for player in self.__players:
+	
+		# 	# Sérialisation
+		# 	serialized_data = pickle.dumps(player[PLAYER])
 
-			# Sérialisation
-			serialized_data = pickle.dumps(player[PLAYER])
+		# 	# Envoi vers le player : Objet Player (1)
+		# 	player[SOCKET].send(serialized_data)
 
-			# Envoi vers le player : Objet Player (1)
-			player[SOCKET].send(serialized_data)
+		# # Phase Mulligan
+		# for player in self.__players:
 
-		# Phase Mulligan
-		for player in self.__players:
+		# 	# Réponse
+		# 	data = "PHASE_START"
 
-			# Réponse
-			data = "PHASE_START"
+		# 	# Rafraichissement de l'écran
+		# 	self.clear_terminal()			
 
-			# Rafraichissement de l'écran
-			self.clear_terminal()			
+		# 	# Sérialisation
+		# 	serialized_data = pickle.dumps(data)
 
-			# Sérialisation
-			serialized_data = pickle.dumps(data)
-
-			# Envoi vers le player : Démarrage de la phase (2)
-			player[SOCKET].send(serialized_data)
+		# 	# Envoi vers le player : Démarrage de la phase (2)
+		# 	player[SOCKET].send(serialized_data)
 		
-			# Exécution de la phase
-			self.mulligan(player[PLAYER].get_id())
+		# 	# Exécution de la phase
+		# 	self.mulligan(player[PLAYER].get_id())
 			
 		
 
@@ -201,32 +201,35 @@ class Game:
 		print("land_zone")
 		print("")
 		#battlezone j2
+		i=0
 		for card in Player2.get_board().get_battle_zone():
-			print("|",card._name,"|")
-		for i in range(len(Player2.get_board().get_battle_zone())):
 			if Player2.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,i,RESET+'|',end='  ')	
+				print('|'+ORANGE,card._name,RESET+'|',end='  ')	
 			elif Player2.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,i,RESET+'|',end='  ')
+				print('|'+ROUGE,card._name,RESET+'|',end='  ')
 			elif Player2.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,i,RESET+'|',end='  ')
+				print('|'+BLEU,card._name,RESET+'|',end='  ')
 			else:
-				print("|",i,"|",end='  ')
-			
+				print("|",card._name,"|",end='  ')
+			print("")	
+			print("|",card.get_damage(),",",card.get_life(),"|")
+			i+=1
 		print("")
 		print("          battle_zone")
 		#battlezone j1
+		i=0
 		for card in Player1.get_board().get_battle_zone():
-			print("|",card._name,"|")
-		for i in range(len(Player1.get_board().get_battle_zone())):	
 			if Player1.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,i,RESET+'|',end='  ')		
+				print('|'+ORANGE,card._name,RESET+'|',end='  ')		
 			elif Player1.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,i,RESET+'|',end='  ')
+				print('|'+ROUGE,card._name,RESET+'|',end='  ')
 			elif Player1.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,i,RESET+'|',end='  ')
+				print('|'+BLEU,card._name,RESET+'|',end='  ')
 			else:
-				print("|",i,"|",end='  ')
+				print("|",card._name,"|",end='  ')
+			print("")
+			print("|",card.get_damage(),",",card.get_life(),"|")
+			i= i+1
 			
 		print("")
 		print("")
@@ -239,16 +242,36 @@ class Game:
 
 		#	for i in range(len(Player1.get_board().get_hand())):
 		#		print("|",i,"|",end='  ')
-		Player2.debug_print_hand()
+		Player1.debug_print_hand()
 
 		print("")
 
 		print("")
 		print("graveyard","    ","vie","       ","deck")
-		print("|",len(Player2.get_board().get_graveyard()),"|","      ","|",Player2.get_life(),"|","      ","|",len(Player2.get_board().get_deck().get_cards()),"|")
+		print("|",len(Player1.get_board().get_graveyard()),"|","      ","|",Player1.get_life(),"|","      ","|",len(Player1.get_board().get_deck().get_cards()),"|")
 		print("__________________________________________________________________________________________")
 
 
+
+
+	def recovery(self,Player1,Player2):
+		pass
+
+
+	def killing(self,Player1,Player2):
+		i=0
+		for card in Player1.get_board().get_battle_zone():
+			if card.get_life() <= 0 :
+				Player1.to_graveyard("BATTLE_ZONE", i)
+			else:
+				i+=1
+
+		i=0
+		for card in Player2.get_board().get_battle_zone():
+			if card.get_life() <= 0 :
+				Player2.to_graveyard("BATTLE_ZONE", i)
+			else:
+				i+=1
 	def test(self):
 
 
@@ -260,18 +283,29 @@ class Game:
 		Player1  = Player(2,20,self.__deckmanager.copy_deck(0))
 
 		#pioche
-		Player1.draw_card(3)
-		Player2.draw_card(2)
+		Player1.draw_card(9)
+		Player2.draw_card(9)
 		self.debug_print_all(Player1,Player2)
 
+	
+			#clear la carte avant de faire le graveyard
+
 		#jouer
-		Player1.play_card(0)
-		Player2.play_card(0)
+		Player1.play_card(6)
+		Player1.play_card(1)
+		Player1.play_card(6)
+		
+		Player2.play_card(1)
+		Player2.play_card(5)
 
 	
-		#Player2.choice_attack(0)
-	#	Player1.choice_block(Player2,0,0)
+		Player2.choice_attack(0)
+		Player1.choice_block(Player2,0,1)
 
+		Player1.defense(Player2, 0, 1)
+		self.killing(Player1,Player2)
+
+		#afterblessing
 
 		#	Player2.to_graveyard("BATTLE_ZONE", 0)
 		#	self.debug_print_all(self.__players[0][PLAYER])
@@ -280,11 +314,11 @@ class Game:
 		#	print(Player1.get_board().get_battle_zone()[0]._isattack)
 		#	print("block")
 		#	print(Player1.get_board().get_battle_zone()[0]._isblocked)
-		self.debug_print_all(Player1,Player2)
+		
 		#	Player2.block(0)
-	
+		self.debug_print_all(Player1,Player2)
 
-		#detruire
+
 
 
 
