@@ -14,6 +14,7 @@ RESET = '\x1b[0m'
 
 DECK1 = "White"
 DECK2 = "Black"
+DECKTEST = "Test_Tristan"
 
 class Game:
 
@@ -71,7 +72,7 @@ class Game:
 		for player in self.__players:
 	
 			# Création automatique du deck sans demander au client
-			self.__deckmanager.add(DECK1)
+			self.__deckmanager.add(DECKTEST)
 			deck = self.__deckmanager.copy_deck(0)
 
 			# Création de l'objet Player en lui passant le deck
