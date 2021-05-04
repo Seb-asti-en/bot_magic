@@ -4,6 +4,7 @@ import os, sys, re
 import effect_enum as enum
 import pymysql # Installer le module avec pip
 
+
 class Card:
 
 	#constructeur
@@ -20,10 +21,19 @@ class Card:
 		self._text			= card["Text"]
 		self._effects		= self.init_effect(card)
 		self._collection 	= ""
+		self._isengaged 	= False
+		self._istarget		= False
+		
+
 		self._isblocked 	= False
 		self._isattack 		= False
-		self._isengaged 	= False
-		self._istarget		= False	
+		self._issummoning_sickness = False
+		self._tmp_end_Game_life = 0
+		self._tmp_end_Game_damage = 0
+
+
+
+
 
 	#Getters
 

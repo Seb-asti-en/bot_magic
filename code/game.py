@@ -435,6 +435,8 @@ class Game:
 		#soin
 		self.recovery(Player1, Player2)
 
+		
+
 		#affichage
 		self.debug_print_all(Player1,Player2)
 

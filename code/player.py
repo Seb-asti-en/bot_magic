@@ -1,4 +1,5 @@
 from board import Board
+from effect import Effect 
 
 class Player():
 
@@ -119,6 +120,7 @@ class Player():
 	# @param index_source l'index de la carte qui attaque
 	##
 	def attack(self,Player_target,index_source):
+
 		deal_damage_to_player(index_source,Player_target)
 
 	##
@@ -129,7 +131,6 @@ class Player():
 	##
 	def defense(self,Player_target,index_target,index_source):
 		self.deal_damage_to_card( Player_target,index_target, index_source)
-
 
 	##
 	# suprime le deck
@@ -156,6 +157,8 @@ class Player():
 	# @param index_source carte qui inflige les dps
 	##
 	def deal_damage_to_card(self,Player_target,index_target,index_source):
+
+		
 		source_dps = self.__board.get_battle_zone()[index_source].get_damage()
 		source_life = self.__board.get_battle_zone()[index_source].get_life()
 
@@ -165,6 +168,14 @@ class Player():
 		Player_target.get_board().get_battle_zone()[index_target].set_life(ennemi_life - source_dps)
 		self.__board.get_battle_zone()[index_source].set_life(source_life - ennemi_dps)
 
+		
+		
+
+		if "deathtouch" in self.__board.get_battle_zone()[index_source].get_effect():
+			Effect.deathtouch(Player_target.get_board().get_battle_zone()[index_target])
+		if "deathtouch" in Player_target.get_board().get_battle_zone()[index_target].get_effect():
+			Effect.deathtouch(self.__board.get_battle_zone()[index_source])
+		
 	def concede():
 		pass
 
