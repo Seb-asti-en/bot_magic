@@ -8,8 +8,6 @@ class Player():
 		self.__life = life
 		self.__board = Board(deck)
 
-	def get_id(self):
-		return self.__id
 	
 	#Getters
 	def get_board(self):
@@ -18,11 +16,20 @@ class Player():
 	def get_life(self):
 		return self.__life
 
+	def get_id(self):
+		return self.__id
+	
 	#Setter
 	def set_life(self,nb_life):
 		self.__life = nb_life
 
 	#Methodes
+
+
+	##
+	# permet de piocher un nombre n de carte
+	# @param nb_card  le nombre de card a piocher
+	##
 	def draw_card(self,nb_card=1):
 		#print("Eugneugneu vous piocheZ",nb_card,"carte(s) TAILLE")
 		if len(self.__board.get_deck().get_cards()) > 0:
@@ -34,6 +41,10 @@ class Player():
 
 			print("ça marche pas")
 		
+	##
+	# permet de jouer une cart et la place selon sont type
+	# @param index_card index de la carte
+	##
 	def play_card(self,index_card):
 		print("taille",len(self.__board.get_hand()),index_card)
 		if index_card < 0 or index_card >=  len(self.__board.get_hand()) :
@@ -54,20 +65,36 @@ class Player():
 				print(self.__board.get_hand()[index_card].to_string())
 				
 	def use_card(self,index_source):
-		self.__board.get_battle_zone()[index_source].get
+		pass
 
+	##
+	# permet de netoyer une carte de ses effets
+	# @param Card la carte a clear
+	##
 	def clear_card(self,Card):
-		Card.
-
+		Card.reset()
+		
+	##
+	# permet de mettre une carte dans le cimetiere de nimporte qu'elle liste
+	# @param source_list la liste  ou se trouve la carte a defausser 
+	# @param index_card l'index de la carte a defausser
+	##
 	def to_graveyard(self,source_list,index_card):
 
 		if source_list == "HAND":
 			if len(self.__board.get_hand()) != 0 :
+				clear_card(self.__board.get_hand()[index_card])
 				self.__board.add_graveyard(self.__board.get_hand().pop(index_card))
 		elif source_list == "BATTLE_ZONE":
 			if len(self.__board.get_battle_zone()) != 0 :
+				clear_card(self.__board.get_battle_zone()[index_card])
 				self.__board.add_graveyard(self.__board.get_battle_zone().pop(index_card))
-
+	##
+	# permet de choisir les cartes bloquante
+	# @param Player_target le joueur adverse
+	# @param index_target  l'index de la carte adverse a bloquer
+	# @param index_src	l'index de la carte qui doit bloquer
+	##
 	def choice_block(self,Player_target,index_target,index_src):
 		if self.__board.isempty_battle_zone() or index_src >= len(self.__board.get_battle_zone()) or index_src < 0:
 				print("l'index source est trop grand ou trop petit", index_src)
@@ -77,8 +104,11 @@ class Player():
 				Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
 			else:
 				print("selectioner un attaquant")
-		
 
+	###
+	#permet de choisir la carte qui attaque
+	# @param index l'index de la carte
+	###
 	def choice_attack(self,index):
 		print("index",index,len(self.__board.get_battle_zone()))
 		if self.__board.isempty_battle_zone() or index >= len(self.__board.get_battle_zone()) or index < 0 :
@@ -86,23 +116,49 @@ class Player():
 		else:
 			self.__board.get_battle_zone()[index].set_isattack(True)
 
-	def attack(self,index_source,Player_target):
+	##
+	# donne des degats aux joueurs  adverse
+	# @param Player_target le joueur adverse
+	# @param index_source l'index de la carte qui attaque
+	##
+	def attack(self,Player_target,index_source):
 		deal_damage_to_player(index_source,Player_target)
 
+	##
+	# donne des degats aux carte  adverse
+	# @param Player_target le joueur adverse
+	# @parem index_target l'index de la carte adverse
+	# @param index_source l'index de la carte qui attaque
+	##
 	def defense(self,Player_target,index_target,index_source):
 		self.deal_damage_to_card(index_target, index_source, Player_target)
 
+
+	##
+	# suprime le deck
+	##
 	def delete_deck(self):
 		for i in range( len(self.get_board().get_deck().get_cards())):
 			self.get_board().get_deck().get_cards().pop(0)
 
-	def deal_damage_to_player(self,index_source,Player):
+	##
+	# donne des degats au joueur adverse
+	# @param Player_target joueur adverse
+	# @param index_source carte qui inflige les dps
+	##
+	def deal_damage_to_player(self,Player_target,index_source):
 		source_dps = self.__board.get_battle_zone()[index_source]
-		ennemi_life = Player.get_life()
+		ennemi_life = Player_target.get_life()
 
 		Player.set_life(ennemi_life - source_dps)
 
-	def deal_damage_to_card(self,index_target,index_source,Player_target):
+	##
+	# donne des degats au carte adverse
+	# @param Player_target joueur adverse
+	# @param index_target l'index de la carte adverse
+	# @param index_source carte qui inflige les dps
+	##
+	def deal_damage_to_card(self,Player_target,index_target,index_source):
 		source_dps = self.__board.get_battle_zone()[index_source].get_damage()
 		source_life = self.__board.get_battle_zone()[index_source].get_life()
 

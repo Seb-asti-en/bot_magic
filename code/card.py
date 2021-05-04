@@ -6,6 +6,7 @@ import pymysql # Installer le module avec pip
 
 class Card:
 
+	#constructeur
 	def __init__(self, card):
 
 		self._id			= card["Id"]
@@ -23,6 +24,8 @@ class Card:
 		self._isattack 		= False
 		self._isengaged 	= False
 		self._istarget		= False	
+
+	#Getters
 
 	def get_id(self):
 		return self._id
@@ -69,6 +72,7 @@ class Card:
 	def get_istarget(self):
 		return self._istarget
 
+	#Setters
 	def set_id(self, ids):
 		self._id = ids
 	
@@ -96,6 +100,8 @@ class Card:
 	def set_istarget(self,bool):
 		self._istarget = bool
 
+	#Methodes
+	
 	def reset_bool(self):
 		self._isblocked 	= False
 		self._isattack 		= False

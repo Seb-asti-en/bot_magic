@@ -18,15 +18,18 @@ DECKTEST = "Test_Tristan"
 
 class Game:
 
+	#constructeur
 	def __init__(self, socket, slots = 2):
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
 		self.__slots = slots
 		self.__players = []
 
+	#Getters
 	def get_socket(self):
 		return self.__socket
 	
+	#Methodes
 	def netconfig(self):
 		return self.__socket.getsockname()
 
@@ -364,7 +367,11 @@ class Game:
 	def recovery(self,Player1,Player2):
 		pass
 
-
+	##
+	# tue les cartes qui on plus de vie 
+	# @param Player1 le joueur1
+	# @param Player2 le joueur2
+	##
 	def killing(self,Player1,Player2):
 		i=0
 		for card in Player1.get_board().get_battle_zone():
@@ -379,9 +386,9 @@ class Game:
 				Player2.to_graveyard("BATTLE_ZONE", i)
 			else:
 				i+=1
+
+
 	def test(self):
-
-
 		print('|'+BLEU+'BLEU'+RESET+'|')
 		print('|'+ROUGE+'ROUGE'+RESET+'|')
 
@@ -405,11 +412,11 @@ class Game:
 		Player2.play_card(1)
 		Player2.play_card(5)
 
-		Player2.choice_attack(0)
-		Player1.choice_block(Player2,0,1)
+	#	Player2.choice_attack(0)
+	#	Player1.choice_block(Player2,0,1)
 
-		Player1.defense(Player2, 0, 1)
-		self.killing(Player1,Player2)
+	#	Player1.defense(Player2, 0, 1)
+	#	self.killing(Player1,Player2)
 
 		#afterblessing
 
