@@ -363,9 +363,24 @@ class Game:
 
 
 
-
+	##
+	#soigne les blessures des creatures 
+	# @param Player1 le joueur1
+	# @param Player2 le joueur2 
+	##
 	def recovery(self,Player1,Player2):
-		pass
+		for card in Player1.get_board().get_battle_zone():
+			card.set_life(card.get_tmp_life())
+			card.set_damage(card.get_tmp_damage())
+			card._isattack = False
+			card._istarget = False
+			card._isblocked = False
+		for card in Player2.get_board().get_battle_zone():
+			card.set_life(card.get_tmp_life())
+			card.set_damage(card.get_tmp_damage())
+			card._isattack = False
+			card._istarget = False
+			card._isblocked = False
 
 	##
 	# tue les cartes qui on plus de vie 
@@ -389,46 +404,38 @@ class Game:
 
 
 	def test(self):
-		print('|'+BLEU+'BLEU'+RESET+'|')
-		print('|'+ROUGE+'ROUGE'+RESET+'|')
-
+		#creation du deck
 		self.__deckmanager.add(DECK2)
+
+		#creation des joueurs
 		Player2  = Player(1,20,self.__deckmanager.copy_deck(0))
 		Player1  = Player(2,20,self.__deckmanager.copy_deck(0))
 
 		#pioche
 		Player1.draw_card(9)
 		Player2.draw_card(9)
-		self.debug_print_all(Player1,Player2)
-
-	
-			#clear la carte avant de faire le graveyard
 
 		#jouer
-		Player1.play_card(6)
-		Player1.play_card(1)
-		Player1.play_card(6)
+		Player1.play_card(2)
+		Player1.play_card(5)
 		
-		Player2.play_card(1)
+		Player2.play_card(2)
 		Player2.play_card(5)
 
-	#	Player2.choice_attack(0)
-	#	Player1.choice_block(Player2,0,1)
+		#attaque du joueur1
+		Player1.choice_attack(1)
 
-	#	Player1.defense(Player2, 0, 1)
-	#	self.killing(Player1,Player2)
+		#blockage du joueur2
+		Player2.choice_block(Player1, 1, 0)
+		Player2.defense(Player1, 1, 0)
 
-		#afterblessing
+		#attribution damage
+		self.killing(Player1,Player2)
 
-		#	Player2.to_graveyard("BATTLE_ZONE", 0)
-		#	self.debug_print_all(self.__players[0][PLAYER])
-		
-		#	print("attack")
-		#	print(Player1.get_board().get_battle_zone()[0]._isattack)
-		#	print("block")
-		#	print(Player1.get_board().get_battle_zone()[0]._isblocked)
-		
-		#	Player2.block(0)
+		#soin
+		self.recovery(Player1, Player2)
+
+		#affichage
 		self.debug_print_all(Player1,Player2)
 
 

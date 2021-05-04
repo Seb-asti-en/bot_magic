@@ -33,12 +33,9 @@ class Player():
 	def draw_card(self,nb_card=1):
 		#print("Eugneugneu vous piocheZ",nb_card,"carte(s) TAILLE")
 		if len(self.__board.get_deck().get_cards()) > 0:
-
 			for i in range(nb_card):
-
 				self.__board.add_hand(self.__board.get_deck().get_cards().pop(0))	
 		else:
-
 			print("ça marche pas")
 		
 	##
@@ -83,11 +80,11 @@ class Player():
 
 		if source_list == "HAND":
 			if len(self.__board.get_hand()) != 0 :
-				clear_card(self.__board.get_hand()[index_card])
+				self.clear_card(self.__board.get_hand()[index_card])
 				self.__board.add_graveyard(self.__board.get_hand().pop(index_card))
 		elif source_list == "BATTLE_ZONE":
 			if len(self.__board.get_battle_zone()) != 0 :
-				clear_card(self.__board.get_battle_zone()[index_card])
+				self.clear_card(self.__board.get_battle_zone()[index_card])
 				self.__board.add_graveyard(self.__board.get_battle_zone().pop(index_card))
 	##
 	# permet de choisir les cartes bloquante
@@ -131,7 +128,7 @@ class Player():
 	# @param index_source l'index de la carte qui attaque
 	##
 	def defense(self,Player_target,index_target,index_source):
-		self.deal_damage_to_card(index_target, index_source, Player_target)
+		self.deal_damage_to_card( Player_target,index_target, index_source)
 
 
 	##
