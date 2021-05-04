@@ -85,35 +85,35 @@ class Game:
 		data = None
 		serialized_data = None
 
-		# # Tristan, jarte ça stp dans un main
-		# self.test()
 
-		# Initialisation de la partie
-		for player in self.__players:
+		self.test()
 
-			# Sérialisation
-			serialized_data = pickle.dumps(player[PLAYER])
+		# # Initialisation de la partie
+		# for player in self.__players:
 
-			# Envoi vers le player : Objet Player (1)
-			player[SOCKET].send(serialized_data)
+		# 	# Sérialisation
+		# 	serialized_data = pickle.dumps(player[PLAYER])
 
-		# Phase Mulligan
-		for player in self.__players:
+		# 	# Envoi vers le player : Objet Player (1)
+		# 	player[SOCKET].send(serialized_data)
 
-			# Réponse
-			data = "PHASE_START"
+		# # Phase Mulligan
+		# for player in self.__players:
 
-			# Rafraichissement de l'écran
-			self.clear_terminal()			
+		# 	# Réponse
+		# 	data = "PHASE_START"
 
-			# Sérialisation
-			serialized_data = pickle.dumps(data)
+		# 	# Rafraichissement de l'écran
+		# 	self.clear_terminal()			
 
-			# Envoi vers le player : Démarrage de la phase (2)
-			player[SOCKET].send(serialized_data)
+		# 	# Sérialisation
+		# 	serialized_data = pickle.dumps(data)
+
+		# 	# Envoi vers le player : Démarrage de la phase (2)
+		# 	player[SOCKET].send(serialized_data)
 		
-			# Exécution de la phase
-			self.mulligan(player[PLAYER].get_id())
+		# 	# Exécution de la phase
+		# 	self.mulligan(player[PLAYER].get_id())
 
 	def turn(self): 
 

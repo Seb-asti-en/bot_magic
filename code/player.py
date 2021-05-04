@@ -56,8 +56,11 @@ class Player():
 	def use_card(self,index_source):
 		self.__board.get_battle_zone()[index_source].get
 
+	def clear_card(self,Card):
+		Card.
 
 	def to_graveyard(self,source_list,index_card):
+
 		if source_list == "HAND":
 			if len(self.__board.get_hand()) != 0 :
 				self.__board.add_graveyard(self.__board.get_hand().pop(index_card))
@@ -75,6 +78,7 @@ class Player():
 			else:
 				print("selectioner un attaquant")
 		
+
 	def choice_attack(self,index):
 		print("index",index,len(self.__board.get_battle_zone()))
 		if self.__board.isempty_battle_zone() or index >= len(self.__board.get_battle_zone()) or index < 0 :

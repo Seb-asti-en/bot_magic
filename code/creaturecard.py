@@ -8,8 +8,10 @@ class CreatureCard(Card):
 		self.__toughness = card["Toughness"]
 		self.__damage = card["Power"]
 		self.__life = card["Toughness"]
-		self.__tristan_life = card["Toughness"]
-		self.__tristan_damage = card["Power"]
+		self.__buff_life = card["Toughness"]
+		self.__buff_damage = card["Power"]
+
+		
 
 	#Getter
 	def get_power(self):
@@ -24,8 +26,11 @@ class CreatureCard(Card):
 	def get_life(self):
 		return self.__life
 	
-	def get_tristan_damage(self):
-		return self.__tristan_damage
+	def get_buff_damage(self):
+		return self.__buff_damage	
+	
+	def get_buff_life(self):
+		return self.__buff_life
 
 	#Setter
 	def set_damage(self,nb_damage):
