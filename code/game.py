@@ -12,6 +12,9 @@ ROUGE = '\x1b[6;30;41m'
 ORANGE = '\x1b[6;30;43m'
 RESET = '\x1b[0m'
 
+DECK1 = "White"
+DECK2 = "Black"
+
 class Game:
 
 	def __init__(self, socket, slots = 2):
@@ -68,7 +71,7 @@ class Game:
 		for player in self.__players:
 	
 			# Création automatique du deck sans demander au client
-			self.__deckmanager.add()
+			self.__deckmanager.add(DECK1)
 			deck = self.__deckmanager.copy_deck(0)
 
 			# Création de l'objet Player en lui passant le deck
@@ -82,7 +85,7 @@ class Game:
 		data = None
 		serialized_data = None
 
-		# # Tristan, jarte ça stp
+		# # Tristan, jarte ça stp dans un main
 		# self.test()
 
 		# Initialisation de la partie
@@ -381,7 +384,7 @@ class Game:
 		print('|'+BLEU+'BLEU'+RESET+'|')
 		print('|'+ROUGE+'ROUGE'+RESET+'|')
 
-		self.__deckmanager.add()
+		self.__deckmanager.add(DECK2)
 		Player2  = Player(1,20,self.__deckmanager.copy_deck(0))
 		Player1  = Player(2,20,self.__deckmanager.copy_deck(0))
 

@@ -1,9 +1,6 @@
-from abc import ABC
 from board import Board
 
-
-
-class Player(ABC):
+class Player():
 
 	#Constructeur
 	def __init__(self, player_id, life, deck):
@@ -25,7 +22,6 @@ class Player(ABC):
 	def set_life(self,nb_life):
 		self.__life = nb_life
 
-
 	#Methodes
 	def draw_card(self,nb_card=1):
 		#print("Eugneugneu vous piocheZ",nb_card,"carte(s) TAILLE")
@@ -33,12 +29,10 @@ class Player(ABC):
 
 			for i in range(nb_card):
 
-				self.__board.add_hand(self.__board.get_deck().get_cards().pop(0))
-
+				self.__board.add_hand(self.__board.get_deck().get_cards().pop(0))	
 		else:
 
 			print("ça marche pas")
-	
 		
 	def play_card(self,index_card):
 		print("taille",len(self.__board.get_hand()),index_card)
@@ -59,8 +53,6 @@ class Player(ABC):
 				print("itsss INSTANT")
 				print(self.__board.get_hand()[index_card].to_string())
 				
-		
-
 	def use_card(self,index_source):
 		self.__board.get_battle_zone()[index_source].get
 
@@ -96,8 +88,6 @@ class Player(ABC):
 	def defense(self,Player_target,index_target,index_source):
 		self.deal_damage_to_card(index_target, index_source, Player_target)
 
-
-
 	def delete_deck(self):
 		for i in range( len(self.get_board().get_deck().get_cards())):
 			self.get_board().get_deck().get_cards().pop(0)
@@ -118,8 +108,6 @@ class Player(ABC):
 		Player_target.get_board().get_battle_zone()[index_target].set_life(ennemi_life - source_dps)
 		self.__board.get_battle_zone()[index_source].set_life(source_life - ennemi_dps)
 
-	
-	
 	def concede():
 		pass
 
@@ -140,16 +128,3 @@ class Player(ABC):
 		print("")
 		if len(self.__board.get_battle_zone()) == 0:
 			print("vide")
-
-	
-
-
-class HumanPlayer(Player):
-
-	def __init__(self, life, deck):
-		super().__init__(life, deck)
-
-class BotPlayer(Player):
-
-	def __init__(self, life, deck):
-		super().__init__(life, deck)

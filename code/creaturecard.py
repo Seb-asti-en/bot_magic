@@ -16,14 +16,14 @@ COLLECTION  	= 11
 
 class CreatureCard(Card):
 
-	def __init__(self, card, effect):
-		super().__init__(card, effect)
-		self.__power = card[POWER]
-		self.__toughness = card[TOUGHNESS]
-		self.__damage = card[POWER]
-		self.__life = card[TOUGHNESS]
-		self.__buff_life = self.__life
-		self.__tristan_damage = card[POWER]
+	def __init__(self, card):
+		super().__init__(card)
+		self.__power = card["Power"]
+		self.__toughness = card["Toughness"]
+		self.__damage = card["Power"]
+		self.__life = card["Toughness"]
+		self.__tristan_life = card["Toughness"]
+		self.__tristan_damage = card["Power"]
 
 	#Getter
 	def get_power(self):
@@ -38,8 +38,8 @@ class CreatureCard(Card):
 	def get_life(self):
 		return self.__life
 	
-	def get_damage(self):
-		return self.__damage
+	def get_tristan_damage(self):
+		return self.__tristan_damage
 
 	#Setter
 	def set_damage(self,nb_damage):
