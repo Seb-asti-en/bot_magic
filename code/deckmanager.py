@@ -5,25 +5,6 @@ from creaturecard  import CreatureCard
 from sorcerycard import SorceryCard
 from landcard import LandCard
 from instantcard import InstantCard
-TYPE = 8
-
-CREATURE_CARD = 3
-INSTANT_CARD = 7
-LAND_CARD = 8
-SORCERY_CARD = 14
-
-ID 				= 0
-NAME 			= 1
-COLOR 			= 2
-MANA_COST 		= 3
-IDENTITY 		= 4
-TEXT 			= 5
-POWER 			= 6
-TOUGHNESS 		= 7
-TYPE 			= 8
-SUBTYPE 		= 9
-SUPERTYPE 		= 10
-COLLECTION  	= 11
 
 class DeckManager:
 
