@@ -90,38 +90,36 @@ class Game:
 		serialized_data = None
 
 
-		self.test()
+		#self.test()
 
-		# # Initialisation de la partie
-		# for player in self.__players:
+		# Initialisation de la partie
+		for player in self.__players:
 
-		# 	# Sérialisation
-		# 	serialized_data = pickle.dumps(player[PLAYER])
+			# Sérialisation
+			serialized_data = pickle.dumps(player[PLAYER])
 
-		# 	# Envoi vers le player : Objet Player (1)
-		# 	player[SOCKET].send(serialized_data)
+			# Envoi vers le player : Objet Player (1)
+			player[SOCKET].send(serialized_data)
 
-		# # Phase Mulligan
-		# for player in self.__players:
+		# Phase Mulligan
+		for player in self.__players:
 
-		# 	# Réponse
-		# 	data = "PHASE_START"
+			# Réponse
+			data = "PHASE_START"
 
-		# 	# Rafraichissement de l'écran
-		# 	self.clear_terminal()			
+			# Rafraichissement de l'écran
+			self.clear_terminal()			
 
-		# 	# Sérialisation
-		# 	serialized_data = pickle.dumps(data)
+			# Sérialisation
+			serialized_data = pickle.dumps(data)
 
-		# 	# Envoi vers le player : Démarrage de la phase (2)
-		# 	player[SOCKET].send(serialized_data)
+			# Envoi vers le player : Démarrage de la phase (2)
+			player[SOCKET].send(serialized_data)
 		
-		# 	# Exécution de la phase
-		# 	self.mulligan(player[PLAYER].get_id())
+			# Exécution de la phase
+			self.mulligan(player[PLAYER].get_id())
 
 	def turn(self): 
-
-		return
 
 		data = None
 		serialized_data = None
@@ -175,7 +173,9 @@ class Game:
 							# Désérialisation
 							data = pickle.loads(serialized_data)
 
-							self.effect_phase(ennemy[PLAYER].get_id(),data)
+							if(data.get("type") == "USE_EFFECT"):
+
+								self.effect_phase(ennemy[PLAYER].get_id(),data)
 
 					# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
 					self.main_phase(player[PLAYER].get_id(),data)
@@ -192,9 +192,23 @@ class Game:
 
 				 		# Engager éphémère (peut boucler)
 
-				 		# Appliquer les dommages de combat
+				 		# Appliquer les dommages de combat (prévenir du décès avec une requête)
 
 				 	# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
+
+					if(player[PLAYER].get_id() > 0):
+				 		
+				 		player[PLAYER].set_life(0)
+
+				else :
+
+					data = "DEATH"		
+					serialized_data = pickle.dumps(data)
+					player[SOCKET].send(serialized_data)
+
+			data = "VICTORY"		
+			serialized_data = pickle.dumps(data)
+			self.__players[0][SOCKET].send(serialized_data)
 
 	def mulligan(self, index):
 
