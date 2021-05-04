@@ -29,8 +29,26 @@ def main():
 	player = client.connect_game()
 
 	# Lancement de la partie
-	client.play(player)
-	
+	result = client.play(player)
+
+	# Affichage des résultats de la partie
+	if(result == "VICTORY"):
+
+		print("Victory !")
+
+	elif(result == "DEFEAT"):
+
+		print("Defeat.")
+
+	else:
+
+		print("Quelque chose has gone terribly mal (:")
+
+	input("Appuyez sur ENTER pour quitter")
+
+	# Déconnexion du serveur
+	client.disconnect()
+
 	# Nettoyage en sortie
 	client.clear_terminal()
 
@@ -73,6 +91,11 @@ class Client:
 			command = "cls"
 
 		os.system(command)
+
+	def disconnect(self):
+
+		self.__game_socket.close()
+		self.__server_socket.close()
 
 	# Connexion au serveur UDP
 	def connect_server(self):
@@ -177,6 +200,7 @@ class Client:
 
 	def play(self, player):
 
+		result = ""
 		request = None
 		serialized_request = None
 		response = None
@@ -217,6 +241,18 @@ class Client:
 			if(response == "DECLINE"):
 				continue
 
+			elif(response == "DEATH"):
+				
+				result = "DEFEAT"
+				
+				break
+
+			elif(response == "VICTORY"):
+
+				result = "VICTORY"
+
+				break
+
 			# Réception depuis le serveur de jeu : Etat de la partie (5)
 			serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
 
@@ -225,6 +261,8 @@ class Client:
 
 			# Mise à jour des informations de jeu
 			self.update(player,gamestate)
+
+		return result
 
 	def action_menu(self, player):
 
