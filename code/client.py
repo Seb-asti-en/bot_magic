@@ -237,9 +237,49 @@ class Client:
 			# Déserialisation
 			response = pickle.loads(serialized_response)
 
+			input(response)
+
 			# En cas de refus, on recommence
 			if(response == "DECLINE"):
 				continue
+
+			elif(response == "PHASE_END"):
+				
+				while True:
+					
+					print("En attente de la fin du tour ennemi")
+
+					# Réception depuis le serveur de jeu : Démarrage de la phase (2)
+					serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
+
+					# Déserialisation
+					response = pickle.loads(serialized_response)
+
+					if(response == "PHASE_START"):
+						input("Putain de merde")
+
+						break
+
+					elif(response == "VICTORY"):
+						break
+
+					elif(response == "DEATH"):
+						break
+				
+				if(response == "PHASE_START"):
+					continue
+
+				elif(response == "DEATH"):
+				
+					result = "DEFEAT"
+					
+					break
+
+				elif(response == "VICTORY"):
+
+					result = "VICTORY"
+
+					break
 
 			elif(response == "DEATH"):
 				
@@ -260,7 +300,7 @@ class Client:
 			gamestate = pickle.loads(serialized_response)
 
 			# Mise à jour des informations de jeu
-			self.update(player,gamestate)
+			self.update(player, gamestate)
 
 		return result
 
