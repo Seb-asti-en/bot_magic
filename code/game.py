@@ -90,7 +90,9 @@ class Game:
 		serialized_data = None
 
 
-		self.test()
+
+		#self.test()
+
 
 		# # Initialisation de la partie
 		# for player in self.__players:
@@ -107,8 +109,8 @@ class Game:
 		# 	# Réponse
 		# 	data = "PHASE_START"
 
-		# 	# Rafraichissement de l'écran
-		# 	self.clear_terminal()			
+			# Rafraichissement de l'écran
+			# self.clear_terminal()			
 
 		# 	# Sérialisation
 		# 	serialized_data = pickle.dumps(data)
@@ -119,7 +121,19 @@ class Game:
 		# 	# Exécution de la phase
 		# 	self.mulligan(player[PLAYER].get_id())
 
-	def turn(self): 
+			player[SOCKET].recv(SEGMENT_SIZE)
+
+			print("DEBUG 3")
+
+			data = "PHASE_END"
+
+			serialized_data = pickle.dumps(data)
+
+			player[SOCKET].send(serialized_data)
+
+			print("DEBUG 4")
+
+	def turn(self):
 
 		data = None
 		serialized_data = None
@@ -128,8 +142,15 @@ class Game:
 
 			for player in self.__players:
 
+				print("DEBUG 1")
+
 				# Vérification si le joueur est encore en vie
-				if player[PLAYER].get_life() > 0:
+				if(player[PLAYER].get_life() > 0):
+
+					print("DEBUG 5")
+					data = "PHASE_START"
+					serialized_data = pickle.dumps(data)
+					player[SOCKET].send(serialized_data)
 
 					# # Dégagement des cartes
 					# player[PLAYER].untap()
@@ -164,18 +185,18 @@ class Game:
 					self.draw_phase(player[PLAYER].get_id(),data)
 
 					# Ennemi activation d'une ou plusieurs capacités (peut boucler)
-					for ennemy in self.__players:
+					# for ennemy in self.__players:
 
-						if(ennemy[PLAYER].get_id() != player[PLAYER].get_id()):
+					# 	if(ennemy[PLAYER].get_id() != player[PLAYER].get_id()):
 
-							serialized_data = ennemy[SOCKET].recv(SEGMENT_SIZE)
+					# 		serialized_data = ennemy[SOCKET].recv(SEGMENT_SIZE)
 
-							# Désérialisation
-							data = pickle.loads(serialized_data)
+					# 		# Désérialisation
+					# 		data = pickle.loads(serialized_data)
 
-							if(data.get("type") == "USE_EFFECT"):
+					# 		if(data.get("type") == "USE_EFFECT"):
 
-								self.effect_phase(ennemy[PLAYER].get_id(),data)
+					# 			self.effect_phase(ennemy[PLAYER].get_id(),data)
 
 					# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
 					self.main_phase(player[PLAYER].get_id(),data)
@@ -196,19 +217,42 @@ class Game:
 
 				 	# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
 
-					if(player[PLAYER].get_id() > 0):
-				 		
-				 		player[PLAYER].set_life(0)
+					print("DEBUG 3")
 
-				else :
+					data = "PHASE_END"
 
-					data = "DEATH"		
 					serialized_data = pickle.dumps(data)
+
 					player[SOCKET].send(serialized_data)
 
-			data = "VICTORY"		
-			serialized_data = pickle.dumps(data)
-			self.__players[0][SOCKET].send(serialized_data)
+					if(player[PLAYER].get_id() > 0):
+				 		
+						player[PLAYER].set_life(0)
+
+						print("Ciao bon week-end")
+
+				else:
+					print("DEBUG 2")
+					self.__players[0][SOCKET].recv(SEGMENT_SIZE)
+					data = "DEATH"
+					serialized_data = pickle.dumps(data)
+					player[SOCKET].send(serialized_data)
+			
+			for player in self.__players:
+
+				if(player[PLAYER].get_life() > 0):
+					data = "VICTORY"
+				
+				else:
+					data = "DEATH"
+
+				serialized_data = pickle.dumps(data)
+				player[SOCKET].send(serialized_data)
+
+			# self.__players[0][SOCKET].recv(SEGMENT_SIZE)
+			# data = "VICTORY"
+			# serialized_data = pickle.dumps(data)
+			# self.__players[0][SOCKET].send(serialized_data)
 
 	def mulligan(self, index):
 
@@ -307,6 +351,7 @@ class Game:
 		pass
 
 	def main_phase(self, index, request):
+		print("Main phase")
 		pass
 
 
