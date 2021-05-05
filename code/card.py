@@ -4,6 +4,8 @@ import os, sys, re
 import effect_enum as enum
 import pymysql # Installer le module avec pip
 
+from effect import Effect
+
 
 class Card:
 
@@ -19,7 +21,7 @@ class Card:
 		self._colors		= self.init_colors(card)
 		self._identity		= self.init_identity(card)
 		self._text			= card["Text"]
-		self._effects		= self.init_effect(card)
+		self._effect		= Effect(self.init_effect(card))
 		self._collection 	= ""
 		self._isengaged 	= False
 		self._istarget		= False
@@ -65,11 +67,8 @@ class Card:
 		return self._text
 
 	def get_effect(self):
-		temp = []
-		for i in self._effects:
-			temp.append(i)
-		return temp
-	
+		return self._effect
+
 	def get_isblocked(self):
 		return self._isblocked
 
@@ -155,15 +154,15 @@ class Card:
 		return self._identity
 
 	def init_effect(self, card):
-		self._effects = []
+		effects = []
 		effect_tampon = []
 		for i in enum.Effect:
 			effect_tampon.append(i.name)
-		temp = re.split('\n|, | \(', card["Text"])
+		temp = re.split('\n| strike|, | \(', card["Text"])
 		for eff in temp:
 			if eff.lower() in effect_tampon:
-				self._effects.append(eff.lower())
-		return self._effects
+				effects.append(eff.lower())
+		return effects
 		
 	def to_string(self):
 

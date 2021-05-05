@@ -158,24 +158,49 @@ class Player():
 	##
 	def deal_damage_to_card(self,Player_target,index_target,index_source):
 
-		
-		source_dps = self.__board.get_battle_zone()[index_source].get_damage()
-		source_life = self.__board.get_battle_zone()[index_source].get_life()
+		card_attk = self.__board.get_battle_zone()[index_source]
+		card_deff = Player_target.get_board().get_battle_zone()[index_target]
 
-		ennemi_dps = Player_target.get_board().get_battle_zone()[index_target].get_damage()
-		ennemi_life = Player_target.get_board().get_battle_zone()[index_target].get_life()
+		source_dps = card_deff.get_damage()
+		source_life = card_deff.get_life()
 
-		Player_target.get_board().get_battle_zone()[index_target].set_life(ennemi_life - source_dps)
-		self.__board.get_battle_zone()[index_source].set_life(source_life - ennemi_dps)
+		ennemi_dps = card_attk.get_damage()
+		ennemi_life = card_attk.get_life()
 
+		print("EFECT ATTACK",card_attk.get_effect().get_list_effects())
+		print("EFECT DEFF",card_deff.get_effect().get_list_effects())
+
+
+		if "first" or "double" in card_attk.get_effect().get_list_effects() :
+			card_deff.set_life(source_life - ennemi_dps)
+
+			if  card_deff.get_life() >= 0:
+				card_attk.set_life(ennemi_life - source_dps)
+
+				if "double" in card_attk.get_effect().get_list_effects() :
+					card_deff.set_life(card_deff.get_life() - ennemi_dps)
+		else:
+				card_deff.set_life(ennemi_life - source_dps)
+				card_attk.set_life(source_life - ennemi_dps)
+
+
+		for effect in card_attk.get_effect().get_list_effects():
+			card_attk.get_effect().end_battle_phase(effect, Player_target, self, card_deff)
+
+		# if "lifelink" in card_deff.get_effect().get_list_effects():
+		#  	card_deff.get_effect().lifelink(self,card_deff)
+		# if "lifelink" in card_attk.get_effect().get_list_effects():
+		#  	card_attk.get_effect().lifelink(Player_target,card_attk)
 		
+		# if "trample" in card_deff.get_effect().get_list_effects():
+		#  	card_deff.get_effect().trample(card_attk,ennemi_life)
+	
+		# if "deathtouch" in card_deff.get_effect().get_list_effects():
+		#  	card_deff.get_effect().deathtouch(card_attk)
+		# if "deathtouch" in card_attk.get_effect().get_list_effects():
+		#  	card_attk.get_effect().deathtouch(card_deff)
 		
 
-		if "deathtouch" in self.__board.get_battle_zone()[index_source].get_effect():
-			Effect.deathtouch(Player_target.get_board().get_battle_zone()[index_target])
-		if "deathtouch" in Player_target.get_board().get_battle_zone()[index_target].get_effect():
-			Effect.deathtouch(self.__board.get_battle_zone()[index_source])
-		
 	def concede():
 		pass
 

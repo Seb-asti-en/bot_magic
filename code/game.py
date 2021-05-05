@@ -90,34 +90,34 @@ class Game:
 		serialized_data = None
 
 
-		#self.test()
+		self.test()
 
-		# Initialisation de la partie
-		for player in self.__players:
+		# # Initialisation de la partie
+		# for player in self.__players:
 
-			# Sérialisation
-			serialized_data = pickle.dumps(player[PLAYER])
+		# 	# Sérialisation
+		# 	serialized_data = pickle.dumps(player[PLAYER])
 
-			# Envoi vers le player : Objet Player (1)
-			player[SOCKET].send(serialized_data)
+		# 	# Envoi vers le player : Objet Player (1)
+		# 	player[SOCKET].send(serialized_data)
 
-		# Phase Mulligan
-		for player in self.__players:
+		# # Phase Mulligan
+		# for player in self.__players:
 
-			# Réponse
-			data = "PHASE_START"
+		# 	# Réponse
+		# 	data = "PHASE_START"
 
-			# Rafraichissement de l'écran
-			self.clear_terminal()			
+		# 	# Rafraichissement de l'écran
+		# 	self.clear_terminal()			
 
-			# Sérialisation
-			serialized_data = pickle.dumps(data)
+		# 	# Sérialisation
+		# 	serialized_data = pickle.dumps(data)
 
-			# Envoi vers le player : Démarrage de la phase (2)
-			player[SOCKET].send(serialized_data)
+		# 	# Envoi vers le player : Démarrage de la phase (2)
+		# 	player[SOCKET].send(serialized_data)
 		
-			# Exécution de la phase
-			self.mulligan(player[PLAYER].get_id())
+		# 	# Exécution de la phase
+		# 	self.mulligan(player[PLAYER].get_id())
 
 	def turn(self): 
 
@@ -395,7 +395,7 @@ class Game:
 			card._isattack = False
 			card._istarget = False
 			card._isblocked = False
-
+			
 	##
 	# tue les cartes qui on plus de vie 
 	# @param Player1 le joueur1
@@ -411,7 +411,7 @@ class Game:
 
 		i=0
 		for card in Player2.get_board().get_battle_zone():
-			if card.get_life() <= 0 :
+			if card.get_life() <= 0:
 				Player2.to_graveyard("BATTLE_ZONE", i)
 			else:
 				i+=1
@@ -426,33 +426,45 @@ class Game:
 		Player1  = Player(2,20,self.__deckmanager.copy_deck(0))
 
 		#pioche
+		
 		Player1.draw_card(9)
+
 		Player2.draw_card(9)
 
 		#jouer
+	
 		Player1.play_card(2)
 		Player1.play_card(5)
 		
 		Player2.play_card(2)
 		Player2.play_card(5)
 
+
 		#attaque du joueur1
-		Player1.choice_attack(1)
+		Player1.choice_attack(0)
 
 		#blockage du joueur2
-		Player2.choice_block(Player1, 1, 0)
-		Player2.defense(Player1, 1, 0)
-
+		Player2.choice_block(Player1, 0, 1)
+		#affichage
+		
+		Player2.defense(Player1, 0, 1)
+		self.debug_print_all(Player1,Player2)
 		#attribution damage
 		self.killing(Player1,Player2)
+		print("BLESSURE")
+		#affichage
+		self.debug_print_all(Player1,Player2)
 
 		#soin
 		self.recovery(Player1, Player2)
 
-		
-
+		print("RECOVERY")
 		#affichage
 		self.debug_print_all(Player1,Player2)
+
+		
+
+		
 
 
 

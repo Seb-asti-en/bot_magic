@@ -1,13 +1,32 @@
 
 class Effect:
 	
-	def __init__(self,name):
-		self.__name	= name
-		
-	@staticmethod
-	def deathtouch(Card):
-		Card.set_life(-999999)
+	def __init__(self,list_effects):
+		self.__list_effects	= list_effects
 	
+
+
+	def get_list_effects(self):
+		return self.__list_effects
+
+
+	def deathtouch(player_target, Card_target,Player_source, Card_def):
+		Card_target.set_life(-999999)
+	
+
+	def end_battle_phase(effect,Player_target, Card_target,Player_source,card_def):
+		switcher = {
+			"deathtouch": deathtouch,
+			# "lifelink": lifelink,
+			# "trample": trample
+		}
+		# Get the function from switcher dictionary
+		func = switcher.get(effect, lambda player_target, Card_target,Player_source, card_def: "Invalid effect")
+		# Execute the function
+		func(player_target, Card_target,Player_source, Card_def)
+
+
+
 	# def defender(self):
 	# 	pass
 	
@@ -23,7 +42,7 @@ class Effect:
 	# def flying(self):
 	# 	pass
 	
-	def haste(self,Card):
+	def haste(Card):
 		Card._issummoning_sickness = True
 	
 	# def hexproof(self):
@@ -32,8 +51,8 @@ class Effect:
 	# def indestructible(self):
 	# 	pass
 	
-	def lifelink(self,Player,Card):
-	 	Player.set_life(Player.get_life()+Card.get_damage())
+	def lifelink(player_target, Card_target,Player_source, Card_def):
+	 	Player_source.set_life(Player_source.get_life()+Card_def.get_damage())
 	
 	# def menace(self):
 	# 	pass
@@ -44,10 +63,10 @@ class Effect:
 	# def reach(self):
 	# 	pass
 	
-	def trample(self,Player_target,Card_attk,Card_def):
-		res = Card_attk.get_damage() - Card_def.get_life()
+	def trample(player_target, Card_target,Player_source, Card_def):
+		res = Card_attk.get_damage() - tmp_ennemi_life
 		if res >=0:
-			Player_target.set_life(Playet_target.get_life()-res)
+			Player_target.set_life(Player_target.get_life() - res)
 
 	def vigilance(self,Card):
 		Card._isengaged = False
