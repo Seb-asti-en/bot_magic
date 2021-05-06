@@ -104,21 +104,24 @@ class Player():
 	def choice_block(self,Player_target,index_target,index_src):
 		if self.__board.isempty_battle_zone() or index_src >= len(self.__board.get_battle_zone()) or index_src < 0:
 				print("l'index source est trop grand ou trop petit", index_src)
-		else:
+		elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[index_target],self.__board.get_battle_zone()[index_src]) == True :
 			self.__board.get_battle_zone()[index_src].set_isblocked(True)
 			if Player_target.get_board().get_battle_zone()[index_target].get_isattack() == True:
 				Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
 			else:
 				print("selectioner un attaquant")
+		else:
+			print("vous ne pouvez pas bloquer")
 
 	###
 	# permet de choisir la carte qui attaque
 	# @param index l'index de la carte
 	###
 	def choice_attack(self,index):
-		print("index",index,len(self.__board.get_battle_zone()))
 		if self.__board.isempty_battle_zone() or index >= len(self.__board.get_battle_zone()) or index < 0 :
 			print("l'index est trop grand ou trop petit", index)
+		elif Effect.early_choice_attack(self.__board.get_battle_zone()[index]) == False :
+			print("la carte ne peut pas attaquer")
 		else:
 			self.__board.get_battle_zone()[index].set_isattack(True)
 
@@ -168,29 +171,13 @@ class Player():
 		card_attk = self.__board.get_battle_zone()[index_source]
 		card_deff = Player_target.get_board().get_battle_zone()[index_target]
 
-		source_dps = card_attk.get_damage()
-		source_life = card_attk.get_life()
-
-		ennemi_dps = card_deff.get_damage()
-		ennemi_life = card_deff.get_life()
-
 		print("EFECT ATTACK",card_attk.get_effect().get_list_effects())
 		print("EFECT DEFF",card_deff.get_effect().get_list_effects())
 
-
-		if "first" or "double" in card_attk.get_effect().get_list_effects() :
-			#la deff se prend le coup
-			card_deff.set_life(ennemi_life - source_dps)
-
-			if  card_deff.get_life() >= 0:
-				#lattk se prend le coup
-				card_attk.set_life(source_life - ennemi_dps)
-
-				if "double" in card_attk.get_effect().get_list_effects() :
-					card_deff.set_life(card_deff.get_life() - source_dps)
-		else:
-				card_deff.set_life(ennemi_life - source_dps)
-				card_attk.set_life(source_life - ennemi_dps)
+		#regarde si il y a un effet avant l'attaque
+		if Effect.early_battle_phase(card_deff,card_attk) == False:
+			card_deff.set_life(card_deff.get_life() - card_attk.get_damage())
+			card_attk.set_life(card_attk.get_life() - card_deff.get_damage())
 
 		#effets apres l'attaque
 		Effect.end_battle_phase(Player_target,card_deff,self,card_attk)

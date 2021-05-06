@@ -360,15 +360,12 @@ class Game:
 		print("|",len(Player2.get_board().get_graveyard()),"|","      ","|",Player2.get_life(),"|","      ","|",len(Player2.get_board().get_deck().get_cards()),"|")
 		print("graveyard","    ","vie","       ","deck")
 		print("")
-		#hand j2
-		#	for i in range(len(Player2.get_board().get_hand())):
-		#		print("|",i,"|",end='  ')
+		
 		Player2.debug_print_hand()
-		print("          hand")
-		print("")
 		print("|",len(Player2.get_board().get_land_zone()),"|")
 		print("land_zone")
 		print("")
+		
 		#battlezone j2
 		i=0
 		for card in Player2.get_board().get_battle_zone():
@@ -381,10 +378,14 @@ class Game:
 			else:
 				print("|",card._name,"|",end='  ')
 			print("")	
+			print("|",card.get_effect().get_list_effects(),"|")
 			print("|",card.get_damage(),",",card.get_life(),"|")
 			i+=1
+
 		print("")
 		print("          battle_zone")
+		print("")
+
 		#battlezone j1
 		i=0
 		for card in Player1.get_board().get_battle_zone():
@@ -397,25 +398,18 @@ class Game:
 			else:
 				print("|",card._name,"|",end='  ')
 			print("")
+			print("|",card.get_effect().get_list_effects(),"|")
 			print("|",card.get_damage(),",",card.get_life(),"|")
 			i= i+1
 			
-		print("")
+		
 		print("")
 		print("land_zone")
 		print("|",len(Player1.get_board().get_land_zone()),"|")
 		print("")
-		#hand j1
-		print("          hand")
 
-
-		#	for i in range(len(Player1.get_board().get_hand())):
-		#		print("|",i,"|",end='  ')
 		Player1.debug_print_hand()
 
-		print("")
-
-		print("")
 		print("graveyard","    ","vie","       ","deck")
 		print("|",len(Player1.get_board().get_graveyard()),"|","      ","|",Player1.get_life(),"|","      ","|",len(Player1.get_board().get_deck().get_cards()),"|")
 		print("__________________________________________________________________________________________")
@@ -472,9 +466,9 @@ class Game:
 
 		#pioche
 		
-		Player1.draw_card(9)
+		Player1.draw_card(7)
 
-		Player2.draw_card(9)
+		Player2.draw_card(7)
 
 		#jouer
 	
