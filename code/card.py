@@ -1,15 +1,12 @@
-#!/usr/bin/env python3
-
-import os, sys, re
+############################ Import ############################
+import re
 import effect_enum as enum
-import pymysql # Installer le module avec pip
-
 from effect import Effect
 
 
 class Card:
 
-	#constructeur
+	############################ Constructeur ############################
 	def __init__(self, card):
 
 		self._id			= card["Id"]
@@ -26,19 +23,16 @@ class Card:
 		self._isengaged 	= False
 		self._istarget		= False
 		
-
 		self._isblocked 	= False
 		self._isattack 		= False
 		self._issummoning_sickness = False
-		self._tmp_end_Game_life = 0
-		self._tmp_end_Game_damage = 0
-
-
-
-
-
-	#Getters
-
+# =============================================================================
+# 		self._tmp_end_Game_life = 0
+# 		self._tmp_end_Game_damage = 0
+# =============================================================================
+		
+		
+	############################ Getters ############################
 	def get_id(self):
 		return self._id
 		
@@ -81,7 +75,8 @@ class Card:
 	def get_istarget(self):
 		return self._istarget
 
-	#Setters
+
+	############################ Setters ############################
 	def set_id(self, ids):
 		self._id = ids
 	
@@ -109,14 +104,21 @@ class Card:
 	def set_istarget(self,bool):
 		self._istarget = bool
 
-	#Methodes
-	
+
+	############################ Méthode ############################
+	##
+	# Reset les valeurs possiblement changer des booleen a false
+	##
 	def reset_bool(self):
 		self._isblocked 	= False
 		self._isattack 		= False
 		self._isengaged 	= False
 		self._istarget		= False	
 
+	##
+	# Initialise le cout en mana d'une carte
+	# @param card 	la carte qu'il faut initialiser
+	##
 	def init_mana_cost(self, card):
 		self._mana_cost = {'X' : 0,'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
 		temp = card["Mana_cost"]
@@ -131,6 +133,10 @@ class Card:
 				self._mana_cost[x] = 1
 		return self._mana_cost
 	
+	##
+	# Initialise la couleur d'une carte
+	# @param card 	la carte qu'il faut initialiser
+	##
 	def init_colors(self, card):
 		self._colors = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
 		temp = card["Colors"]
@@ -142,6 +148,10 @@ class Card:
 				self._colors[x] = 1
 		return self._colors
 	
+	##
+	# Initialise l'identitée d'une carte
+	# @param card 	la carte qu'il faut initialiser
+	##
 	def init_identity(self, card):
 		self._identity = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
 		temp = card["Identity"]
@@ -153,6 +163,10 @@ class Card:
 				self._identity[x] = 1
 		return self._identity
 
+	##
+	# Récupère les effets evergreen d'une carte par rapport a son texte
+	# @param card 	la carte qu'il faut analyser
+	##
 	def init_effect(self, card):
 		effects = []
 		effect_tampon = []
@@ -164,10 +178,13 @@ class Card:
 				effects.append(eff.lower())
 		return effects
 		
+	##
+	# Méthode qui retourne l'affichage d'une carte
+	##
 	def to_string(self):
 
 		string = ""
-
+		
 		string += "CARD TYPE : " + str(self._type) + " \n" 
 		string += "ID : " + str(self._id) + " \n" 
 		string += "COLLECTION : " + str(self._collection) + "\n"
@@ -248,6 +265,7 @@ class Card:
 			string += "TEXT : " + self._text + "\n"
 		if(self._effects != []):
 			string += "EFFECT : " + str(self._effects) + "\n"
+			
 		return string
 
 class EnchantmentCard(Card):
