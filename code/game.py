@@ -18,18 +18,18 @@ DECKTEST = "Test_Tristan"
 
 class Game:
 
-	#constructeur
+	############################ constructeur ############################
 	def __init__(self, socket, slots = 2):
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
 		self.__slots = slots
 		self.__players = []
 
-	#Getters
+	############################ Getters ############################
 	def get_socket(self):
 		return self.__socket
 	
-	#Methodes
+	############################ Methodes ############################
 	def netconfig(self):
 		return self.__socket.getsockname()
 
@@ -91,7 +91,7 @@ class Game:
 
 
 
-		#self.test()
+		self.test()
 
 
 		# # Initialisation de la partie
@@ -121,17 +121,17 @@ class Game:
 		# 	# Exécution de la phase
 		# 	self.mulligan(player[PLAYER].get_id())
 
-			player[SOCKET].recv(SEGMENT_SIZE)
+			# player[SOCKET].recv(SEGMENT_SIZE)
 
-			print("DEBUG 3")
+			# print("DEBUG 3")
 
-			data = "PHASE_END"
+			# data = "PHASE_END"
 
-			serialized_data = pickle.dumps(data)
+			# serialized_data = pickle.dumps(data)
 
-			player[SOCKET].send(serialized_data)
+			# player[SOCKET].send(serialized_data)
 
-			print("DEBUG 4")
+			# print("DEBUG 4")
 
 	def turn(self):
 
@@ -484,7 +484,7 @@ class Game:
 		Player2.play_card(2)
 		Player2.play_card(5)
 
-
+		self.debug_print_all(Player1,Player2)
 		#attaque du joueur1
 		Player1.choice_attack(0)
 
@@ -492,7 +492,8 @@ class Game:
 		Player2.choice_block(Player1, 0, 1)
 		#affichage
 		
-		Player2.defense(Player1, 0, 1)
+		Player1.attack(Player2, 1, 0)
+
 		self.debug_print_all(Player1,Player2)
 		#attribution damage
 		self.killing(Player1,Player2)

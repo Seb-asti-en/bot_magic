@@ -61,7 +61,7 @@ class CreatureCard(Card):
 		return string
 
 	##
-	# reset a la carte avec les stats par defaut
+	# reset la carte avec les stats par defaut
 	##
 	def reset(self):
 		self.__damage = self.__power

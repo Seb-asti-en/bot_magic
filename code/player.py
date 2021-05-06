@@ -3,14 +3,14 @@ from effect import Effect
 
 class Player():
 
-	#Constructeur
+	############################ Constructeur ############################
 	def __init__(self, player_id, life, deck):
 		self.__id = player_id
 		self.__life = life
 		self.__board = Board(deck)
 
 	
-	#Getters
+	############################ Getters ############################
 	def get_board(self):
 		return self.__board
 	
@@ -20,12 +20,16 @@ class Player():
 	def get_id(self):
 		return self.__id
 	
-	#Setter
+
+	############################ Setter ############################
+	def set_id(self,nb_id):
+		self.__id = nb_id
+	
 	def set_life(self,nb_life):
 		self.__life = nb_life
 
-	#Methodes
 
+	############################ Methodes ############################
 
 	##
 	# permet de piocher un nombre n de carte
@@ -61,7 +65,10 @@ class Player():
 			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
 				print("itsss INSTANT")
 				print(self.__board.get_hand()[index_card].to_string())
-				
+
+	##
+	# permet d'utiliser des cartes
+	##	
 	def use_card(self,index_source):
 		pass
 
@@ -87,6 +94,7 @@ class Player():
 			if len(self.__board.get_battle_zone()) != 0 :
 				self.clear_card(self.__board.get_battle_zone()[index_card])
 				self.__board.add_graveyard(self.__board.get_battle_zone().pop(index_card))
+	
 	##
 	# permet de choisir les cartes bloquante
 	# @param Player_target le joueur adverse
@@ -104,7 +112,7 @@ class Player():
 				print("selectioner un attaquant")
 
 	###
-	#permet de choisir la carte qui attaque
+	# permet de choisir la carte qui attaque
 	# @param index l'index de la carte
 	###
 	def choice_attack(self,index):
@@ -119,8 +127,7 @@ class Player():
 	# @param Player_target le joueur adverse
 	# @param index_source l'index de la carte qui attaque
 	##
-	def attack(self,Player_target,index_source):
-
+	def direct_attack(self,Player_target,index_source):
 		deal_damage_to_player(index_source,Player_target)
 
 	##
@@ -129,7 +136,7 @@ class Player():
 	# @parem index_target l'index de la carte adverse
 	# @param index_source l'index de la carte qui attaque
 	##
-	def defense(self,Player_target,index_target,index_source):
+	def attack(self,Player_target,index_target,index_source):
 		self.deal_damage_to_card( Player_target,index_target, index_source)
 
 	##
@@ -157,53 +164,46 @@ class Player():
 	# @param index_source carte qui inflige les dps
 	##
 	def deal_damage_to_card(self,Player_target,index_target,index_source):
-
+		#defini les cartes(pour que ça soit plus court a ecrire)
 		card_attk = self.__board.get_battle_zone()[index_source]
 		card_deff = Player_target.get_board().get_battle_zone()[index_target]
 
-		source_dps = card_deff.get_damage()
-		source_life = card_deff.get_life()
+		source_dps = card_attk.get_damage()
+		source_life = card_attk.get_life()
 
-		ennemi_dps = card_attk.get_damage()
-		ennemi_life = card_attk.get_life()
+		ennemi_dps = card_deff.get_damage()
+		ennemi_life = card_deff.get_life()
 
 		print("EFECT ATTACK",card_attk.get_effect().get_list_effects())
 		print("EFECT DEFF",card_deff.get_effect().get_list_effects())
 
 
 		if "first" or "double" in card_attk.get_effect().get_list_effects() :
-			card_deff.set_life(source_life - ennemi_dps)
+			#la deff se prend le coup
+			card_deff.set_life(ennemi_life - source_dps)
 
 			if  card_deff.get_life() >= 0:
-				card_attk.set_life(ennemi_life - source_dps)
+				#lattk se prend le coup
+				card_attk.set_life(source_life - ennemi_dps)
 
 				if "double" in card_attk.get_effect().get_list_effects() :
-					card_deff.set_life(card_deff.get_life() - ennemi_dps)
+					card_deff.set_life(card_deff.get_life() - source_dps)
 		else:
 				card_deff.set_life(ennemi_life - source_dps)
 				card_attk.set_life(source_life - ennemi_dps)
 
-
-		for effect in card_attk.get_effect().get_list_effects():
-			card_attk.get_effect().end_battle_phase(effect, Player_target, self, card_deff)
-
-		# if "lifelink" in card_deff.get_effect().get_list_effects():
-		#  	card_deff.get_effect().lifelink(self,card_deff)
-		# if "lifelink" in card_attk.get_effect().get_list_effects():
-		#  	card_attk.get_effect().lifelink(Player_target,card_attk)
-		
-		# if "trample" in card_deff.get_effect().get_list_effects():
-		#  	card_deff.get_effect().trample(card_attk,ennemi_life)
+		#effets apres l'attaque
+		Effect.end_battle_phase(Player_target,card_deff,self,card_attk)
 	
-		# if "deathtouch" in card_deff.get_effect().get_list_effects():
-		#  	card_deff.get_effect().deathtouch(card_attk)
-		# if "deathtouch" in card_attk.get_effect().get_list_effects():
-		#  	card_attk.get_effect().deathtouch(card_deff)
-		
-
+	##
+	#permet de conceder
+	##
 	def concede():
 		pass
 
+	##
+	# affiche  le nom des carte de la main
+	##
 	def debug_print_hand(self):
 		print("Hand (" + str(len(self.__board.get_hand())) + "):")
 		
@@ -215,6 +215,9 @@ class Player():
 		if len(self.__board.get_hand()) == 0:
 			print("La main est vide")
 
+	##
+	# affiche  le nom des carte de la battlezone
+	##
 	def debug_print_battle_zone(self):
 		for card in self.__board.get_battle_zone():
 			print("|",card._name,"|",end=' ')
