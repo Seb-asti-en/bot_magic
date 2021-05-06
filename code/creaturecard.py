@@ -1,8 +1,10 @@
+############################ Import ############################
 from card import Card
+
 
 class CreatureCard(Card):
 
-	#constructeur
+	############################ Constructeur ############################
 	def __init__(self, card):
 		super().__init__(card)
 		self.__power = card["Power"]
@@ -13,7 +15,7 @@ class CreatureCard(Card):
 		self.__tmp_damage = card["Power"]
 
 		
-	#Getter
+	############################ Getters ############################
 	def get_power(self):
 		return self.__power
 
@@ -32,7 +34,8 @@ class CreatureCard(Card):
 	def get_tmp_life(self):
 		return self.__tmp_life
 
-	#Setter
+
+	############################ Setters ############################
 	def set_damage(self,nb_damage):
 		self.__damage = nb_damage
 
@@ -40,18 +43,38 @@ class CreatureCard(Card):
 		self.__life = nb_life
 
 
+	############################ Méthode ############################
+	##
+	# Augmente les dégats de la carte 
+	# @param quantity 	La quantitée de dégats ajouté
+	##
 	def buf_damage(self, quantity):
 		self.__damage = self.__damage + quantity
-
+	
+	##
+	# Réduit les dégats de la carte 
+	# @param quantity 	La quantitée de dégats retiré
+	##
 	def reduce_damage(self, quantity):
 		self.__damage = self.__damage - quantity
 		
+	##
+	# Augmente les point de vie de la carte 
+	# @param quantity 	La quantitée de point de vie ajouté
+	##
 	def buf_life(self, quantity):
 		self.__life = self.__life + quantity
 		
+	##
+	# Réduit les point de vie de la carte 
+	# @param quantity 	La quantitée de point de vie retiré
+	##
 	def reduce_life(self, quantity):
 		self.__life = self.__life - quantity
 	
+	##
+	# Extension de la fonction to string de la classe card 
+	##
 	def to_string(self):
 		string = super().to_string()
 		string += "POWER : " + str(self.__power) + " \n" 
@@ -61,7 +84,7 @@ class CreatureCard(Card):
 		return string
 
 	##
-	# reset a la carte avec les stats par defaut
+	# Reset la carte aux stats par defaut
 	##
 	def reset(self):
 		self.__damage = self.__power
