@@ -465,30 +465,36 @@ class Game:
 		Player1  = Player(2,20,self.__deckmanager.copy_deck(0))
 
 		#pioche
-		
 		Player1.draw_card(7)
-
 		Player2.draw_card(7)
 
 		#jouer
-	
-		Player1.play_card(2)
-		Player1.play_card(5)
-		
-		Player2.play_card(2)
-		Player2.play_card(5)
-
 		self.debug_print_all(Player1,Player2)
+		a = int(input("saisir un index pour jouer une carte : "))
+		Player1.play_card(a)
+		Player2.play_card(a)
+		self.debug_print_all(Player1,Player2)
+
+		a = int(input("saisir un index pour jouer une carte : "))
+		Player1.play_card(a)
+		Player2.play_card(a)
+		self.debug_print_all(Player1,Player2)
+
 		#attaque du joueur1
-		Player1.choice_attack(0)
+		a = int(input("saisir l'index de l'attaque : "))
+		Player1.choice_attack(a)
+		self.debug_print_all(Player1,Player2)
 
 		#blockage du joueur2
-		Player2.choice_block(Player1, 0, 1)
-		#affichage
-		
-		Player1.attack(Player2, 1, 0)
-
+		a = int(input("saisir l'index du blockeur : "))
+		b = int(input("saisir l'index de l'attaqueur : "))
+		Player2.choice_block(Player1, a, b)
 		self.debug_print_all(Player1,Player2)
+
+		#attaque
+		Player1.attack(Player2, b, a)
+		self.debug_print_all(Player1,Player2)
+
 		#attribution damage
 		self.killing(Player1,Player2)
 		print("BLESSURE")
