@@ -1,37 +1,33 @@
 import socket, pickle, sys, os
-from player import Player
 from deckmanager import DeckManager
+from player import Player
+
+import time
+
+DEBUG = False
 
 SOCKET = 0
 PLAYER = 1
-LIFE = 20
-SEGMENT_SIZE = 65536
-
-NOIR = '\x1b[6;37;40m'
-ROUGE = '\x1b[6;30;41m'
-ORANGE = '\x1b[6;30;43m'
-BLEU = '\x1b[6;30;44m'
-BLANC = '\x1b[6;30;47m'
-RESET = '\x1b[0m'
+LIFE = 10
 
 DECK1 = "White"
 DECK2 = "Black"
-DECKTEST = "Test_Tristan"
 
 class Game:
 
-	############################ constructeur ############################
-	def __init__(self, socket, slots = 2):
+	def __init__(self, socket, slots = 3):
+
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
 		self.__slots = slots
 		self.__players = []
 
-	############################ Getters ############################
 	def get_socket(self):
 		return self.__socket
+
+	def get_deckmanager(self):
+		return self.__deckmanager
 	
-	############################ Methodes ############################
 	def netconfig(self):
 		return self.__socket.getsockname()
 
@@ -59,6 +55,92 @@ class Game:
 				alive += 1
 
 		return alive
+
+	def send_signal(self, index, data):
+
+		serialized_data = None
+
+		# Sérialisation
+		serialized_data = pickle.dumps(data)
+
+		# Envoi vers le client : Taille du segment (1)
+		self.send_size(index,serialized_data)
+
+		# Envoi vers le client : Segment (signal) (2)
+		self.__players[index][SOCKET].send(serialized_data)
+		
+		if(DEBUG):
+			print(data,"(envoyé)")
+
+	# TODO : (à modifier plus tard selon le format JSON)
+	def send_gamestate(self, index):
+
+		serialized_data = None
+
+		# Sérialisation 
+		serialized_data = pickle.dumps(self.__players[index][PLAYER])
+
+		# Envoi vers le client : Taille du segment (1)
+		self.send_size(index,serialized_data)
+
+		# Envoi vers le client : Segment (gamestate) (2)
+		self.__players[index][SOCKET].send(serialized_data)
+
+		if(DEBUG):
+			print("GAMESTATE (envoyé)")
+
+	def send_size(self, index, segment):
+
+		data = ""
+		serialized_data = None
+
+		# Calcul de la taille du segment à envoyer passé en paramètre
+		data = '%16s' %len(segment)
+
+		# Sérialisation
+		serialized_data = data.encode()
+
+		# Envoi vers le client : Taille du segment
+		self.__players[index][SOCKET].send(serialized_data)
+
+		if(DEBUG):
+			print(int(data),"BYTES (envoyé)")
+
+	def recv_action(self, index):
+		
+		size = 0
+		serialized_data = None
+		data = None
+
+		# Réception depuis le client : Taille du segment (1)
+		size = self.recv_size(index)
+
+		# Réception depuis le client : Segment (action) (2)
+		serialized_data = self.__players[index][SOCKET].recv(size)
+
+		# Désérialisation
+		data = pickle.loads(serialized_data)
+
+		if(DEBUG):
+			print(data,"(reçu)")
+		
+		return data
+
+	def recv_size(self,index):
+
+		data = 0
+		serialized_data = None
+
+		# Réception depuis le client : Taille du segment
+		serialized_data = self.__players[index][SOCKET].recv(16)
+
+		# Désérialisation
+		data = int(serialized_data.decode())
+
+		if(DEBUG):
+			print(data,"BYTES (reçu)")
+
+		return data
 
 	def wait_client(self):
 
@@ -88,120 +170,128 @@ class Game:
 
 	def start(self):
 
-		data = None
-		serialized_data = None
+		# Initialisation de la partie
+		for player in self.__players:
 
+			# Envoi vers le player : Objet Player (1)
+			self.send_gamestate(player[PLAYER].get_id())
 
-
-		self.test()
-
-
-		# # Initialisation de la partie
-		# for player in self.__players:
-
-		# 	# Sérialisation
-		# 	serialized_data = pickle.dumps(player[PLAYER])
-
-		# 	# Envoi vers le player : Objet Player (1)
-		# 	player[SOCKET].send(serialized_data)
-
-		# # Phase Mulligan
-		# for player in self.__players:
-
-		# 	# Réponse
-		# 	data = "PHASE_START"
+		# Phase Mulligan
+		for player in self.__players:
 
 			# Rafraichissement de l'écran
-			# self.clear_terminal()			
-
-		# 	# Sérialisation
-		# 	serialized_data = pickle.dumps(data)
-
-		# 	# Envoi vers le player : Démarrage de la phase (2)
-		# 	player[SOCKET].send(serialized_data)
+			self.clear_terminal()			
 		
-		# 	# Exécution de la phase
-		# 	self.mulligan(player[PLAYER].get_id())
+			# Exécution de la phase
+			print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Mulligan")
+			self.mulligan(player[PLAYER].get_id())
 
-			# player[SOCKET].recv(SEGMENT_SIZE)
-
-			# print("DEBUG 3")
-
-			# data = "PHASE_END"
-
-			# serialized_data = pickle.dumps(data)
-
-			# player[SOCKET].send(serialized_data)
-
-			# print("DEBUG 4")
-
-	def turn(self):
+	def mulligan(self, index):
 
 		data = None
-		serialized_data = None
+		mulligan_count = 0
+
+		# Mélange initial du deck
+		self.__players[index][PLAYER].get_board().get_deck().shuffle()
+
+		# Pioche 7 cartes
+		self.__players[index][PLAYER].draw_card(7)
+
+		while True:
+
+			# DEBUG
+			self.__players[index][PLAYER].debug_print_hand()
+
+			# Envoi vers le player : Signal de jeu (2)
+			self.send_signal(index,"PLAY")
+
+			# Réception depuis le client : Requête d'action (3)
+			data = self.recv_action(index)
+
+			# Continuer à mulligan ?
+			if( (data.get("type") == "MULLIGAN") and (mulligan_count < 7) ):
+
+				# Envoi vers le client : Acceptation (4.1.1)
+				self.send_signal(index,"ACCEPT")
+
+				# Défausse de la main
+				self.__players[index][PLAYER].get_board().empty_hand()
+				
+				# Mélange du deck
+				self.__players[index][PLAYER].get_board().get_deck().shuffle()
+
+				# Envoi vers le client : Etat de la partie (4.1.2)
+				self.send_gamestate(index)
+
+				mulligan_count += 1
+
+				# Pioche (7-n) cartes
+				self.__players[index][PLAYER].draw_card(7 - mulligan_count)
+			
+			elif(data.get("type") == "SKIP_PHASE"):
+
+				# Envoi vers le client : Acceptation (4.2.1)
+				self.send_signal(index,"ACCEPT")
+
+				# Envoi vers le client : Etat de la partie (4.2.2)
+				self.send_gamestate(index)
+
+				break
+
+			else:
+
+				# Envoi vers le client : Refus (4.3)
+				self.send_signal(index,"DECLINE")
+
+				continue
+
+	def turn(self): 
+
+		data = None
+
+		# Rafraichissement de l'écran
+		self.clear_terminal()	
 
 		while self.players_alive() > 1:
 
 			for player in self.__players:
 
-				print("DEBUG 1")
+				print("Tour du joueur", player[PLAYER].get_id()+1)
 
 				# Vérification si le joueur est encore en vie
-				if(player[PLAYER].get_life() > 0):
+				if (self.players_alive() > 1) and (player[PLAYER].get_life() > 0):
 
-					print("DEBUG 5")
-					data = "PHASE_START"
-					serialized_data = pickle.dumps(data)
-					player[SOCKET].send(serialized_data)
+					print("Le joueur " + str(player[PLAYER].get_id()+1) + " est en vie (" + str(player[PLAYER].get_life()) + "HP)")
 
 					# # Dégagement des cartes
 					# player[PLAYER].untap()
 
-					# Réception depuis le client : Requête d'action (3)
-					serialized_data = player[SOCKET].recv(SEGMENT_SIZE)
+					# Phase Effet 1
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 1")
+					self.effect_phase(player[PLAYER].get_id())
 
-					# Désérialisation
-					data = pickle.loads(serialized_data)
+					# Phase Ephémère 1
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Ephémères 1")
+					self.instant_phase(player[PLAYER].get_id())
 
-					if(data.get("type") == "USE_EFFECT"):
+					# Phase de pioche
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de pioche")
+					self.draw_phase(player[PLAYER].get_id())
 
-						# Activation d'une ou plusieurs capacités (peut boucler)
-						self.effect_phase(player[PLAYER].get_id(),data)
+					# Phase Effet 2
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 2")
+					for ennemy in self.__players:
 
-						serialized_data = player[SOCKET].recv(SEGMENT_SIZE)
+						if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
 
-						# Désérialisation
-						data = pickle.loads(serialized_data)
+							print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut activer un effet")
 
-					if(data.get("type") == "INSTANT"):
+							# Phase Effet 2 par ennemy
+							self.effect_phase(ennemy[PLAYER].get_id())
 
-						# Engager éphémère (peut boucler)
-						self.instant_phase(player[PLAYER].get_id(),data)
-
-						serialized_data = player[SOCKET].recv(SEGMENT_SIZE)
-
-						# Désérialisation
-						data = pickle.loads(serialized_data)
-
-					# Pioche
-					self.draw_phase(player[PLAYER].get_id(),data)
-
-					# Ennemi activation d'une ou plusieurs capacités (peut boucler)
-					# for ennemy in self.__players:
-
-					# 	if(ennemy[PLAYER].get_id() != player[PLAYER].get_id()):
-
-					# 		serialized_data = ennemy[SOCKET].recv(SEGMENT_SIZE)
-
-					# 		# Désérialisation
-					# 		data = pickle.loads(serialized_data)
-
-					# 		if(data.get("type") == "USE_EFFECT"):
-
-					# 			self.effect_phase(ennemy[PLAYER].get_id(),data)
-
-					# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
-					self.main_phase(player[PLAYER].get_id(),data)
+					# Phase Principale
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (1)")
+					self.main_phase(player[PLAYER].get_id())
 
 					# Attaque ?
 
@@ -216,331 +306,168 @@ class Game:
 				 		# Engager éphémère (peut boucler)
 
 				 		# Appliquer les dommages de combat (prévenir du décès avec une requête)
+					
+					# Phase Secondaire
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (2)")
+					self.main_phase(player[PLAYER].get_id())
 
-				 	# Jouer monstres ou terrain ou éphémère (peut boucler si éphémère) (1 terrain max par tour)
+				 	# On retire de la vie au joueur
+					player[PLAYER].set_life(player[PLAYER].get_life() - 10)
 
-					print("DEBUG 3")
+					# On vérifie s'il est en vie
+					if(player[PLAYER].get_life() <= 0):
 
-					data = "PHASE_END"
+						# Envoi vers le client : Signal de mort (23)
+						self.send_signal(player[PLAYER].get_id(),"DEATH")
 
-					serialized_data = pickle.dumps(data)
+		# Envoi des résultats
+		for player in self.__players:
 
-					player[SOCKET].send(serialized_data)
-
-					if(player[PLAYER].get_id() > 0):
-				 		
-						player[PLAYER].set_life(0)
-
-						print("Ciao bon week-end")
-
-				else:
-					print("DEBUG 2")
-					self.__players[0][SOCKET].recv(SEGMENT_SIZE)
-					data = "DEATH"
-					serialized_data = pickle.dumps(data)
-					player[SOCKET].send(serialized_data)
-			
-			for player in self.__players:
-
-				if(player[PLAYER].get_life() > 0):
-					data = "VICTORY"
+			if(player[PLAYER].get_life() > 0):
 				
-				else:
-					data = "DEATH"
+				# Envoi vers le client : Signal de mort (24.1)
+				self.send_signal(player[PLAYER].get_id(),"VICTORY")
 
-				serialized_data = pickle.dumps(data)
-				player[SOCKET].send(serialized_data)
+			else:
+				
+				# Envoi vers le client : Signal de mort (24.2)
+				self.send_signal(player[PLAYER].get_id(),"DEATH")
 
-			# self.__players[0][SOCKET].recv(SEGMENT_SIZE)
-			# data = "VICTORY"
-			# serialized_data = pickle.dumps(data)
-			# self.__players[0][SOCKET].send(serialized_data)
-
-	def mulligan(self, index):
-
-		mulligan_count = 0
-		data = None
-		serialized_data = None
-		response = ""
-
-		# Mélange initial du deck
-		self.__players[index][PLAYER].get_board().get_deck().shuffle()
-
-		# Pioche 7 cartes
-		self.__players[index][PLAYER].draw_card(7)
+	def effect_phase(self, index):
 
 		while True:
 
-			# DEBUG
-			self.__players[index][PLAYER].debug_print_hand()
+			# Envoi vers le client : Signal de jeu (5)
+			self.send_signal(index,"PLAY")
 
-			# Réception depuis le client : Requête d'action (3)
-			serialized_data = self.__players[index][SOCKET].recv(SEGMENT_SIZE)
+			# Réception depuis le client : Requête d'action (6)
+			data = self.recv_action(index)
 
-			# Désérialisation
-			data = pickle.loads(serialized_data)
+			if(data.get("type") == "USE_EFFECT"):
 
-			# Continuer à mulligan ?
-			if( (data.get("type") == "MULLIGAN") and (mulligan_count < 7) ):
+				# Envoi vers le client : Acceptation (7.1.1)
+				self.send_signal(index,"ACCEPT")
 
-				# Réponse
-				response = "ACCEPT"
+				# TODO : Activation des effets
 
-				# Sérialisation
-				serialized_data = pickle.dumps(response)
+				# Envoi vers le client : Etat de la partie (7.1.2)
+				self.send_gamestate(index)
 
-				# Envoi vers le client : Acceptation (4)
-				self.__players[index][SOCKET].send(serialized_data)
+				break
 
-				# Défausse de la main
-				self.__players[index][PLAYER].get_board().empty_hand()
-				
-				# Mélange du deck
-				self.__players[index][PLAYER].get_board().get_deck().shuffle()
-
-				# Sérialisation 
-				# TODO : (à modifier plus tard selon le format JSON)
-				serialized_data = pickle.dumps(self.__players[index][PLAYER])
-
-				# Envoi vers le client : Etat de la partie (5)
-				self.__players[index][SOCKET].send(serialized_data)
-
-				mulligan_count += 1
-
-				# Pioche (7-n) cartes
-				self.__players[index][PLAYER].draw_card(7 - mulligan_count)
-			
 			elif(data.get("type") == "SKIP_PHASE"):
 
-				# Réponse
-				response = "ACCEPT"
+				# Envoi vers le client : Acceptation (7.2.1)
+				self.send_signal(index,"ACCEPT")
 
-				# Sérialisation
-				serialized_data = pickle.dumps(response)
-
-				# Envoi vers le client : Acceptation (4)
-				self.__players[index][SOCKET].send(serialized_data)
-
-				# Sérialisation 
-				# TODO : (à modifier plus tard selon le format JSON)
-				serialized_data = pickle.dumps(self.__players[index][PLAYER])
-
-				# Envoi vers le client : Etat de la partie (5)
-				self.__players[index][SOCKET].send(serialized_data)
+				# Envoi vers le client : Etat de la partie (7.2.2)
+				self.send_gamestate(index)
 
 				break
 
 			else:
 
-				# Réponse
-				response = "DECLINE"
+				# Envoi vers le client : Refus (7.3)
+				self.send_signal(index,"DECLINE")
 
-				# Sérialisation
-				serialized_data = pickle.dumps(response)
+	def instant_phase(self, index):
 
-				# Envoi vers le client : Refus (4)
-				self.__players[index][SOCKET].send(serialized_data)
+		while True:
 
-				continue
+			# Envoi vers le client : Signal de jeu (8)
+			self.send_signal(index,"PLAY")
 
-	def effect_phase(self, index, request):
-		pass
+			# Réception depuis le client : Requête d'action (9)
+			data = self.recv_action(index)
 
-	def instant_phase(self, index, request):
-		pass
+			if(data.get("type") == "INSTANT"):
 
-	def draw_phase(self, index, request):
-		pass
+				# Envoi vers le client : Acceptation (10.1.1)
+				self.send_signal(index,"ACCEPT")
 
-	def main_phase(self, index, request):
-		print("Main phase")
-		pass
+				# TODO : Activation des ephémères
 
+				# Envoi vers le client : Etat de la partie (10.1.2)
+				self.send_gamestate(index)
 
-	def debug_print_all(self,Player1,Player2):
-		print("___________________________________________________________________________________________")
-		print("|",len(Player2.get_board().get_graveyard()),"|","      ","|",Player2.get_life(),"|","      ","|",len(Player2.get_board().get_deck().get_cards()),"|")
-		print("graveyard","    ","vie","       ","deck")
-		print("")
-		
-		Player2.debug_print_hand()
-		print("|",len(Player2.get_board().get_land_zone()),"|")
-		print("land_zone")
-		print("")
-		
-		#battlezone j2
-		i=0
-		for card in Player2.get_board().get_battle_zone():
-			if Player2.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,card._name,RESET+'|,"[",card.get_mana_cost(),"]"',end='  ')	
-			elif Player2.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
-			elif Player2.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
-			elif Player2.get_board().get_battle_zone()[i]._issummoning_sickness == True:	
-				print('|'+NOIR,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
+				break
+
+			elif(data.get("type") == "SKIP_PHASE"):
+
+				# Envoi vers le client : Acceptation (10.2.1)
+				self.send_signal(index,"ACCEPT")
+
+				# Envoi vers le client : Etat de la partie (10.2.2)
+				self.send_gamestate(index)
+
+				break
+
 			else:
-				print("|",card._name,"[",card.get_mana_cost(),"]","|",end='  ')
-			print("")	
-			print("|",card.get_effect().get_list_effects(),"|")
-			print("|",card.get_damage(),",",card.get_life(),"|")
-			i+=1
 
-		print("")
-		print("          battle_zone")
-		print("")
+				# Envoi vers le client : Refus (10.3)
+				self.send_signal(index,"DECLINE")
 
-		#battlezone j1
-		i=0
-		for card in Player1.get_board().get_battle_zone():
-			if Player1.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')		
-			elif Player1.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
-			elif Player1.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
-			elif Player1.get_board().get_battle_zone()[i]._issummoning_sickness == True:	
-				print('|'+NOIR,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
+	def draw_phase(self, index):
+
+		while True:
+
+			# Envoi vers le client : Signal de jeu (11)
+			self.send_signal(index,"PLAY")
+
+			# Réception depuis le client : Requête d'action (12)
+			data = self.recv_action(index)
+
+			if(data.get("type") == "DRAW_CARD"):
+
+				# Envoi vers le client : Acceptation (13.1.1)
+				self.send_signal(index,"ACCEPT")
+
+				# Pioche
+				self.__players[index][PLAYER].draw_card(1)
+
+				# Envoi vers le client : Etat de la partie (13.1.2)
+				self.send_gamestate(index)
+
+				break
+
 			else:
-				print("|",card._name,"[",card.get_mana_cost(),"]","|",end='  ')
-			print("")
-			print("|",card.get_effect().get_list_effects(),"|")
-			print("|",card.get_damage(),",",card.get_life(),"|")
-			i= i+1
-			
-		
-		print("")
-		print("land_zone")
-		Player1.debug_print_land_zone()
-		print("")
 
-		Player1.debug_print_hand()
+				# Envoi vers le client : Refus (13.2)
+				self.send_signal(index,"DECLINE")
 
-		print("graveyard","    ","vie","       ","deck")
-		print("|",len(Player1.get_board().get_graveyard()),"|","      ","|",Player1.get_life(),"|","      ","|",len(Player1.get_board().get_deck().get_cards()),"|")
-		print("__________________________________________________________________________________________")
+	def main_phase(self, index):
 
+		while True:
 
+			# Envoi vers le client : Signal de jeu (17)
+			self.send_signal(index,"PLAY")
 
-	##
-	#soigne les blessures des creatures 
-	# @param Player1 le joueur1
-	# @param Player2 le joueur2 
-	##
-	def recovery(self,Player1,Player2):
-		for card in Player1.get_board().get_battle_zone():
-			card.set_life(card.get_tmp_life())
-			card.set_damage(card.get_tmp_damage())
-			card._isattack = False
-			card._istarget = False
-			card._isblocked = False
-		for card in Player2.get_board().get_battle_zone():
-			card.set_life(card.get_tmp_life())
-			card.set_damage(card.get_tmp_damage())
-			card._isattack = False
-			card._istarget = False
-			card._isblocked = False
-			
+			# Réception depuis le client : Requête d'action (18)
+			data = self.recv_action(index)
 
-	
-	
-	##
-	# tue les cartes qui on plus de vie 
-	# @param Player1 le joueur1
-	# @param Player2 le joueur2
-	##
-	def killing(self,Player1,Player2):
-		i=0
-		for card in Player1.get_board().get_battle_zone():
-			if card.get_life() <= 0 :
-				Player1.to_graveyard("BATTLE_ZONE", i)
+			if(data.get("type") == "PLAY_CARD"):
+
+				# Envoi vers le client : Acceptation (19.1.1)
+				self.send_signal(index,"ACCEPT")
+
+				# TODO : Engagement des cartes
+
+				# Envoi vers le client : Etat de la partie (19.1.2)
+				self.send_gamestate(index)
+
+				break
+
+			elif(data.get("type") == "SKIP_PHASE"):
+
+				# Envoi vers le client : Acceptation (19.2.1)
+				self.send_signal(index,"ACCEPT")
+
+				# Envoi vers le client : Etat de la partie (19.2.2)
+				self.send_gamestate(index)
+
+				break
+
 			else:
-				i+=1
 
-		i=0
-		for card in Player2.get_board().get_battle_zone():
-			if card.get_life() <= 0:
-				Player2.to_graveyard("BATTLE_ZONE", i)
-			else:
-				i+=1
-
-
-	def test(self):
-		#creation du deck
-		self.__deckmanager.add(DECK2)
-
-		#creation des joueurs
-		Player2  = Player(1,20,self.__deckmanager.copy_deck(0))
-		Player1  = Player(2,20,self.__deckmanager.copy_deck(0))
-
-		#pioche
-		Player1.draw_card(7)
-		Player2.draw_card(7)
-
-		#jouer
-		b = False
-		self.debug_print_all(Player1,Player2)
-		while(b == False):
-			index = int(input("saisir un index pour jouer une carte : "))
-			b = Player1.play_card(index)
-		
-		b = False
-		while(b == False):
-			index = int(input("saisir un index pour jouer une carte : "))
-			b = Player2.play_card(index)
-		
-		self.debug_print_all(Player1,Player2)
-
-		b = False
-		self.debug_print_all(Player1,Player2)
-		while(b == False):
-			index = int(input("saisir un index pour jouer une carte : "))
-			b = Player1.play_card(index)
-		
-		b = False
-		while(b == False):
-			index = int(input("saisir un index pour jouer une carte : "))
-			b = Player2.play_card(index)
-		
-		self.debug_print_all(Player1,Player2)
-
-		#attaque du joueur1
-		index = int(input("Player 1: saisir l'index de l'attaque : "))
-		print("La carte qui attaque : ",Player1.get_board().get_battle_zone()[index].get_name())
-		Player1.choice_attack(index)
-		self.debug_print_all(Player1,Player2)
-
-		#blockage du joueur2
-		index_block = int(input("Player 2 : saisir l'index du blockeur : "))
-		print("La carte qui block : ",Player2.get_board().get_battle_zone()[index_block].get_name())
-		index_attk = int(input("Player 2: saisir l'index de l'attaqueur : "))
-		print("La carte qui attaque : ",Player1.get_board().get_battle_zone()[index_attk].get_name())
-		Player2.choice_block(Player1, index_block, index_attk)
-		self.debug_print_all(Player1,Player2)
-
-		#attaque
-		Player1.attack(Player2, index_attk, index_block)
-		self.debug_print_all(Player1,Player2)
-
-		#attribution damage
-		self.killing(Player1,Player2)
-		print("BLESSURE")
-		#affichage
-		self.debug_print_all(Player1,Player2)
-
-		#soin
-		self.recovery(Player1, Player2)
-
-		print("RECOVERY")
-		#affichage
-		self.debug_print_all(Player1,Player2)
-
-		Player1.untap()
-		Player2.untap()
-		self.debug_print_all(Player1,Player2)
-
-		
-
-
-
-
+				# Envoi vers le client : Refus (19.3)
+				self.send_signal(index,"DECLINE")

@@ -1,16 +1,26 @@
 #!/usr/bin/env python3
 
-import socket, pickle, sys, json
+import socket, pickle, sys, json, os, sandbox
 from threading import Thread
 from game import Game
-
 
 PACKET_SIZE = 1024
 
 def main():
 	
+	server = None
+	choice = ""
+
 	server = Server()
-	server.run()
+	choice = server.menu()
+
+	if(choice == "MAIN"):
+
+		server.run()
+
+	elif(choice == "SANDBOX"):
+
+		sandbox.main()
 
 class Server:
 
@@ -27,6 +37,45 @@ class Server:
 
 		# Nommage de la socket UDP
 		self.__socket.bind((json_string['host_server'], int(json_string['port_server'])))
+
+	def menu(self):
+
+		request = ""
+
+		while True :
+
+			# Rafraichissement de l'écran
+			command = "clear"
+
+			if os.name == "nt":
+				command = "cls"
+
+			os.system(command)
+
+			# Affichage initial
+			print("[  MAIN    (1)  ]")
+			print("[  SANDBOX (2)  ]")
+
+			# Récupération de l'entrée utilisateur
+			user_input = input(">")
+
+			if(user_input == "1"):
+
+				request = "MAIN"
+
+				break
+
+			elif(user_input == "2"):
+				
+				request = "SANDBOX"
+
+				break			
+
+			else:
+
+				input("Erreur lors de la saisie, appuyez sur Entrée pour revenir au menu")
+
+		return request
 
 	def run(self):
 
