@@ -49,13 +49,20 @@ class Card:
 		return self._subtype
 	
 	def get_mana_cost(self):
-		return self._mana_cost
+		return_mana = {}
+		for mana in self._mana_cost:
+			if(self._mana_cost[mana] != 0):
+				return_mana[mana] = self._mana_cost[mana]
+		return return_mana
 	
 	def get_colors(self):
 		return self._colors
 
 	def get_identity(self):
-		return self._identity
+		temp = []
+		for key in self._identity:
+			temp.append(key)
+		return temp
 	
 	def get_text(self):
 		return self._text
@@ -257,14 +264,12 @@ class Card:
 				string += "Bleu "
 			
 			if (self._identity['B'] == 1):
-				string += "Noir"
+				string += "Noir "
 
 		string += "\n"
 		
 		if(self._text != None):
 			string += "TEXT : " + self._text + "\n"
-		if(self._effects != []):
-			string += "EFFECT : " + str(self._effects) + "\n"
 			
 		return string
 
