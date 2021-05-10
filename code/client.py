@@ -3,8 +3,9 @@
 import socket, pickle, sys, json, os
 from player import Player
 
+DEBUG = False
+
 PACKET_SIZE = 1024
-SEGMENT_SIZE = 65536
 
 MULLIGAN = "1"
 DRAW_CARD = "2"
@@ -91,6 +92,97 @@ class Client:
 			command = "cls"
 
 		os.system(command)
+
+	def send_action(self, action):
+
+		serialized_data = None
+
+		# Sérialisation
+		serialized_data = pickle.dumps(action)
+
+		# Envoi vers le serveur de jeu : Taille du segment (1)
+		self.send_size(serialized_data)
+
+		# Envoi vers le serveur de jeu : Segment (Requête d'action) (2)
+		self.__game_socket.send(serialized_data)
+		
+		if(DEBUG):
+			print("REQUETE D'ACTION :",action,"(envoyé)")
+
+
+	def send_size(self, segment):
+
+		data = ""
+		serialized_data = None
+
+		# Calcul de la taille du segment à envoyer passé en paramètre
+		data = '%16s' %len(segment)
+
+		# Sérialisation
+		serialized_data = data.encode()
+
+		# Envoi vers le serveur de jeu : Taille du segment
+		self.__game_socket.send(serialized_data)
+
+		if(DEBUG):
+			print(int(data),"BYTES (envoyé)")
+
+	def recv_signal(self):
+
+		size = 0
+		serialized_data = None
+		data = ""
+
+		# Réception depuis le serveur de jeu : Taille du segment (1)
+		size = self.recv_size()
+
+		# Réception depuis le serveur de jeu : Signal (2)
+		serialized_data = self.__game_socket.recv(size)
+
+		# Désérialisation
+		data = pickle.loads(serialized_data)
+
+		if(DEBUG):
+			print("SIGNAL :",data,"(reçu)")
+
+		return data
+
+	# TODO : (à modifier plus tard selon le format JSON)
+	def recv_gamestate(self):
+
+		size = 0
+		serialized_data = None
+		data = None
+
+		# Réception depuis le serveur de jeu : Taille du segment (1)
+		size = self.recv_size()
+
+		# Réception depuis le serveur de jeu : Gamestate (2)
+		serialized_data = self.__game_socket.recv(size)
+
+		# Désérialisation
+		data = pickle.loads(serialized_data)
+
+		if(DEBUG):
+			print("GAMESTATE (reçu)")	
+
+		return data	
+
+	def recv_size(self):
+
+		data = 0
+		serialized_data = None
+
+		# Réception depuis le client : Taille du segment (1)
+		serialized_data = self.__game_socket.recv(16)
+
+		# Désérialisation
+		data = int(serialized_data.decode())
+
+		if(DEBUG):
+			print(data,"BYTES (reçu)")
+
+		return data
 
 	def disconnect(self):
 
@@ -185,16 +277,12 @@ class Client:
 	def connect_game(self):
 
 		player = None
-		serialized_data = None
 	
 		# Connexion au serveur de jeu
 		self.__game_socket.connect(self.__game_netconfig)
 
 		# Réception depuis le serveur de jeu : Objet Player (1)
-		serialized_data = self.__game_socket.recv(SEGMENT_SIZE)
-
-		# Désérialisation
-		player = pickle.loads(serialized_data)
+		player = self.recv_gamestate()
 
 		return player
 
@@ -202,87 +290,42 @@ class Client:
 
 		result = ""
 		request = None
-		serialized_request = None
 		response = None
-		serialized_response = None
 		gamestate = None
 
 		while True:
 
-			print("En attente de la fin du tour ennemi")
+			# Réception depuis le serveur de jeu : Signal (2)
+			response = self.recv_signal()
 
-			# Réception depuis le serveur de jeu : Démarrage de la phase (2)
-			serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
+			if(response == "PLAY"):
 
-			# Déserialisation
-			response = pickle.loads(serialized_response)
+				# Choix de l'action
+				request = self.action_menu(player)
 
-			if(response == "PHASE_START"):
-				break
+				# Envoi vers le serveur de jeu : Requête d'action (3)
+				self.send_action(request)
 
-		while True:
+				# Réception depuis le serveur de jeu : Acceptation / Refus (4)
+				response = self.recv_signal()
 
-			# Choix de l'action
-			request = self.action_menu(player)
-
-			# Sérialisation
-			serialized_request = pickle.dumps(request)
-
-			# Envoi vers le serveur de jeu : Requête d'action (3)
-			self.__game_socket.send(serialized_request)
-
-			# Réception depuis le serveur de jeu : Acceptation / Refus (4)
-			serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
-
-			# Déserialisation
-			response = pickle.loads(serialized_response)
-
-			input(response)
-
-			# En cas de refus, on recommence
-			if(response == "DECLINE"):
-				continue
-
-			elif(response == "PHASE_END"):
-				
-				while True:
-					
-					print("En attente de la fin du tour ennemi")
-
-					# Réception depuis le serveur de jeu : Démarrage de la phase (2)
-					serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
-
-					# Déserialisation
-					response = pickle.loads(serialized_response)
-
-					if(response == "PHASE_START"):
-						input("Putain de merde")
-
-						break
-
-					elif(response == "VICTORY"):
-						break
-
-					elif(response == "DEATH"):
-						break
-				
-				if(response == "PHASE_START"):
+				# En cas de refus, on recommence
+				if(response == "DECLINE"):
 					continue
 
-				elif(response == "DEATH"):
+				# Réception depuis le serveur de jeu : Etat de la partie (5)
+				gamestate = self.recv_gamestate()
+
+				# Mise à jour des informations de jeu
+				player = gamestate
 				
-					result = "DEFEAT"
-					
-					break
+				if(DEBUG):
+					print("MAJ DE LA PARTIE")
 
-				elif(response == "VICTORY"):
-
-					result = "VICTORY"
-
-					break
+				#input(response)
 
 			elif(response == "DEATH"):
-				
+					
 				result = "DEFEAT"
 				
 				break
@@ -293,20 +336,14 @@ class Client:
 
 				break
 
-			# Réception depuis le serveur de jeu : Etat de la partie (5)
-			serialized_response = self.__game_socket.recv(SEGMENT_SIZE)
-
-			# Déserialisation
-			gamestate = pickle.loads(serialized_response)
-
-			# Mise à jour des informations de jeu
-			self.update(player, gamestate)
-
 		return result
 
 	def action_menu(self, player):
 
 		request = ""
+
+		if(DEBUG):
+			input("[CLEAR SCREEN]")
 
 		while True :
 
@@ -314,6 +351,7 @@ class Client:
 			self.clear_terminal()
 
 			# Affichage initial
+			print("Joueur", player.get_id(), "(" + str(player.get_life()) + ")")
 			print("[  MULLIGAN   (1)  ]")
 			print("[  DRAW_CARD  (2)  ]")
 			print("[  PLAY_CARD  (3)  ]")
@@ -345,7 +383,39 @@ class Client:
 				break
 
 			elif(user_input == PLAY_CARD):
+
+				request = { 
+					"player" : player.get_id(),
+					"type" : "PLAY_CARD"
+				}
+
+				break
 				
+			elif(user_input == ATTACK):
+
+				request = { 
+					"player" : player.get_id(),
+					"type" : "ATTACK"
+				}
+
+				break
+				
+			elif(user_input == BLOCK):
+
+				request = { 
+					"player" : player.get_id(),
+					"type" : "BLOCK"
+				}
+
+				break
+
+			elif(user_input == DISCARD):
+
+				request = { 
+					"player" : player.get_id(),
+					"type" : "DISCARD"
+				}
+
 				break
 
 			elif(user_input == SKIP_PHASE):
@@ -353,6 +423,15 @@ class Client:
 				request = { 
 					"player" : player.get_id(),
 					"type" : "SKIP_PHASE"
+				}
+
+				break
+
+			elif(user_input == CONCEDE):
+
+				request = { 
+					"player" : player.get_id(),
+					"type" : "CONCEDE"
 				}
 
 				break				
@@ -364,9 +443,6 @@ class Client:
 		#input(request)
 
 		return request
-
-	def update(self, player, gamestate):
-		pass
 
 if __name__ == "__main__":
 	try:
