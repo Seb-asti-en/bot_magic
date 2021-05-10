@@ -25,7 +25,7 @@ class Card:
 		
 		self._isblocked 	= False
 		self._isattack 		= False
-		self._issummoning_sickness = False
+		self._issummoning_sickness = True
 # =============================================================================
 # 		self._tmp_end_Game_life = 0
 # 		self._tmp_end_Game_damage = 0
@@ -81,6 +81,9 @@ class Card:
 	
 	def get_istarget(self):
 		return self._istarget
+	
+	def get_issummoning_sickness(self):
+		return self._issummoning_sickness
 
 
 	############################ Setters ############################
@@ -110,6 +113,9 @@ class Card:
 
 	def set_istarget(self,bool):
 		self._istarget = bool
+
+	def set_issummoning_sickness(self,bool):
+	 	self._issummoning_sickness = bool
 
 
 	############################ Méthode ############################
@@ -160,7 +166,7 @@ class Card:
 	# @param card 	la carte qu'il faut initialiser
 	##
 	def init_identity(self, card):
-		self._identity = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		self._identity = {}
 		temp = card["Identity"]
 		res = temp.split(';')
 		for x in res:

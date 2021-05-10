@@ -31,6 +31,12 @@ class Player():
 
 	############################ Methodes ############################
 
+
+
+	def untap(self):
+		for card in self.__board.get_battle_zone():
+			card.set_issummoning_sickness(False)
+
 	##
 	# permet de piocher un nombre n de carte
 	# @param nb_card  le nombre de card a piocher
@@ -61,6 +67,7 @@ class Player():
 	
 				print("itsss creature",self.__board.get_hand()[index_card]._name)
 				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
+
 
 			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
 				print("itsss INSTANT")
@@ -120,8 +127,11 @@ class Player():
 	def choice_attack(self,index):
 		if self.__board.isempty_battle_zone() or index >= len(self.__board.get_battle_zone()) or index < 0 :
 			print("l'index est trop grand ou trop petit", index)
+		
 		elif Effect.early_choice_attack(self.__board.get_battle_zone()[index]) == False :
 			print("la carte ne peut pas attaquer")
+		elif self.get_board().get_battle_zone()[index].get_issummoning_sickness() == True:
+			print("la carte ne peut pas attaquer elle a le mal d'invocation")
 		else:
 			self.__board.get_battle_zone()[index].set_isattack(True)
 
@@ -211,3 +221,15 @@ class Player():
 		print("")
 		if len(self.__board.get_battle_zone()) == 0:
 			print("vide")
+
+	def debug_print_land_zone(self):
+		white = 0
+		for card in self.__board.get_land_zone():
+			print("|",card.get_identity(),"|",end=' ')
+			print("")
+		for card in self.__board.get_land_zone():
+			if "W" in card.get_identity():
+				white +=1
+				
+		print(white)	
+	
