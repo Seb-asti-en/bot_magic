@@ -10,18 +10,13 @@ SOCKET = 0
 PLAYER = 1
 LIFE = 10
 
-BLEU = '\x1b[6;30;44m'
-ROUGE = '\x1b[6;30;41m'
-ORANGE = '\x1b[6;30;43m'
-RESET = '\x1b[0m'
-
 DECK1 = "White"
 DECK2 = "Black"
-DECKTEST = "Test_Tristan"
 
 class Game:
 
 	def __init__(self, socket, slots = 3):
+
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
 		self.__slots = slots
@@ -174,8 +169,6 @@ class Game:
 			player_id += 1
 
 	def start(self):
-
-		#self.test()
 
 		# Initialisation de la partie
 		for player in self.__players:
@@ -478,149 +471,3 @@ class Game:
 
 				# Envoi vers le client : Refus (19.3)
 				self.send_signal(index,"DECLINE")
-
-	def debug_print_all(self,Player1,Player2):
-		print("___________________________________________________________________________________________")
-		print("|",len(Player2.get_board().get_graveyard()),"|","      ","|",Player2.get_life(),"|","      ","|",len(Player2.get_board().get_deck().get_cards()),"|")
-		print("graveyard","    ","vie","       ","deck")
-		print("")
-		#hand j2
-		#	for i in range(len(Player2.get_board().get_hand())):
-		#		print("|",i,"|",end='  ')
-		Player2.debug_print_hand()
-		print("          hand")
-		print("")
-		print("|",len(Player2.get_board().get_land_zone()),"|")
-		print("land_zone")
-		print("")
-		#battlezone j2
-		i=0
-		for card in Player2.get_board().get_battle_zone():
-			if Player2.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,card._name,RESET+'|',end='  ')	
-			elif Player2.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,card._name,RESET+'|',end='  ')
-			elif Player2.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,card._name,RESET+'|',end='  ')
-			else:
-				print("|",card._name,"|",end='  ')
-			print("")	
-			print("|",card.get_damage(),",",card.get_life(),"|")
-			i+=1
-		print("")
-		print("          battle_zone")
-		#battlezone j1
-		i=0
-		for card in Player1.get_board().get_battle_zone():
-			if Player1.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,card._name,RESET+'|',end='  ')		
-			elif Player1.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,card._name,RESET+'|',end='  ')
-			elif Player1.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,card._name,RESET+'|',end='  ')
-			else:
-				print("|",card._name,"|",end='  ')
-			print("")
-			print("|",card.get_damage(),",",card.get_life(),"|")
-			i= i+1
-			
-		print("")
-		print("")
-		print("land_zone")
-		print("|",len(Player1.get_board().get_land_zone()),"|")
-		print("")
-		#hand j1
-		print("          hand")
-
-
-		#	for i in range(len(Player1.get_board().get_hand())):
-		#		print("|",i,"|",end='  ')
-		Player1.debug_print_hand()
-
-		print("")
-
-		print("")
-		print("graveyard","    ","vie","       ","deck")
-		print("|",len(Player1.get_board().get_graveyard()),"|","      ","|",Player1.get_life(),"|","      ","|",len(Player1.get_board().get_deck().get_cards()),"|")
-		print("__________________________________________________________________________________________")
-
-
-
-	##
-	#soigne les blessures des creatures 
-	# @param Player1 le joueur1
-	# @param Player2 le joueur2 
-	##
-	def recovery(self,Player1,Player2):
-		for card in Player1.get_board().get_battle_zone():
-			card.set_life(card.get_tmp_life())
-			card.set_damage(card.get_tmp_damage())
-			card._isattack = False
-			card._istarget = False
-			card._isblocked = False
-		for card in Player2.get_board().get_battle_zone():
-			card.set_life(card.get_tmp_life())
-			card.set_damage(card.get_tmp_damage())
-			card._isattack = False
-			card._istarget = False
-			card._isblocked = False
-
-	##
-	# tue les cartes qui on plus de vie 
-	# @param Player1 le joueur1
-	# @param Player2 le joueur2
-	##
-	def killing(self,Player1,Player2):
-		i=0
-		for card in Player1.get_board().get_battle_zone():
-			if card.get_life() <= 0 :
-				Player1.to_graveyard("BATTLE_ZONE", i)
-			else:
-				i+=1
-
-		i=0
-		for card in Player2.get_board().get_battle_zone():
-			if card.get_life() <= 0 :
-				Player2.to_graveyard("BATTLE_ZONE", i)
-			else:
-				i+=1
-
-
-	def test(self):
-		#creation du deck
-		self.__deckmanager.add(DECK2)
-
-		#creation des joueurs
-		Player2  = Player(1,20,self.__deckmanager.copy_deck(0))
-		Player1  = Player(2,20,self.__deckmanager.copy_deck(0))
-
-		#pioche
-		Player1.draw_card(9)
-		Player2.draw_card(9)
-
-		#jouer
-		Player1.play_card(2)
-		Player1.play_card(5)
-		
-		Player2.play_card(2)
-		Player2.play_card(5)
-
-		#attaque du joueur1
-		Player1.choice_attack(1)
-
-		#blockage du joueur2
-		Player2.choice_block(Player1, 1, 0)
-		Player2.defense(Player1, 1, 0)
-
-		#attribution damage
-		self.killing(Player1,Player2)
-
-		#soin
-		self.recovery(Player1, Player2)
-
-		#affichage
-		self.debug_print_all(Player1,Player2)
-
-
-
-

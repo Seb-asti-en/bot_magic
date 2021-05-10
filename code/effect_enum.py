@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-
 from enum import Enum
 
 class Effect(Enum):
-		
+	
 	deathtouch = 1
 	defender = 2
 	double = 3

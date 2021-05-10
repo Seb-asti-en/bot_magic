@@ -1,13 +1,12 @@
-#!/usr/bin/env python3
-
-import os, sys, re
+############################ Import ############################
+import re
 import effect_enum as enum
-import pymysql # Installer le module avec pip
+from effect import Effect
 
 
 class Card:
 
-	#constructeur
+	############################ Constructeur ############################
 	def __init__(self, card):
 
 		self._id			= card["Id"]
@@ -19,24 +18,21 @@ class Card:
 		self._colors		= self.init_colors(card)
 		self._identity		= self.init_identity(card)
 		self._text			= card["Text"]
-		self._effects		= self.init_effect(card)
+		self._effect		= Effect(self.init_effect(card))
 		self._collection 	= ""
 		self._isengaged 	= False
 		self._istarget		= False
 		
-
 		self._isblocked 	= False
 		self._isattack 		= False
-		self._issummoning_sickness = False
-		self._tmp_end_Game_life = 0
-		self._tmp_end_Game_damage = 0
-
-
-
-
-
-	#Getters
-
+		self._issummoning_sickness = True
+# =============================================================================
+# 		self._tmp_end_Game_life = 0
+# 		self._tmp_end_Game_damage = 0
+# =============================================================================
+		
+		
+	############################ Getters ############################
 	def get_id(self):
 		return self._id
 		
@@ -65,11 +61,8 @@ class Card:
 		return self._text
 
 	def get_effect(self):
-		temp = []
-		for i in self._effects:
-			temp.append(i)
-		return temp
-	
+		return self._effect
+
 	def get_isblocked(self):
 		return self._isblocked
 
@@ -81,8 +74,12 @@ class Card:
 	
 	def get_istarget(self):
 		return self._istarget
+	
+	def get_issummoning_sickness(self):
+		return self._issummoning_sickness
 
-	#Setters
+
+	############################ Setters ############################
 	def set_id(self, ids):
 		self._id = ids
 	
@@ -110,16 +107,26 @@ class Card:
 	def set_istarget(self,bool):
 		self._istarget = bool
 
-	#Methodes
-	
+	def set_issummoning_sickness(self,bool):
+	 	self._issummoning_sickness = bool
+
+
+	############################ Méthode ############################
+	##
+	# Reset les valeurs possiblement changer des booleen a false
+	##
 	def reset_bool(self):
 		self._isblocked 	= False
 		self._isattack 		= False
 		self._isengaged 	= False
 		self._istarget		= False	
 
+	##
+	# Initialise le cout en mana d'une carte
+	# @param card 	la carte qu'il faut initialiser
+	##
 	def init_mana_cost(self, card):
-		self._mana_cost = {'X' : 0,'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		self._mana_cost = {}
 		temp = card["Mana_cost"]
 		res = temp.strip('}{').split('}{')
 		if(res[0].isnumeric()):
@@ -132,8 +139,12 @@ class Card:
 				self._mana_cost[x] = 1
 		return self._mana_cost
 	
+	##
+	# Initialise la couleur d'une carte
+	# @param card 	la carte qu'il faut initialiser
+	##
 	def init_colors(self, card):
-		self._colors = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		self._colors = {}
 		temp = card["Colors"]
 		res = temp.split(';')
 		for x in res:
@@ -143,8 +154,12 @@ class Card:
 				self._colors[x] = 1
 		return self._colors
 	
+	##
+	# Initialise l'identitée d'une carte
+	# @param card 	la carte qu'il faut initialiser
+	##
 	def init_identity(self, card):
-		self._identity = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		self._identity = {}
 		temp = card["Identity"]
 		res = temp.split(';')
 		for x in res:
@@ -154,21 +169,28 @@ class Card:
 				self._identity[x] = 1
 		return self._identity
 
+	##
+	# Récupère les effets evergreen d'une carte par rapport a son texte
+	# @param card 	la carte qu'il faut analyser
+	##
 	def init_effect(self, card):
-		self._effects = []
+		effects = []
 		effect_tampon = []
 		for i in enum.Effect:
 			effect_tampon.append(i.name)
-		temp = re.split('\n|, | \(', card["Text"])
+		temp = re.split('\n| strike|, | \(', card["Text"])
 		for eff in temp:
 			if eff.lower() in effect_tampon:
-				self._effects.append(eff.lower())
-		return self._effects
+				effects.append(eff.lower())
+		return effects
 		
+	##
+	# Méthode qui retourne l'affichage d'une carte
+	##
 	def to_string(self):
 
 		string = ""
-
+		
 		string += "CARD TYPE : " + str(self._type) + " \n" 
 		string += "ID : " + str(self._id) + " \n" 
 		string += "COLLECTION : " + str(self._collection) + "\n"
@@ -241,14 +263,13 @@ class Card:
 				string += "Bleu "
 			
 			if (self._identity['B'] == 1):
-				string += "Noir"
+				string += "Noir "
 
 		string += "\n"
 		
 		if(self._text != None):
 			string += "TEXT : " + self._text + "\n"
-		if(self._effects != []):
-			string += "EFFECT : " + str(self._effects) + "\n"
+			
 		return string
 
 class EnchantmentCard(Card):

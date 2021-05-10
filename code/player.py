@@ -3,14 +3,15 @@ from effect import Effect
 
 class Player():
 
-	#Constructeur
+	############################ Constructeur ############################
 	def __init__(self, player_id, life, deck):
 		self.__id = player_id
 		self.__life = life
 		self.__board = Board(deck)
+		self.__available_mana = {'W' : 10}
 
 	
-	#Getters
+	############################ Getters ############################
 	def get_board(self):
 		return self.__board
 	
@@ -20,12 +21,47 @@ class Player():
 	def get_id(self):
 		return self.__id
 	
-	#Setter
+	def get_available_mana(self):
+		return self.__available_mana
+	
+
+	############################ Setter ############################
+	def set_id(self,nb_id):
+		self.__id = nb_id
+	
 	def set_life(self,nb_life):
 		self.__life = nb_life
+		
 
-	#Methodes
 
+	############################ Methodes ############################
+
+	##
+	# Ajoute un mana dans la reserve de mana
+	# @param key la couleur voulu
+	# @param valeur la quantité ajouté
+	##
+	def add_mana(self, key, valeur):
+		try:
+			self.__available_mana[key] = self._mana_cost[key] + valeur
+		except:
+			self.__available_mana[key] = valeur
+
+	##
+	# Le nombre de mana disponible  
+	# @return nb mana
+	##
+	def remaining_mana(self):
+		res = 0
+		for key in self.__available_mana:
+			res += self.__available_mana[key]
+		return res
+	##
+	# (pour l'instant) Enlève le mal d'invocation
+	##
+	def untap(self):
+		for card in self.__board.get_battle_zone():
+			card.set_issummoning_sickness(False)
 
 	##
 	# permet de piocher un nombre n de carte
@@ -54,14 +90,49 @@ class Player():
 				self.__board.add_land_zone(self.__board.get_hand().pop(index_card))
 
 			elif self.__board.get_hand()[index_card].get_type() =="Creature" or self.__board.get_hand()[index_card].get_type() =="Artifact" :
-	
+				if(self.playable_card(index_card)):
+					print("Je suis jouable")
+				else:
+					print("Je ne suis pas jouable")
 				print("itsss creature",self.__board.get_hand()[index_card]._name)
 				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
+
 
 			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
 				print("itsss INSTANT")
 				print(self.__board.get_hand()[index_card].to_string())
-				
+
+
+	##
+	# permet de savoir si une carte est jouable 
+	# @param index_card index de la carte vérifié
+	# retourne true si elle est jouable, sinon false
+	##
+	def playable_card(self, index_card):
+		tmpX = 0
+		tmp = self.remaining_mana()
+		b = True
+		if tmp != 0:
+			for key in self.__board.get_hand()[index_card].get_mana_cost():
+				if key == 'X':
+					tmpX = self.__board.get_hand()[index_card].get_mana_cost()['X']
+				elif key in self.__available_mana:
+					if self.__available_mana[key] >= self.__board.get_hand()[index_card].get_mana_cost()[key]:
+						tmp -= self.__board.get_hand()[index_card].get_mana_cost()[key]
+					else:
+						b = False
+				else:
+					b = False
+			if tmpX != 0 and b != False:
+				if tmp >= tmpX:
+					b = True
+				else:
+					b = False
+			return b
+
+	##
+	# permet d'utiliser des cartes
+	##	
 	def use_card(self,index_source):
 		pass
 
@@ -87,6 +158,7 @@ class Player():
 			if len(self.__board.get_battle_zone()) != 0 :
 				self.clear_card(self.__board.get_battle_zone()[index_card])
 				self.__board.add_graveyard(self.__board.get_battle_zone().pop(index_card))
+	
 	##
 	# permet de choisir les cartes bloquante
 	# @param Player_target le joueur adverse
@@ -96,21 +168,27 @@ class Player():
 	def choice_block(self,Player_target,index_target,index_src):
 		if self.__board.isempty_battle_zone() or index_src >= len(self.__board.get_battle_zone()) or index_src < 0:
 				print("l'index source est trop grand ou trop petit", index_src)
-		else:
+		elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[index_target],self.__board.get_battle_zone()[index_src]) == True :
 			self.__board.get_battle_zone()[index_src].set_isblocked(True)
 			if Player_target.get_board().get_battle_zone()[index_target].get_isattack() == True:
 				Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
 			else:
 				print("selectioner un attaquant")
+		else:
+			print("vous ne pouvez pas bloquer")
 
 	###
-	#permet de choisir la carte qui attaque
+	# permet de choisir la carte qui attaque
 	# @param index l'index de la carte
 	###
 	def choice_attack(self,index):
-		print("index",index,len(self.__board.get_battle_zone()))
 		if self.__board.isempty_battle_zone() or index >= len(self.__board.get_battle_zone()) or index < 0 :
 			print("l'index est trop grand ou trop petit", index)
+		
+		elif Effect.early_choice_attack(self.__board.get_battle_zone()[index]) == False :
+			print("la carte ne peut pas attaquer")
+		elif self.get_board().get_battle_zone()[index].get_issummoning_sickness() == True:
+			print("la carte ne peut pas attaquer elle a le mal d'invocation")
 		else:
 			self.__board.get_battle_zone()[index].set_isattack(True)
 
@@ -119,9 +197,8 @@ class Player():
 	# @param Player_target le joueur adverse
 	# @param index_source l'index de la carte qui attaque
 	##
-	def attack(self,Player_target,index_source):
-
-		deal_damage_to_player(index_source,Player_target)
+	def direct_attack(self,Player_target,index_source):
+		self.deal_damage_to_player(index_source,Player_target)
 
 	##
 	# donne des degats aux carte  adverse
@@ -129,7 +206,7 @@ class Player():
 	# @parem index_target l'index de la carte adverse
 	# @param index_source l'index de la carte qui attaque
 	##
-	def defense(self,Player_target,index_target,index_source):
+	def attack(self,Player_target,index_target,index_source):
 		self.deal_damage_to_card( Player_target,index_target, index_source)
 
 	##
@@ -157,28 +234,30 @@ class Player():
 	# @param index_source carte qui inflige les dps
 	##
 	def deal_damage_to_card(self,Player_target,index_target,index_source):
+		#defini les cartes(pour que ça soit plus court a ecrire)
+		card_attk = self.__board.get_battle_zone()[index_source]
+		card_deff = Player_target.get_board().get_battle_zone()[index_target]
 
-		
-		source_dps = self.__board.get_battle_zone()[index_source].get_damage()
-		source_life = self.__board.get_battle_zone()[index_source].get_life()
+		print("EFECT ATTACK",card_attk.get_effect().get_list_effects())
+		print("EFECT DEFF",card_deff.get_effect().get_list_effects())
 
-		ennemi_dps = Player_target.get_board().get_battle_zone()[index_target].get_damage()
-		ennemi_life = Player_target.get_board().get_battle_zone()[index_target].get_life()
+		#regarde si il y a un effet avant l'attaque
+		if Effect.early_battle_phase(card_deff,card_attk) == False:
+			card_deff.set_life(card_deff.get_life() - card_attk.get_damage())
+			card_attk.set_life(card_attk.get_life() - card_deff.get_damage())
 
-		Player_target.get_board().get_battle_zone()[index_target].set_life(ennemi_life - source_dps)
-		self.__board.get_battle_zone()[index_source].set_life(source_life - ennemi_dps)
-
-		
-		
-
-		if "deathtouch" in self.__board.get_battle_zone()[index_source].get_effect():
-			Effect.deathtouch(Player_target.get_board().get_battle_zone()[index_target])
-		if "deathtouch" in Player_target.get_board().get_battle_zone()[index_target].get_effect():
-			Effect.deathtouch(self.__board.get_battle_zone()[index_source])
-		
+		#effets apres l'attaque
+		Effect.end_battle_phase(Player_target,card_deff,self,card_attk)
+	
+	##
+	#permet de conceder
+	##
 	def concede():
 		pass
 
+	##
+	# affiche  le nom des carte de la main
+	##
 	def debug_print_hand(self):
 		print("Hand (" + str(len(self.__board.get_hand())) + "):")
 		
@@ -190,9 +269,16 @@ class Player():
 		if len(self.__board.get_hand()) == 0:
 			print("La main est vide")
 
+	##
+	# affiche  le nom des carte de la battlezone
+	##
 	def debug_print_battle_zone(self):
 		for card in self.__board.get_battle_zone():
 			print("|",card._name,"|",end=' ')
 		print("")
 		if len(self.__board.get_battle_zone()) == 0:
 			print("vide")
+
+	def debug_print_land_zone(self):
+		print("|",self.get_available_mana(),"|")
+	
