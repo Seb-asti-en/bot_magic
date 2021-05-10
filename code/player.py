@@ -135,15 +135,6 @@ class Player():
 					b = False
 			return b
 
-	
-	def is_playable(self, index_card):
-		b = False
-		if(self.playable_card(index_card)):
-			self.play_card(index_card)
-			b = True
-		return b
-
-
 	##
 	# permet d'utiliser des cartes
 	##	

@@ -26,8 +26,8 @@ def main():
 	deckmanager = game.get_deckmanager()
 
 	# Ajout de deux decks (tu peux mettre ce que tu veux bâtard)
-	deckmanager.add("White")
-	deckmanager.add("Black")
+	deckmanager.add(DECKTEST)
+	deckmanager.add(DECKTEST)
 
 	# Création des joueurs (à ta sauce aussi, c'est qu'un exemple)
 	player1 = Player(1,20,deckmanager.copy_deck(0))
@@ -37,31 +37,48 @@ def main():
 	player1.draw_card(7)
 	player2.draw_card(7)
 
-	#jouer
+	b = False
 	debug_print_all(player1,player2)
-	a = int(input("saisir un index pour jouer une carte : "))
-	player1.play_card(a)
-	player2.play_card(a)
+	while(b == False):
+		index = int(input("saisir un index pour jouer une carte : "))
+		b = player1.play_card(index)
+	
+	b = False
+	while(b == False):
+		index = int(input("saisir un index pour jouer une carte : "))
+		b = player2.play_card(index)
+	
 	debug_print_all(player1,player2)
 
-	a = int(input("saisir un index pour jouer une carte : "))
-	player1.play_card(a)
-	player2.play_card(a)
+	b = False
+	debug_print_all(player1,player2)
+	while(b == False):
+		index = int(input("saisir un index pour jouer une carte : "))
+		b = player1.play_card(index)
+	
+	b = False
+	while(b == False):
+		index = int(input("saisir un index pour jouer une carte : "))
+		b = player2.play_card(index)
+	
 	debug_print_all(player1,player2)
 
 	#attaque du joueur1
-	a = int(input("Player 1: saisir l'index de l'attaque : "))
-	player1.choice_attack(a)
+	index = int(input("player 1: saisir l'index de l'attaque : "))
+	print("La carte qui attaque : ",player1.get_board().get_battle_zone()[index].get_name())
+	player1.choice_attack(index)
 	debug_print_all(player1,player2)
 
 	#blockage du joueur2
-	a = int(input("Player 2 : saisir l'index du blockeur : "))
-	b = int(input("Player 2: saisir l'index de l'attaqueur : "))
-	player2.choice_block(player1, a, b)
+	index_block = int(input("player 2 : saisir l'index du blockeur : "))
+	print("La carte qui block : ",player2.get_board().get_battle_zone()[index_block].get_name())
+	index_attk = int(input("player 2: saisir l'index de l'attaqueur : "))
+	print("La carte qui attaque : ",player1.get_board().get_battle_zone()[index_attk].get_name())
+	player2.choice_block(player1, index_block, index_attk)
 	debug_print_all(player1,player2)
 
 	#attaque
-	player1.attack(player2, b, a)
+	player1.attack(player2, index_attk, index_block)
 	debug_print_all(player1,player2)
 
 	#attribution damage
