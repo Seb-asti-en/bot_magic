@@ -49,20 +49,13 @@ class Card:
 		return self._subtype
 	
 	def get_mana_cost(self):
-		return_mana = {}
-		for mana in self._mana_cost:
-			if(self._mana_cost[mana] != 0):
-				return_mana[mana] = self._mana_cost[mana]
-		return return_mana
+		return self._mana_cost
 	
 	def get_colors(self):
 		return self._colors
 
 	def get_identity(self):
-		temp = []
-		for key in self._identity:
-			temp.append(key)
-		return temp
+		return self._identity
 	
 	def get_text(self):
 		return self._text
@@ -133,7 +126,7 @@ class Card:
 	# @param card 	la carte qu'il faut initialiser
 	##
 	def init_mana_cost(self, card):
-		self._mana_cost = {'X' : 0,'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		self._mana_cost = {}
 		temp = card["Mana_cost"]
 		res = temp.strip('}{').split('}{')
 		if(res[0].isnumeric()):
@@ -151,7 +144,7 @@ class Card:
 	# @param card 	la carte qu'il faut initialiser
 	##
 	def init_colors(self, card):
-		self._colors = {'C' : 0, 'W' : 0, 'B' : 0, 'R' : 0, 'G' : 0, 'U' : 0}
+		self._colors = {}
 		temp = card["Colors"]
 		res = temp.split(';')
 		for x in res:

@@ -8,6 +8,7 @@ class Player():
 		self.__id = player_id
 		self.__life = life
 		self.__board = Board(deck)
+		self.__available_mana = {'W' : 10}
 
 	
 	############################ Getters ############################
@@ -20,6 +21,9 @@ class Player():
 	def get_id(self):
 		return self.__id
 	
+	def get_available_mana(self):
+		return self.__available_mana
+	
 
 	############################ Setter ############################
 	def set_id(self,nb_id):
@@ -27,12 +31,34 @@ class Player():
 	
 	def set_life(self,nb_life):
 		self.__life = nb_life
+		
 
 
 	############################ Methodes ############################
 
+	##
+	# Ajoute un mana dans la reserve de mana
+	# @param key la couleur voulu
+	# @param valeur la quantité ajouté
+	##
+	def add_mana(self, key, valeur):
+		try:
+			self.__available_mana[key] = self._mana_cost[key] + valeur
+		except:
+			self.__available_mana[key] = valeur
 
-
+	##
+	# Le nombre de mana disponible  
+	# @return nb mana
+	##
+	def remaining_mana(self):
+		res = 0
+		for key in self.__available_mana:
+			res += self.__available_mana[key]
+		return res
+	##
+	# (pour l'instant) Enlève le mal d'invocation
+	##
 	def untap(self):
 		for card in self.__board.get_battle_zone():
 			card.set_issummoning_sickness(False)
@@ -64,7 +90,10 @@ class Player():
 				self.__board.add_land_zone(self.__board.get_hand().pop(index_card))
 
 			elif self.__board.get_hand()[index_card].get_type() =="Creature" or self.__board.get_hand()[index_card].get_type() =="Artifact" :
-	
+				if(self.playable_card(index_card)):
+					print("Je suis jouable")
+				else:
+					print("Je ne suis pas jouable")
 				print("itsss creature",self.__board.get_hand()[index_card]._name)
 				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
 
@@ -72,6 +101,34 @@ class Player():
 			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
 				print("itsss INSTANT")
 				print(self.__board.get_hand()[index_card].to_string())
+
+
+	##
+	# permet de savoir si une carte est jouable 
+	# @param index_card index de la carte vérifié
+	# retourne true si elle est jouable, sinon false
+	##
+	def playable_card(self, index_card):
+		tmpX = 0
+		tmp = self.remaining_mana()
+		b = True
+		if tmp != 0:
+			for key in self.__board.get_hand()[index_card].get_mana_cost():
+				if key == 'X':
+					tmpX = self.__board.get_hand()[index_card].get_mana_cost()['X']
+				elif key in self.__available_mana:
+					if self.__available_mana[key] >= self.__board.get_hand()[index_card].get_mana_cost()[key]:
+						tmp -= self.__board.get_hand()[index_card].get_mana_cost()[key]
+					else:
+						b = False
+				else:
+					b = False
+			if tmpX != 0 and b != False:
+				if tmp >= tmpX:
+					b = True
+				else:
+					b = False
+			return b
 
 	##
 	# permet d'utiliser des cartes
@@ -141,7 +198,7 @@ class Player():
 	# @param index_source l'index de la carte qui attaque
 	##
 	def direct_attack(self,Player_target,index_source):
-		deal_damage_to_player(index_source,Player_target)
+		self.deal_damage_to_player(index_source,Player_target)
 
 	##
 	# donne des degats aux carte  adverse
@@ -223,13 +280,5 @@ class Player():
 			print("vide")
 
 	def debug_print_land_zone(self):
-		white = 0
-		for card in self.__board.get_land_zone():
-			print("|",card.get_identity(),"|",end=' ')
-			print("")
-		for card in self.__board.get_land_zone():
-			if "W" in card.get_identity():
-				white +=1
-				
-		print(white)	
+		print("|",self.get_available_mana(),"|")
 	
