@@ -36,6 +36,9 @@ class Player():
 
 	############################ Methodes ############################
 
+	### TODO: Ajout mana quand land carte jouer
+	### TODO: Soustrait mana quand carte jouer
+	
 	##
 	# Ajoute un mana dans la reserve de mana
 	# @param key la couleur voulu
@@ -80,20 +83,20 @@ class Player():
 	# @param index_card index de la carte
 	##
 	def play_card(self,index_card):
+		b = False
 		print("taille",len(self.__board.get_hand()),index_card)
 		if index_card < 0 or index_card >=  len(self.__board.get_hand()) :
 			print("index trop grand ou trop petit")
+			
+		elif self.playable_card(index_card) == False:
+			print("Le mana necessaire pour certe carte est insuffisant")
+		
 		else:
-
 			if self.__board.get_hand()[index_card].get_type() =="Land":
 				print("itsss lannnd",self.__board.get_hand()[index_card]._name)
 				self.__board.add_land_zone(self.__board.get_hand().pop(index_card))
 
 			elif self.__board.get_hand()[index_card].get_type() =="Creature" or self.__board.get_hand()[index_card].get_type() =="Artifact" :
-				if(self.playable_card(index_card)):
-					print("Je suis jouable")
-				else:
-					print("Je ne suis pas jouable")
 				print("itsss creature",self.__board.get_hand()[index_card]._name)
 				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
 
@@ -101,7 +104,9 @@ class Player():
 			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
 				print("itsss INSTANT")
 				print(self.__board.get_hand()[index_card].to_string())
-
+			b = True
+		
+		return b
 
 	##
 	# permet de savoir si une carte est jouable 
@@ -129,6 +134,15 @@ class Player():
 				else:
 					b = False
 			return b
+
+	
+	def is_playable(self, index_card):
+		b = False
+		if(self.playable_card(index_card)):
+			self.play_card(index_card)
+			b = True
+		return b
+
 
 	##
 	# permet d'utiliser des cartes

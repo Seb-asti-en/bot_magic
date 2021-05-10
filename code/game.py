@@ -478,30 +478,48 @@ class Game:
 		Player2.draw_card(7)
 
 		#jouer
+		b = False
 		self.debug_print_all(Player1,Player2)
-		a = int(input("saisir un index pour jouer une carte : "))
-		Player1.play_card(a)
-		Player2.play_card(a)
+		while(b == False):
+			index = int(input("saisir un index pour jouer une carte : "))
+			b = Player1.play_card(index)
+		
+		b = False
+		while(b == False):
+			index = int(input("saisir un index pour jouer une carte : "))
+			b = Player2.play_card(index)
+		
 		self.debug_print_all(Player1,Player2)
 
-		a = int(input("saisir un index pour jouer une carte : "))
-		Player1.play_card(a)
-		Player2.play_card(a)
+		b = False
+		self.debug_print_all(Player1,Player2)
+		while(b == False):
+			index = int(input("saisir un index pour jouer une carte : "))
+			b = Player1.play_card(index)
+		
+		b = False
+		while(b == False):
+			index = int(input("saisir un index pour jouer une carte : "))
+			b = Player2.play_card(index)
+		
 		self.debug_print_all(Player1,Player2)
 
 		#attaque du joueur1
-		a = int(input("Player 1: saisir l'index de l'attaque : "))
-		Player1.choice_attack(a)
+		index = int(input("Player 1: saisir l'index de l'attaque : "))
+		print("La carte qui attaque : ",Player1.get_board().get_battle_zone()[index].get_name())
+		Player1.choice_attack(index)
 		self.debug_print_all(Player1,Player2)
 
 		#blockage du joueur2
-		a = int(input("Player 2 : saisir l'index du blockeur : "))
-		b = int(input("Player 2: saisir l'index de l'attaqueur : "))
-		Player2.choice_block(Player1, a, b)
+		index_block = int(input("Player 2 : saisir l'index du blockeur : "))
+		print("La carte qui block : ",Player2.get_board().get_battle_zone()[index_block].get_name())
+		index_attk = int(input("Player 2: saisir l'index de l'attaqueur : "))
+		print("La carte qui attaque : ",Player1.get_board().get_battle_zone()[index_attk].get_name())
+		Player2.choice_block(Player1, index_block, index_attk)
 		self.debug_print_all(Player1,Player2)
 
 		#attaque
-		Player1.attack(Player2, b, a)
+		Player1.attack(Player2, index_attk, index_block)
 		self.debug_print_all(Player1,Player2)
 
 		#attribution damage

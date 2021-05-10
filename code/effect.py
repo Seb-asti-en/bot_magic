@@ -129,7 +129,7 @@ class Effect:
 		b = True
 
 		if "hast" in Card_source.get_effect().get_list_effects():
-			self.haste(Card_source)			
+			Card_source.get_effect().haste(Card_source)			
 
 		if "defender" in Card_source.get_effect().get_list_effects():
 			b = False
@@ -180,10 +180,10 @@ class Effect:
 	def early_choice_block(Card_target,Card_source):
 		b = True		
 		if "flying" in Card_target.get_effect().get_list_effects():
-			b = (self.flying(Card_source) or self.reach(Card_source))
+			b = (Card_source.get_effect().flying(Card_source) or Card_source.get_effect().reach(Card_source))
 			 
 		if "skulk"  in Card_target.get_effect().get_list_effects():
-			b = self.skulk(Card_target,Card_source)
+			b = Card_source.get_effect().skulk(Card_target,Card_source)
 
 		return b
 
