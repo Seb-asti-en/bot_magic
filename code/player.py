@@ -171,9 +171,13 @@ class Player():
 	# @param index_src	l'index de la carte qui doit bloquer
 	##
 	def choice_block(self,Player_target,index_target,index_src):
-		if self.__board.isempty_battle_zone() or index_src >= len(self.__board.get_battle_zone()) or index_src < 0:
+		b = False
+		if self.__board.isempty_battle_zone():
+			print("Vous n'avez pas de cartes pour vous defendre")
+		elif index_src >= len(self.__board.get_battle_zone()) or index_src < 0:
 				print("l'index source est trop grand ou trop petit", index_src)
-		elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[index_target],self.__board.get_battle_zone()[index_src]) == True :
+		elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[index_target], self.__board.get_battle_zone()[index_src]) == True :
+			b = True
 			self.__board.get_battle_zone()[index_src].set_isblocked(True)
 			if Player_target.get_board().get_battle_zone()[index_target].get_isattack() == True:
 				Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
@@ -181,21 +185,27 @@ class Player():
 				print("selectioner un attaquant")
 		else:
 			print("vous ne pouvez pas bloquer")
+		return b
 
 	###
 	# permet de choisir la carte qui attaque
 	# @param index l'index de la carte
 	###
 	def choice_attack(self,index):
+		b = False
 		if self.__board.isempty_battle_zone() or index >= len(self.__board.get_battle_zone()) or index < 0 :
 			print("l'index est trop grand ou trop petit", index)
-		
+			
 		elif Effect.early_choice_attack(self.__board.get_battle_zone()[index]) == False :
 			print("la carte ne peut pas attaquer")
+			
 		elif self.get_board().get_battle_zone()[index].get_issummoning_sickness() == True:
 			print("la carte ne peut pas attaquer elle a le mal d'invocation")
+			
 		else:
 			self.__board.get_battle_zone()[index].set_isattack(True)
+			b = True
+		return b
 
 	##
 	# donne des degats aux joueurs  adverse
