@@ -2,16 +2,13 @@ import socket, pickle, sys, os
 from deckmanager import DeckManager
 from player import Player
 
-import time
-
 DEBUG = False
 
 SOCKET = 0
 PLAYER = 1
 LIFE = 10
 
-DECK1 = "White"
-DECK2 = "Black"
+DEFAULT_DECK = "Test_Tristan"
 
 class Game:
 
@@ -159,7 +156,7 @@ class Game:
 		for player in self.__players:
 	
 			# Création automatique du deck sans demander au client
-			self.__deckmanager.add(DECKTEST)
+			self.__deckmanager.add(DEFAULT_DECK)
 			deck = self.__deckmanager.copy_deck(0)
 
 			# Création de l'objet Player en lui passant le deck
