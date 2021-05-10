@@ -111,15 +111,29 @@ class Effect:
 			Card_target.get_effect().deathtouch(Card_source)
 	
 	##
+	# Ne possède pas de mal d'invocation 
+	# @param Card_target carte ciblé
+	##	
+	def haste(Card):
+		Card._issummoning_sickness = False
+
+
+
+	##
 	# verifie les effets avant le choix  d'attaque
 	# @param Card_source carte utilisé
 	# @return True si on peut attaquer sinon FALSE
 	##
 	@staticmethod
 	def early_choice_attack(Card_source):
-		b = True		
+		b = True
+
+		if "hast" in Card_source.get_effect().get_list_effects():
+			self.haste(Card_source)			
+
 		if "defender" in Card_source.get_effect().get_list_effects():
 			b = False
+		
 		return b
 
 	##
@@ -174,13 +188,7 @@ class Effect:
 		return b
 
 
-	##
-	#TODO: faire le mal d'invocation
-	# Ne possède pas de mal d'invocation 
-	# @param Card_target carte ciblé
-	##	
-	def haste(Card):
-		Card._issummoning_sickness = True
+	
 	
 	# def flash(self):
 	# 	pass

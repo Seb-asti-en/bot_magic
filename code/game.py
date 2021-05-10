@@ -7,9 +7,11 @@ PLAYER = 1
 LIFE = 20
 SEGMENT_SIZE = 65536
 
-BLEU = '\x1b[6;30;44m'
+NOIR = '\x1b[6;37;40m'
 ROUGE = '\x1b[6;30;41m'
 ORANGE = '\x1b[6;30;43m'
+BLEU = '\x1b[6;30;44m'
+BLANC = '\x1b[6;30;47m'
 RESET = '\x1b[0m'
 
 DECK1 = "White"
@@ -370,13 +372,15 @@ class Game:
 		i=0
 		for card in Player2.get_board().get_battle_zone():
 			if Player2.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,card._name,RESET+'|',end='  ')	
+				print('|'+ORANGE,card._name,RESET+'|,"[",card.get_mana_cost(),"]"',end='  ')	
 			elif Player2.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,card._name,RESET+'|',end='  ')
+				print('|'+ROUGE,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
 			elif Player2.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,card._name,RESET+'|',end='  ')
+				print('|'+BLEU,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
+			elif Player2.get_board().get_battle_zone()[i]._issummoning_sickness == True:	
+				print('|'+NOIR,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
 			else:
-				print("|",card._name,"|",end='  ')
+				print("|",card._name,"[",card.get_mana_cost(),"]","|",end='  ')
 			print("")	
 			print("|",card.get_effect().get_list_effects(),"|")
 			print("|",card.get_damage(),",",card.get_life(),"|")
@@ -390,13 +394,15 @@ class Game:
 		i=0
 		for card in Player1.get_board().get_battle_zone():
 			if Player1.get_board().get_battle_zone()[i].get_istarget() == True:
-				print('|'+ORANGE,card._name,RESET+'|',end='  ')		
+				print('|'+ORANGE,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')		
 			elif Player1.get_board().get_battle_zone()[i].get_isattack() == True:
-				print('|'+ROUGE,card._name,RESET+'|',end='  ')
+				print('|'+ROUGE,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
 			elif Player1.get_board().get_battle_zone()[i].get_isblocked() == True:
-				print('|'+BLEU,card._name,RESET+'|',end='  ')
+				print('|'+BLEU,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
+			elif Player1.get_board().get_battle_zone()[i]._issummoning_sickness == True:	
+				print('|'+NOIR,card._name,RESET+'|',"[",card.get_mana_cost(),"]",end='  ')
 			else:
-				print("|",card._name,"|",end='  ')
+				print("|",card._name,"[",card.get_mana_cost(),"]","|",end='  ')
 			print("")
 			print("|",card.get_effect().get_list_effects(),"|")
 			print("|",card.get_damage(),",",card.get_life(),"|")
@@ -405,7 +411,7 @@ class Game:
 		
 		print("")
 		print("land_zone")
-		print("|",len(Player1.get_board().get_land_zone()),"|")
+		Player1.debug_print_land_zone()
 		print("")
 
 		Player1.debug_print_hand()
@@ -435,6 +441,9 @@ class Game:
 			card._istarget = False
 			card._isblocked = False
 			
+
+	
+	
 	##
 	# tue les cartes qui on plus de vie 
 	# @param Player1 le joueur1
@@ -481,13 +490,13 @@ class Game:
 		self.debug_print_all(Player1,Player2)
 
 		#attaque du joueur1
-		a = int(input("saisir l'index de l'attaque : "))
+		a = int(input("Player 1: saisir l'index de l'attaque : "))
 		Player1.choice_attack(a)
 		self.debug_print_all(Player1,Player2)
 
 		#blockage du joueur2
-		a = int(input("saisir l'index du blockeur : "))
-		b = int(input("saisir l'index de l'attaqueur : "))
+		a = int(input("Player 2 : saisir l'index du blockeur : "))
+		b = int(input("Player 2: saisir l'index de l'attaqueur : "))
 		Player2.choice_block(Player1, a, b)
 		self.debug_print_all(Player1,Player2)
 
@@ -508,7 +517,9 @@ class Game:
 		#affichage
 		self.debug_print_all(Player1,Player2)
 
-		
+		Player1.untap()
+		Player2.untap()
+		self.debug_print_all(Player1,Player2)
 
 		
 
