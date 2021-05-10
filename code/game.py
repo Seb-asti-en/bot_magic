@@ -18,6 +18,7 @@ class Game:
 		self.__deckmanager = DeckManager()
 		self.__slots = slots
 		self.__players = []
+		self.__dead_players = []
 
 	def get_socket(self):
 		return self.__socket
@@ -183,6 +184,21 @@ class Game:
 			print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Mulligan")
 			self.mulligan(player[PLAYER].get_id())
 
+	def concede(self, index):
+		# Envoi vers le client : Acceptation (10.2.1)
+		self.send_signal(index,"ACCEPT")
+		
+		# On met la vie du joueur a 0
+		self.__players[index][PLAYER].set_life(0)
+
+		# Envoi vers le client : Etat de la partie (10.2.2)
+		self.send_gamestate(index)
+		
+		# Envoi vers le client : Signal de mort (23)
+		self.send_signal(index,"DEATH")
+		
+		self.__dead_players.append(index)
+
 	def mulligan(self, index):
 
 		data = None
@@ -234,6 +250,12 @@ class Game:
 				self.send_gamestate(index)
 
 				break
+			
+			elif(data.get("type") == "CONCEDE"):
+
+				self.concede(index)
+
+				break
 
 			else:
 
@@ -247,7 +269,7 @@ class Game:
 		data = None
 
 		# Rafraichissement de l'écran
-		self.clear_terminal()	
+		self.clear_terminal()
 
 		while self.players_alive() > 1:
 
@@ -316,6 +338,7 @@ class Game:
 
 						# Envoi vers le client : Signal de mort (23)
 						self.send_signal(player[PLAYER].get_id(),"DEATH")
+						self.__dead_players.append(player[PLAYER].get_id())
 
 		# Envoi des résultats
 		for player in self.__players:
@@ -325,10 +348,11 @@ class Game:
 				# Envoi vers le client : Signal de mort (24.1)
 				self.send_signal(player[PLAYER].get_id(),"VICTORY")
 
-			else:
+			elif player[PLAYER].get_id() not in self.__dead_players:
 				
 				# Envoi vers le client : Signal de mort (24.2)
 				self.send_signal(player[PLAYER].get_id(),"DEATH")
+				self.__dead_players.append(player[PLAYER].get_id())
 
 	def effect_phase(self, index):
 
@@ -359,6 +383,12 @@ class Game:
 
 				# Envoi vers le client : Etat de la partie (7.2.2)
 				self.send_gamestate(index)
+
+				break
+			
+			elif(data.get("type") == "CONCEDE"):
+
+				self.concede(index)
 
 				break
 
@@ -398,6 +428,12 @@ class Game:
 				self.send_gamestate(index)
 
 				break
+			
+			elif(data.get("type") == "CONCEDE"):
+
+				self.concede(index)
+
+				break
 
 			else:
 
@@ -424,6 +460,12 @@ class Game:
 
 				# Envoi vers le client : Etat de la partie (13.1.2)
 				self.send_gamestate(index)
+
+				break
+			
+			elif(data.get("type") == "CONCEDE"):
+
+				self.concede(index)
 
 				break
 
@@ -463,8 +505,20 @@ class Game:
 				self.send_gamestate(index)
 
 				break
+				
+			elif(data.get("type") == "CONCEDE"):
+
+				self.concede(index)
+
+				break
 
 			else:
 
 				# Envoi vers le client : Refus (19.3)
 				self.send_signal(index,"DECLINE")
+				
+				
+				
+				
+				
+
