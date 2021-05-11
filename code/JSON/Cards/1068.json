@@ -1,0 +1,14 @@
+{
+    "Id": 1068,
+    "Name": "Sparring Mummy",
+    "Colors": "W",
+    "Mana_cost": "{3}{W}",
+    "Identity": "W",
+    "Text": "When Sparring Mummy enters the battlefield, untap target creature.",
+    "Power": 3.0,
+    "Toughness": 3.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": "Zombie",
+    "Supertype": null
+}

@@ -1,0 +1,14 @@
+{
+    "Id": 17625,
+    "Name": "Spreading Rot",
+    "Colors": "B",
+    "Mana_cost": "{4}{B}",
+    "Identity": "B",
+    "Text": "Destroy target land. Its controller loses 2 life.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Sorcery",
+    "Type ID": 14,
+    "Subtype": null,
+    "Supertype": null
+}

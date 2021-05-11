@@ -1,0 +1,14 @@
+{
+    "Id": 2660,
+    "Name": "Smuggler's Copter",
+    "Colors": "",
+    "Mana_cost": "{2}",
+    "Identity": "",
+    "Text": "Flying\nWhenever Smuggler's Copter attacks or blocks, you may draw a card. If you do, discard a card.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+    "Power": 3.0,
+    "Toughness": 3.0,
+    "Type": "Artifact",
+    "Type ID": 1,
+    "Subtype": "Vehicle",
+    "Supertype": null
+}

@@ -1,0 +1,14 @@
+{
+    "Id": 17531,
+    "Name": "Pious Interdiction",
+    "Colors": "W",
+    "Mana_cost": "{3}{W}",
+    "Identity": "W",
+    "Text": "Enchant creature\nWhen Pious Interdiction enters the battlefield, you gain 2 life.\nEnchanted creature can't attack or block.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Enchantment",
+    "Type ID": 6,
+    "Subtype": "Aura",
+    "Supertype": null
+}

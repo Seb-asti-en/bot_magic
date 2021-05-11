@@ -1,0 +1,14 @@
+{
+    "Id": 1146,
+    "Name": "Splendid Agony",
+    "Colors": "B",
+    "Mana_cost": "{2}{B}",
+    "Identity": "B",
+    "Text": "Distribute two -1/-1 counters among one or two target creatures.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

@@ -1,0 +1,14 @@
+{
+    "Id": 1317,
+    "Name": "Air Elemental",
+    "Colors": "U",
+    "Mana_cost": "{3}{U}{U}",
+    "Identity": "U",
+    "Text": "Flying",
+    "Power": 4.0,
+    "Toughness": 4.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": "Elemental",
+    "Supertype": null
+}

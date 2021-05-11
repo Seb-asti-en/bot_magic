@@ -1,0 +1,14 @@
+{
+    "Id": 1166,
+    "Name": "Electrify",
+    "Colors": "R",
+    "Mana_cost": "{3}{R}",
+    "Identity": "R",
+    "Text": "Electrify deals 4 damage to target creature.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

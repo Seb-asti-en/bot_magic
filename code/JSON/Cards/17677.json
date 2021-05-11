@@ -1,0 +1,14 @@
+{
+    "Id": 17677,
+    "Name": "Crash the Ramparts",
+    "Colors": "G",
+    "Mana_cost": "{2}{G}",
+    "Identity": "G",
+    "Text": "Target creature gets +3/+3 and gains trample until end of turn.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

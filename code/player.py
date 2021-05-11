@@ -36,19 +36,19 @@ class Player():
 
 	############################ Methodes ############################
 
-	### TODO: Ajout mana quand land carte jouer
 	### TODO: Soustrait mana quand carte jouer
 	
 	##
 	# Ajoute un mana dans la reserve de mana
 	# @param key la couleur voulu
-	# @param valeur la quantité ajouté
+	# @param Card la carte regardé
 	##
-	def add_mana(self, key, valeur):
-		try:
-			self.__available_mana[key] = self._mana_cost[key] + valeur
-		except:
-			self.__available_mana[key] = valeur
+	def add_mana(self, Card):
+		for key in Card.get_identity():
+			if key in self.__available_mana:
+				self.__available_mana[key] = self.__available_mana[key] + 1
+			else:
+				self.__available_mana[key] = 1
 
 	##
 	# Le nombre de mana disponible  
@@ -94,9 +94,13 @@ class Player():
 		else:
 			if self.__board.get_hand()[index_card].get_type() =="Land":
 				print("itsss lannnd",self.__board.get_hand()[index_card]._name)
-				self.__board.add_land_zone(self.__board.get_hand().pop(index_card))
+				land_card = self.__board.get_hand().pop(index_card)
+				self.__board.add_land_zone(land_card)
+				self.add_mana(land_card)
+				
+				
 
-			elif self.__board.get_hand()[index_card].get_type() =="Creature" or self.__board.get_hand()[index_card].get_type() =="Artifact" :
+			elif self.__board.get_hand()[index_card].get_type() == "Creature" or self.__board.get_hand()[index_card].get_type() == "Artifact" :
 				print("itsss creature",self.__board.get_hand()[index_card]._name)
 				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
 
@@ -114,26 +118,29 @@ class Player():
 	# retourne true si elle est jouable, sinon false
 	##
 	def playable_card(self, index_card):
-		tmpX = 0
-		tmp = self.remaining_mana()
 		b = True
-		if tmp != 0:
-			for key in self.__board.get_hand()[index_card].get_mana_cost():
-				if key == 'X':
-					tmpX = self.__board.get_hand()[index_card].get_mana_cost()['X']
-				elif key in self.__available_mana:
-					if self.__available_mana[key] >= self.__board.get_hand()[index_card].get_mana_cost()[key]:
-						tmp -= self.__board.get_hand()[index_card].get_mana_cost()[key]
+		print(self.__board.get_hand()[index_card].get_mana_cost())
+		print(self.__board.get_hand()[index_card].get_identity())
+		if self.__board.get_hand()[index_card].get_mana_cost() != {}:
+			tmpX = 0
+			tmp = self.remaining_mana()
+			if tmp != 0:
+				for key in self.__board.get_hand()[index_card].get_mana_cost():
+					if key == 'X':
+						tmpX = self.__board.get_hand()[index_card].get_mana_cost()['X']
+					elif key in self.__available_mana:
+						if self.__available_mana[key] >= self.__board.get_hand()[index_card].get_mana_cost()[key]:
+							tmp -= self.__board.get_hand()[index_card].get_mana_cost()[key]
+						else:
+							b = False
 					else:
 						b = False
-				else:
-					b = False
-			if tmpX != 0 and b != False:
-				if tmp >= tmpX:
-					b = True
-				else:
-					b = False
-			return b
+				if tmpX != 0 and b != False:
+					if tmp >= tmpX:
+						b = True
+					else:
+						b = False
+		return b
 
 	##
 	# permet d'utiliser des cartes

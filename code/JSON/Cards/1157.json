@@ -1,0 +1,17 @@
+{
+    "Id": 1157,
+    "Name": "Bloodlust Inciter",
+    "Colors": "R",
+    "Mana_cost": "{R}",
+    "Identity": "R",
+    "Text": "{T}: Target creature gains haste until end of turn.",
+    "Power": 1.0,
+    "Toughness": 1.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Human",
+        "Warrior"
+    ],
+    "Supertype": null
+}

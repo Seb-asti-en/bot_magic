@@ -1,0 +1,14 @@
+{
+    "Id": 1058,
+    "Name": "Impeccable Timing",
+    "Colors": "W",
+    "Mana_cost": "{1}{W}",
+    "Identity": "W",
+    "Text": "Impeccable Timing deals 3 damage to target attacking or blocking creature.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

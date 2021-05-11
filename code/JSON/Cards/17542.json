@@ -1,0 +1,17 @@
+{
+    "Id": 17542,
+    "Name": "Skyblade of the Legion",
+    "Colors": "W",
+    "Mana_cost": "{1}{W}",
+    "Identity": "W",
+    "Text": "Flying",
+    "Power": 1.0,
+    "Toughness": 3.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Vampire",
+        "Soldier"
+    ],
+    "Supertype": null
+}

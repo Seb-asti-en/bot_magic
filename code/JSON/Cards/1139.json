@@ -1,0 +1,14 @@
+{
+    "Id": 1139,
+    "Name": "Painful Lesson",
+    "Colors": "B",
+    "Mana_cost": "{2}{B}",
+    "Identity": "B",
+    "Text": "Target player draws two cards and loses 2 life.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Sorcery",
+    "Type ID": 14,
+    "Subtype": null,
+    "Supertype": null
+}

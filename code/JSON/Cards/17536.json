@@ -1,0 +1,14 @@
+{
+    "Id": 17536,
+    "Name": "Raptor Companion",
+    "Colors": "W",
+    "Mana_cost": "{1}{W}",
+    "Identity": "W",
+    "Text": "",
+    "Power": 3.0,
+    "Toughness": 1.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": "Dinosaur",
+    "Supertype": null
+}

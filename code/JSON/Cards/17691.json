@@ -1,0 +1,17 @@
+{
+    "Id": 17691,
+    "Name": "Jungle Delver",
+    "Colors": "G",
+    "Mana_cost": "{G}",
+    "Identity": "G",
+    "Text": "{3}{G}: Put a +1/+1 counter on Jungle Delver.",
+    "Power": 1.0,
+    "Toughness": 1.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Merfolk",
+        "Warrior"
+    ],
+    "Supertype": null
+}

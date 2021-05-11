@@ -1,0 +1,17 @@
+{
+    "Id": 17603,
+    "Name": "Desperate Castaways",
+    "Colors": "B",
+    "Mana_cost": "{1}{B}",
+    "Identity": "B",
+    "Text": "Desperate Castaways can't attack unless you control an artifact.",
+    "Power": 2.0,
+    "Toughness": 3.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Human",
+        "Pirate"
+    ],
+    "Supertype": null
+}

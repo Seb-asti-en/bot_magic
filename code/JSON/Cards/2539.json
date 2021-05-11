@@ -1,0 +1,14 @@
+{
+    "Id": 2539,
+    "Name": "Demolish",
+    "Colors": "R",
+    "Mana_cost": "{3}{R}",
+    "Identity": "R",
+    "Text": "Destroy target artifact or land.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Sorcery",
+    "Type ID": 14,
+    "Subtype": null,
+    "Supertype": null
+}

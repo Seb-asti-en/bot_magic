@@ -1,0 +1,14 @@
+{
+    "Id": 1103,
+    "Name": "Pull from Tomorrow",
+    "Colors": "U",
+    "Mana_cost": "{X}{U}{U}",
+    "Identity": "U",
+    "Text": "Draw X cards, then discard a card.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

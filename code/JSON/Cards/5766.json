@@ -1,0 +1,17 @@
+{
+    "Id": 5766,
+    "Name": "Rummaging Goblin",
+    "Colors": "R",
+    "Mana_cost": "{2}{R}",
+    "Identity": "R",
+    "Text": "{T}, Discard a card: Draw a card.",
+    "Power": 1.0,
+    "Toughness": 1.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Rogue",
+        "Goblin"
+    ],
+    "Supertype": null
+}

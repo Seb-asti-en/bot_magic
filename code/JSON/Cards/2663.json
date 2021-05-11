@@ -1,0 +1,20 @@
+{
+    "Id": 2663,
+    "Name": "Weldfast Monitor",
+    "Colors": "",
+    "Mana_cost": "{3}",
+    "Identity": "R",
+    "Text": "{R}: Weldfast Monitor gains menace until end of turn.",
+    "Power": 3.0,
+    "Toughness": 2.0,
+    "Type": [
+        "Artifact",
+        "Creature"
+    ],
+    "Type ID": [
+        1,
+        3
+    ],
+    "Subtype": "Lizard",
+    "Supertype": null
+}

@@ -1,0 +1,14 @@
+{
+    "Id": 17567,
+    "Name": "Overflowing Insight",
+    "Colors": "U",
+    "Mana_cost": "{4}{U}{U}{U}",
+    "Identity": "U",
+    "Text": "Target player draws seven cards.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Sorcery",
+    "Type ID": 14,
+    "Subtype": null,
+    "Supertype": null
+}

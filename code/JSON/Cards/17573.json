@@ -1,0 +1,14 @@
+{
+    "Id": 17573,
+    "Name": "Run Aground",
+    "Colors": "U",
+    "Mana_cost": "{3}{U}",
+    "Identity": "U",
+    "Text": "Put target artifact or creature on top of its owner's library.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

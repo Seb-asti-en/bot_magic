@@ -1,0 +1,17 @@
+{
+    "Id": 1137,
+    "Name": "Miasmic Mummy",
+    "Colors": "B",
+    "Mana_cost": "{1}{B}",
+    "Identity": "B",
+    "Text": "When Miasmic Mummy enters the battlefield, each player discards a card.",
+    "Power": 2.0,
+    "Toughness": 2.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Jackal",
+        "Zombie"
+    ],
+    "Supertype": null
+}

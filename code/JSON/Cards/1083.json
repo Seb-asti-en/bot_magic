@@ -1,0 +1,14 @@
+{
+    "Id": 1083,
+    "Name": "Cancel",
+    "Colors": "U",
+    "Mana_cost": "{1}{U}{U}",
+    "Identity": "U",
+    "Text": "Counter target spell.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

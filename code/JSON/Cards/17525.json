@@ -1,0 +1,14 @@
+{
+    "Id": 17525,
+    "Name": "Legion's Judgment",
+    "Colors": "W",
+    "Mana_cost": "{2}{W}",
+    "Identity": "W",
+    "Text": "Destroy target creature with power 4 or greater.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Sorcery",
+    "Type ID": 14,
+    "Subtype": null,
+    "Supertype": null
+}

@@ -128,15 +128,16 @@ class Card:
 	def init_mana_cost(self, card):
 		self._mana_cost = {}
 		temp = card["Mana_cost"]
-		res = temp.strip('}{').split('}{')
-		if(res[0].isnumeric()):
-			self._mana_cost['X'] = int(res[0])
-			res.remove(res[0])
-		for x in res:
-			try:
-				self._mana_cost[x] = self._mana_cost[x] + 1
-			except:
-				self._mana_cost[x] = 1
+		if(temp != ''):
+			res = temp.strip('}{').split('}{')
+			if(res[0].isnumeric()):
+				self._mana_cost['X'] = int(res[0])
+				res.remove(res[0])
+			for x in res:
+				try:
+					self._mana_cost[x] = self._mana_cost[x] + 1
+				except:
+					self._mana_cost[x] = 1
 		return self._mana_cost
 	
 	##
@@ -144,14 +145,14 @@ class Card:
 	# @param card 	la carte qu'il faut initialiser
 	##
 	def init_colors(self, card):
-		self._colors = {}
+		self._colors = []
 		temp = card["Colors"]
 		res = temp.split(';')
 		for x in res:
 			if(x == ''):	
-				self._colors['C'] = 1
+				self._colors.append('C')
 			else:
-				self._colors[x] = 1
+				self._colors.append(x)
 		return self._colors
 	
 	##
@@ -159,14 +160,14 @@ class Card:
 	# @param card 	la carte qu'il faut initialiser
 	##
 	def init_identity(self, card):
-		self._identity = {}
+		self._identity = []
 		temp = card["Identity"]
 		res = temp.split(';')
 		for x in res:
 			if(x == ''):	
-				self._identity['C'] = 1
+				self._identity.append['C']
 			else:
-				self._identity[x] = 1
+				self._identity.append(x)
 		return self._identity
 
 	##

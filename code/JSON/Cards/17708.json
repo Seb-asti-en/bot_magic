@@ -1,0 +1,17 @@
+{
+    "Id": 17708,
+    "Name": "Verdant Sun's Avatar",
+    "Colors": "G",
+    "Mana_cost": "{5}{G}{G}",
+    "Identity": "G",
+    "Text": "Whenever Verdant Sun's Avatar or another creature enters the battlefield under your control, you gain life equal to that creature's toughness.",
+    "Power": 5.0,
+    "Toughness": 5.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Avatar",
+        "Dinosaur"
+    ],
+    "Supertype": null
+}

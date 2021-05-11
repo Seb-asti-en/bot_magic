@@ -1,0 +1,14 @@
+{
+    "Id": 1052,
+    "Name": "Fan Bearer",
+    "Colors": "W",
+    "Mana_cost": "{W}",
+    "Identity": "W",
+    "Text": "{2}, {T}: Tap target creature.",
+    "Power": 1.0,
+    "Toughness": 2.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": "Zombie",
+    "Supertype": null
+}

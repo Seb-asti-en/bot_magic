@@ -1,0 +1,14 @@
+{
+    "Id": 3292,
+    "Name": "Dual Shot",
+    "Colors": "R",
+    "Mana_cost": "{R}",
+    "Identity": "R",
+    "Text": "Dual Shot deals 1 damage to each of up to two target creatures.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

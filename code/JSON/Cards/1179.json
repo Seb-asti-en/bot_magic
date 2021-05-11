@@ -1,0 +1,17 @@
+{
+    "Id": 1179,
+    "Name": "Minotaur Sureshot",
+    "Colors": "R",
+    "Mana_cost": "{2}{R}",
+    "Identity": "R",
+    "Text": "Reach (This creature can block creatures with flying.)\n{1}{R}: Minotaur Sureshot gets +1/+0 until end of turn.",
+    "Power": 2.0,
+    "Toughness": 3.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Archer",
+        "Minotaur"
+    ],
+    "Supertype": null
+}

@@ -1,0 +1,17 @@
+{
+    "Id": 17594,
+    "Name": "Blight Keeper",
+    "Colors": "B",
+    "Mana_cost": "{B}",
+    "Identity": "B",
+    "Text": "Flying\r\n{7}{B}, {T}, Sacrifice Blight Keeper: Target opponent loses 4 life and you gain 4 life.",
+    "Power": 1.0,
+    "Toughness": 1.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Imp",
+        "Bat"
+    ],
+    "Supertype": null
+}

@@ -1,0 +1,14 @@
+{
+    "Id": 195,
+    "Name": "Plains",
+    "Colors": "",
+    "Mana_cost": "",
+    "Identity": "W",
+    "Text": "",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Land",
+    "Type ID": 8,
+    "Subtype": "Plains",
+    "Supertype": "Basic"
+}

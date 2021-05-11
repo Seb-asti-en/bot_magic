@@ -1,0 +1,14 @@
+{
+    "Id": 197,
+    "Name": "Swamp",
+    "Colors": "",
+    "Mana_cost": "",
+    "Identity": "B",
+    "Text": "",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Land",
+    "Type ID": 8,
+    "Subtype": "Swamp",
+    "Supertype": "Basic"
+}

@@ -1,0 +1,17 @@
+{
+    "Id": 17615,
+    "Name": "Queen's Bay Soldier",
+    "Colors": "B",
+    "Mana_cost": "{1}{B}",
+    "Identity": "B",
+    "Text": "",
+    "Power": 2.0,
+    "Toughness": 2.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": [
+        "Soldier",
+        "Vampire"
+    ],
+    "Supertype": null
+}

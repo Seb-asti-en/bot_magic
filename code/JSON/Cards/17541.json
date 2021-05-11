@@ -1,0 +1,14 @@
+{
+    "Id": 17541,
+    "Name": "Shining Aerosaur",
+    "Colors": "W",
+    "Mana_cost": "{4}{W}",
+    "Identity": "W",
+    "Text": "Flying",
+    "Power": 3.0,
+    "Toughness": 4.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": "Dinosaur",
+    "Supertype": null
+}

@@ -30,9 +30,7 @@ class DeckManager:
 	# @param name 	Le nom du deck voulu
 	##
 	def add(self, name):
-		json_cards = None
 		json_deck = None
-		cards = None
 		deck = None
 		
 		#Ouverture du JSON des decks
@@ -46,30 +44,31 @@ class DeckManager:
 		for recup_deck in json_deck["decks"]:
 			if name in recup_deck["Name"]:
 				deck = Deck(name,[])
-				cards = recup_deck["cards"]
-				try:
-					with open("JSON/all_cards.json") as file:
-						json_cards = json.load(file)
-				except OSError:
-					sys.exit("Impossible d'ouvrir le fichier decks JSON")
+				card = recup_deck["cards"]
 		
 		#Ajoute chaque carte du json_all_cards grace au json_deck
-		for d_card in cards:
-			for j_card in json_cards["cards"]:
-				if j_card["Id"] == int(d_card["Id"]):
-		 			for y in range(int(d_card["copy"])):
-		 				if "Creature" in j_card["Type"]:
-		 					deck.add_card(CreatureCard(j_card))
-		 				elif "Land" in j_card["Type"]:
-		 					deck.add_card(LandCard(j_card))
-		 				elif "Instant" in j_card["Type"]:
-		 					deck.add_card(InstantCard(j_card))
-		 				elif "Sorcery" in j_card["Type"] :
-		 					deck.add_card(SorceryCard(j_card))
-		 				elif "Enchantment" in j_card["Type"]:
-		 					deck.add_card(Card(j_card))
-		 				elif "Artifact" in j_card["Type"]:
-							 deck.add_card(Card(j_card))
+		for deck_card in card:
+			print("JSON/Cards/" + str(deck_card["Id"]) + ".json")
+			try:
+				with open("JSON/Cards/" + str(deck_card["Id"]) + ".json") as file:
+					print("Je suis le roi du monde et aussi ",str(deck_card["Id"]))
+					id_card = json.load(file)
+			except OSError:
+				sys.exit("Impossible d'ouvrir le fichier decks JSON")
+				
+			for y in range(int(deck_card["copy"])):
+ 				if "Creature" in id_card["Type"]:
+ 					deck.add_card(CreatureCard(id_card))
+ 				elif "Land" in id_card["Type"]:
+ 					deck.add_card(LandCard(id_card))
+ 				elif "Instant" in id_card["Type"]:
+ 					deck.add_card(InstantCard(id_card))
+ 				elif "Sorcery" in id_card["Type"] :
+ 					deck.add_card(SorceryCard(id_card))
+ 				elif "Enchantment" in id_card["Type"]:
+ 					deck.add_card(Card(id_card))
+ 				elif "Artifact" in id_card["Type"]:
+					 deck.add_card(Card(id_card))
  				
  		# Ajout du deck dans le deckmanager
 		self.__decks.append(deck)

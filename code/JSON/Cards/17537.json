@@ -1,0 +1,14 @@
+{
+    "Id": 17537,
+    "Name": "Ritual of Rejuvenation",
+    "Colors": "W",
+    "Mana_cost": "{2}{W}",
+    "Identity": "W",
+    "Text": "You gain 4 life.\nDraw a card.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

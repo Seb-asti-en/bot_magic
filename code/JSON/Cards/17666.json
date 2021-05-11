@@ -1,0 +1,14 @@
+{
+    "Id": 17666,
+    "Name": "Unfriendly Fire",
+    "Colors": "R",
+    "Mana_cost": "{4}{R}",
+    "Identity": "R",
+    "Text": "Unfriendly Fire deals 4 damage to target creature or player.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

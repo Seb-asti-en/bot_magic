@@ -1,0 +1,14 @@
+{
+    "Id": 6752,
+    "Name": "Slice in Twain",
+    "Colors": "G",
+    "Mana_cost": "{2}{G}{G}",
+    "Identity": "G",
+    "Text": "Destroy target artifact or enchantment.\nDraw a card.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

@@ -1,0 +1,14 @@
+{
+    "Id": 17675,
+    "Name": "Colossal Dreadmaw",
+    "Colors": "G",
+    "Mana_cost": "{4}{G}{G}",
+    "Identity": "G",
+    "Text": "Trample",
+    "Power": 6.0,
+    "Toughness": 6.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": "Dinosaur",
+    "Supertype": null
+}

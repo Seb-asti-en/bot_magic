@@ -1,0 +1,14 @@
+{
+    "Id": 3983,
+    "Name": "Sure Strike",
+    "Colors": "R",
+    "Mana_cost": "{1}{R}",
+    "Identity": "R",
+    "Text": "Target creature gets +3/+0 and gains first strike until end of turn.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}

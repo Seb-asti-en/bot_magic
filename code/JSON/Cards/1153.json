@@ -1,0 +1,14 @@
+{
+    "Id": 1153,
+    "Name": "Wasteland Scorpion",
+    "Colors": "B",
+    "Mana_cost": "{2}{B}",
+    "Identity": "B",
+    "Text": "Deathtouch\nCycling {2} ({2}, Discard this card: Draw a card.)",
+    "Power": 2.0,
+    "Toughness": 2.0,
+    "Type": "Creature",
+    "Type ID": 3,
+    "Subtype": "Scorpion",
+    "Supertype": null
+}

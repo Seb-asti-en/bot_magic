@@ -1,0 +1,14 @@
+{
+    "Id": 1091,
+    "Name": "Essence Scatter",
+    "Colors": "U",
+    "Mana_cost": "{1}{U}",
+    "Identity": "U",
+    "Text": "Counter target creature spell.",
+    "Power": 0.0,
+    "Toughness": 0.0,
+    "Type": "Instant",
+    "Type ID": 7,
+    "Subtype": null,
+    "Supertype": null
+}
