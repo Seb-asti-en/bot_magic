@@ -184,11 +184,6 @@ class Client:
 
 		return data
 
-	def disconnect(self):
-
-		self.__game_socket.close()
-		self.__server_socket.close()
-
 	# Connexion au serveur UDP
 	def connect_server(self):
 
@@ -443,6 +438,11 @@ class Client:
 		#input(request)
 
 		return request
+
+	def disconnect(self):
+
+		self.__game_socket.close()
+		self.__server_socket.close()
 
 if __name__ == "__main__":
 	try:
