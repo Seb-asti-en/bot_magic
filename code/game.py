@@ -2,7 +2,7 @@ import socket, pickle, sys, os
 from deckmanager import DeckManager
 from player import Player
 
-DEBUG = False
+DEBUG = True
 
 SOCKET = 0
 PLAYER = 1
@@ -54,6 +54,33 @@ class Game:
 
 		return alive
 
+	def define_gamestate(self):
+
+		gamestate = []
+
+		for player in self.__players:
+
+			gamestate.append(player[PLAYER])
+
+		return gamestate
+
+	def concede(self, index):
+
+		# Envoi vers le client : Acceptation
+		self.send_signal(index,"ACCEPT")
+		
+		# On met la vie du joueur à 0
+		self.__players[index][PLAYER].set_life(0)
+
+		# Envoi vers le client : Etat de la partie
+		self.send_gamestate(index)
+		
+		# Envoi vers le client : Signal de mort
+		self.send_signal(index,"DEATH")
+		
+		# Mise à jour des morts
+		self.__dead_players.append(index)
+
 	def send_signal(self, index, data):
 
 		serialized_data = None
@@ -71,12 +98,19 @@ class Game:
 			print(data,"(envoyé)")
 
 	# TODO : (à modifier plus tard selon le format JSON)
-	def send_gamestate(self, index):
+	def send_gamestate(self, index, gamestate = None):
 
 		serialized_data = None
 
-		# Sérialisation 
-		serialized_data = pickle.dumps(self.__players[index][PLAYER])
+		if(gamestate):
+
+			# Sérialisation
+			serialized_data = pickle.dumps(gamestate)
+
+		else:
+
+			# Sérialisation 
+			serialized_data = pickle.dumps([])
 
 		# Envoi vers le client : Taille du segment (1)
 		self.send_size(index,serialized_data)
@@ -168,11 +202,19 @@ class Game:
 
 	def start(self):
 
+		gamestate = None
+
 		# Initialisation de la partie
 		for player in self.__players:
 
-			# Envoi vers le player : Objet Player (1)
-			self.send_gamestate(player[PLAYER].get_id())
+			# Génération de l'état de la partie
+			gamestate = self.define_gamestate()
+
+			# Envoi vers le player : ID Player (1)
+			self.send_signal(player[PLAYER].get_id(),str(player[PLAYER].get_id()))
+
+			# Envoi vers le player : Objet Player (2)
+			self.send_gamestate(player[PLAYER].get_id(),gamestate)
 
 		# Phase Mulligan
 		for player in self.__players:
@@ -183,21 +225,6 @@ class Game:
 			# Exécution de la phase
 			print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Mulligan")
 			self.mulligan(player[PLAYER].get_id())
-
-	def concede(self, index):
-		# Envoi vers le client : Acceptation (10.2.1)
-		self.send_signal(index,"ACCEPT")
-		
-		# On met la vie du joueur a 0
-		self.__players[index][PLAYER].set_life(0)
-
-		# Envoi vers le client : Etat de la partie (10.2.2)
-		self.send_gamestate(index)
-		
-		# Envoi vers le client : Signal de mort (23)
-		self.send_signal(index,"DEATH")
-		
-		self.__dead_players.append(index)
 
 	def mulligan(self, index):
 
@@ -259,7 +286,7 @@ class Game:
 
 			else:
 
-				# Envoi vers le client : Refus (4.3)
+				# Envoi vers le client : Refus (4.4)
 				self.send_signal(index,"DECLINE")
 
 				continue
@@ -283,7 +310,7 @@ class Game:
 					print("Le joueur " + str(player[PLAYER].get_id()+1) + " est en vie (" + str(player[PLAYER].get_life()) + "HP)")
 
 					# # Dégagement des cartes
-					# player[PLAYER].untap()
+					player[PLAYER].untap()
 
 					# Phase Effet 1
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 1")
@@ -312,19 +339,35 @@ class Game:
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (1)")
 					self.main_phase(player[PLAYER].get_id())
 
-					# Attaque ?
+					# Attaquant ?
 
-						# Déclaration des monstres attaquants
+					# Déclaration des monstres attaquants
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase d'attaque")
+					self.attack_phase(player[PLAYER].get_id())
+					
+					# Phase Éphémère 2
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Éphémères 2")
+					for ennemy in self.__players:
 
-						# Ennemi engage éphémère (peut boucler)
+						if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
 
-						# Ennemi déclare les monstres bloquants
+							print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut activer un effet")
 
-				 		# Activation d'une ou plusieurs capacités (peut boucler)
+							# Phase Éphémère 2 par ennemy
+							self.instant_phase(ennemy[PLAYER].get_id())
 
-				 		# Engager éphémère (peut boucler)
+					# Ennemi déclare les monstres bloquants
 
-				 		# Appliquer les dommages de combat (prévenir du décès avec une requête)
+			 		# Phase Effet 3
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 3")
+					self.effect_phase(player[PLAYER].get_id())
+
+					# Phase Ephémère 3
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Ephémères 3")
+					self.instant_phase(player[PLAYER].get_id())
+
+			 		# Appliquer les dommages de combat (prévenir du décès avec une requête)
+
 					
 					# Phase Secondaire
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (2)")
@@ -338,6 +381,8 @@ class Game:
 
 						# Envoi vers le client : Signal de mort (23)
 						self.send_signal(player[PLAYER].get_id(),"DEATH")
+
+						# Mise à jour des morts
 						self.__dead_players.append(player[PLAYER].get_id())
 
 		# Envoi des résultats
@@ -352,9 +397,13 @@ class Game:
 				
 				# Envoi vers le client : Signal de mort (24.2)
 				self.send_signal(player[PLAYER].get_id(),"DEATH")
+
+				# Mise à jour des morts
 				self.__dead_players.append(player[PLAYER].get_id())
 
 	def effect_phase(self, index):
+
+		data = None
 
 		while True:
 
@@ -399,6 +448,8 @@ class Game:
 
 	def instant_phase(self, index):
 
+		data = None
+
 		while True:
 
 			# Envoi vers le client : Signal de jeu (8)
@@ -442,6 +493,8 @@ class Game:
 
 	def draw_phase(self, index):
 
+		data = None
+
 		while True:
 
 			# Envoi vers le client : Signal de jeu (11)
@@ -475,6 +528,8 @@ class Game:
 				self.send_signal(index,"DECLINE")
 
 	def main_phase(self, index):
+
+		data = None
 
 		while True:
 
@@ -516,9 +571,17 @@ class Game:
 
 				# Envoi vers le client : Refus (19.3)
 				self.send_signal(index,"DECLINE")
-				
-				
-				
-				
-				
+			
+	def attack_phase(self, index):
 
+		return
+
+		data = None
+
+		while True:
+
+			# Envoi vers le client : Signal de jeu
+			self.send_signal(index,"PLAY")
+
+			# Réception depuis le client : Requête d'action (12)
+			data = self.recv_action(index)

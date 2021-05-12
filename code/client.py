@@ -3,7 +3,7 @@
 import socket, pickle, sys, json, os
 from player import Player
 
-DEBUG = False
+DEBUG = True
 
 PACKET_SIZE = 1024
 
@@ -16,10 +16,17 @@ DISCARD = "6"
 SKIP_PHASE = "7"
 CONCEDE = "8"
 
+ID = 0
+DECK = 1
+HAND = 2
+BATTLE_ZONE = 3
+LAND_ZONE = 4
+GRAVEYARD = 5
+EXILE = 6
+
 def main():
 
 	client = None
-	player = None
 
 	client = Client()
 
@@ -27,10 +34,10 @@ def main():
 	client.connect_server()
 
 	# Connexion au serveur de jeu
-	player = client.connect_game()
+	client.connect_game()
 
 	# Lancement de la partie
-	result = client.play(player)
+	result = client.play()
 
 	# Affichage des résultats de la partie
 	if(result == "VICTORY"):
@@ -61,6 +68,8 @@ class Client:
 		self.__game_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.__server_netconfig = None
 		self.__game_netconfig = None
+		self.__player_id = -1
+		self.__players = []
 
 		try:
 			with open("JSON/ip_config.json") as file:
@@ -93,6 +102,34 @@ class Client:
 
 		os.system(command)
 
+	def update(self, gamestate):
+
+		for player in gamestate:
+
+			if(player[DECK]):
+
+				self.__players[player[ID]].get_board().set_deck(player[DECK])
+
+			if(player[HAND]):
+
+				self.__players[player[ID]].get_board().set_hand(player[HAND])
+
+			if(player[BATTLE_ZONE]):
+
+				self.__players[player[ID]].get_board().set_battle_zone(player[BATTLE_ZONE])
+
+			if(player[LAND_ZONE]):
+
+				self.__players[player[ID]].get_board().set_land_zone(player[LAND_ZONE])
+
+			if(player[GRAVEYARD]):
+
+				self.__players[player[ID]].get_board().set_graveyard(player[GRAVEYARD])
+
+			if(player[EXILE]):
+
+				self.__players[player[ID]].get_board().set_exile(player[EXILE])
+
 	def send_action(self, action):
 
 		serialized_data = None
@@ -108,7 +145,6 @@ class Client:
 		
 		if(DEBUG):
 			print("REQUETE D'ACTION :",action,"(envoyé)")
-
 
 	def send_size(self, segment):
 
@@ -275,18 +311,17 @@ class Client:
 
 	# Connexion à la partie
 	def connect_game(self):
-
-		player = None
 	
 		# Connexion au serveur de jeu
 		self.__game_socket.connect(self.__game_netconfig)
 
-		# Réception depuis le serveur de jeu : Objet Player (1)
-		player = self.recv_gamestate()
+		# Réception depuis le serveur de jeu : ID Player (1)
+		self.__player_id = int(self.recv_signal())
 
-		return player
+		# Réception depuis le serveur de jeu : Objet Player (2)
+		self.__players = self.recv_gamestate()
 
-	def play(self, player):
+	def play(self):
 
 		result = ""
 		request = None
@@ -295,29 +330,29 @@ class Client:
 
 		while True:
 
-			# Réception depuis le serveur de jeu : Signal (2)
+			# Réception depuis le serveur de jeu : Signal (3)
 			response = self.recv_signal()
 
 			if(response == "PLAY"):
 
 				# Choix de l'action
-				request = self.action_menu(player)
+				request = self.action_menu()
 
-				# Envoi vers le serveur de jeu : Requête d'action (3)
+				# Envoi vers le serveur de jeu : Requête d'action (4)
 				self.send_action(request)
 
-				# Réception depuis le serveur de jeu : Acceptation / Refus (4)
+				# Réception depuis le serveur de jeu : Acceptation / Refus (5)
 				response = self.recv_signal()
 
 				# En cas de refus, on recommence
 				if(response == "DECLINE"):
 					continue
 
-				# Réception depuis le serveur de jeu : Etat de la partie (5)
+				# Réception depuis le serveur de jeu : Etat de la partie (6)
 				gamestate = self.recv_gamestate()
 
 				# Mise à jour des informations de jeu
-				player = gamestate
+				self.update(gamestate)
 				
 				if(DEBUG):
 					print("MAJ DE LA PARTIE")
@@ -338,7 +373,7 @@ class Client:
 
 		return result
 
-	def action_menu(self, player):
+	def action_menu(self):
 
 		request = ""
 
@@ -351,7 +386,7 @@ class Client:
 			self.clear_terminal()
 
 			# Affichage initial
-			print("Joueur", player.get_id(), "(" + str(player.get_life()) + ")")
+			print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
 			print("[  MULLIGAN   (1)  ]")
 			print("[  DRAW_CARD  (2)  ]")
 			print("[  PLAY_CARD  (3)  ]")
@@ -367,7 +402,7 @@ class Client:
 			if(user_input == MULLIGAN):
 
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "MULLIGAN"
 				}
 
@@ -376,7 +411,7 @@ class Client:
 			elif(user_input == DRAW_CARD):
 				
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "DRAW_CARD"
 				}
 
@@ -385,7 +420,7 @@ class Client:
 			elif(user_input == PLAY_CARD):
 
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "PLAY_CARD"
 				}
 
@@ -393,8 +428,26 @@ class Client:
 				
 			elif(user_input == ATTACK):
 
+				i = 0
+
+				for card in self.__players[self.__player_id].get_board().get_battle_zone():
+
+					print("[" + i + "] " + card.to_string())
+
+					i = i + 1
+
+				# Rafraichissement de l'écran
+				self.clear_terminal()
+
+				# Affichage initial
+				print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+
+				print("[  PLACEHOLDER  (1)  ]")
+
+				user_input = input(">")
+
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "ATTACK"
 				}
 
@@ -403,7 +456,7 @@ class Client:
 			elif(user_input == BLOCK):
 
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "BLOCK"
 				}
 
@@ -412,7 +465,7 @@ class Client:
 			elif(user_input == DISCARD):
 
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "DISCARD"
 				}
 
@@ -421,7 +474,7 @@ class Client:
 			elif(user_input == SKIP_PHASE):
 
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "SKIP_PHASE"
 				}
 
@@ -430,7 +483,7 @@ class Client:
 			elif(user_input == CONCEDE):
 
 				request = { 
-					"player" : player.get_id(),
+					"player" : self.__player_id,
 					"type" : "CONCEDE"
 				}
 
