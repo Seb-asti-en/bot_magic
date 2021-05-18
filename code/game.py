@@ -20,7 +20,7 @@ EXILE = 6
 
 class Game:
 
-	def __init__(self, socket, slots = 3):
+	def __init__(self, socket, slots = 1):
 
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
@@ -72,13 +72,16 @@ class Game:
 			for player_choice in choice:
 
 				player_state = [player_choice[ID],None,None,None,None,None,None]
-
+				print("index", player_choice[ID])
+				index = player_choice[ID]
+				print("player",self.__players[index][PLAYER])
+				print("player board",self.__players[index][PLAYER].get_board())
 				if(DECK in player_choice):
-
+					print("deck",self.__players[player_choice[ID]][PLAYER].get_board().get_deck())
 					player_state[DECK] = self.__players[player_choice[ID]][PLAYER].get_board().get_deck()
 
 				if(HAND in player_choice):
-
+					print("hand",self.__players[player_choice[ID]][PLAYER].get_board().get_hand())
 					player_state[HAND] = self.__players[player_choice[ID]][PLAYER].get_board().get_hand()
 
 				if(BATTLE_ZONE in player_choice):
@@ -289,6 +292,9 @@ class Game:
 
 			# DEBUG
 			self.__players[index][PLAYER].debug_print_hand()
+			print("index", index)
+			print("deck",self.__players[index][PLAYER].get_board().get_deck())
+			print("hand",self.__players[index][PLAYER].get_board().get_hand())
 
 			# Envoi vers le player : Signal de jeu (3)
 			self.send_signal(index,"PLAY")
