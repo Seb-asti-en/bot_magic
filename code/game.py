@@ -8,19 +8,20 @@ SOCKET = 0
 PLAYER = 1
 LIFE = 10
 
-DEFAULT_DECK = "Test_Tristan"
+DEFAULT_DECK = "White"
 
 ID = 0
-DECK = 1
-HAND = 2
-BATTLE_ZONE = 3
-LAND_ZONE = 4
-GRAVEYARD = 5
-EXILE = 6
+LIFE = 1
+DECK = 2
+HAND = 3
+BATTLE_ZONE = 4
+LAND_ZONE = 5
+GRAVEYARD = 6
+EXILE = 7
 
 class Game:
 
-	def __init__(self, socket, slots = 1):
+	def __init__(self, socket, slots = 3):
 
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
@@ -64,57 +65,78 @@ class Game:
 
 	def choose_gamestate(self, choice):
 
+		player_id = 0
 		gamestate = []
 
-		if(choice):
-
-			# Initialisation
-			for player_choice in choice:
-
-				player_state = [player_choice[ID],None,None,None,None,None,None]
-				print("index", player_choice[ID])
-				index = player_choice[ID]
-				print("player",self.__players[index][PLAYER])
-				print("player board",self.__players[index][PLAYER].get_board())
-				if(DECK in player_choice):
-					print("deck",self.__players[player_choice[ID]][PLAYER].get_board().get_deck())
-					player_state[DECK] = self.__players[player_choice[ID]][PLAYER].get_board().get_deck()
-
-				if(HAND in player_choice):
-					print("hand",self.__players[player_choice[ID]][PLAYER].get_board().get_hand())
-					player_state[HAND] = self.__players[player_choice[ID]][PLAYER].get_board().get_hand()
-
-				if(BATTLE_ZONE in player_choice):
-
-					player_state[BATTLE_ZONE] = self.__players[player_choice[ID]][PLAYER].get_board().get_battle_zone()
-
-				if(LAND_ZONE in player_choice):
-
-					player_state[LAND_ZONE] = self.__players[player_choice[ID]][PLAYER].get_board().get_land_zone()
-
-				if(GRAVEYARD in player_choice):
-
-					player_state[GRAVEYARD] = self.__players[player_choice[ID]][PLAYER].get_board().get_graveyard()
-				
-				if(EXILE in player_choice):
-
-					player_state[EXILE] = self.__players[player_choice[ID]][PLAYER].get_board().get_exile()
-
-				print(gamestate)
-
-				gamestate.append(player_state)
-
-				print(gamestate)
-
-		else:
+		if(choice == "INIT"):
 
 			for player in self.__players:
 
 				gamestate.append(player[PLAYER])
 
+		elif(choice == "ALL"):
+
+			for player_choice in choice: 
+
+				player_state = [player_choice[ID],None,None,None,None,None,None,None]	
+
+				player_state[LIFE] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
+				player_state[DECK] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
+				player_state[HAND] = self.__players[player_state[ID]][PLAYER].get_board().get_hand()
+				player_state[BATTLE_ZONE] = self.__players[player_state[ID]][PLAYER].get_board().get_battle_zone()
+				player_state[LAND_ZONE] = self.__players[player_state[ID]][PLAYER].get_board().get_land_zone()
+				player_state[GRAVEYARD] = self.__players[player_state[ID]][PLAYER].get_board().get_graveyard()
+				player_state[EXILE] = self.__players[player_state[ID]][PLAYER].get_board().get_exile()
+
+				gamestate.append(player_state)
+
+		elif(choice == "EMPTY"):
+
+			for player_choice in choice: 
+
+				player_state = [player_choice[ID],None,None,None,None,None,None,None]
+
+		elif(choice):
+
+			for player_choice in choice: 
+
+				player_state = [player_choice[ID],None,None,None,None,None,None,None]
+
+				if("LIFE" in player_choice):
+					
+					player_state[LIFE] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
+
+				if("DECK" in player_choice):
+					
+					player_state[DECK] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
+
+				if("HAND" in player_choice):
+					
+					player_state[HAND] = self.__players[player_state[ID]][PLAYER].get_board().get_hand()
+
+				if("BATTLE_ZONE" in player_choice):
+
+					player_state[BATTLE_ZONE] = self.__players[player_state[ID]][PLAYER].get_board().get_battle_zone()
+
+				if("LAND_ZONE" in player_choice):
+
+					player_state[LAND_ZONE] = self.__players[player_state[ID]][PLAYER].get_board().get_land_zone()
+
+				if("GRAVEYARD" in player_choice):
+
+					player_state[GRAVEYARD] = self.__players[player_state[ID]][PLAYER].get_board().get_graveyard()
+				
+				if("EXILE" in player_choice):
+
+					player_state[EXILE] = self.__players[player_state[ID]][PLAYER].get_board().get_exile()
+
+				gamestate.append(player_state)
+
 		return gamestate
 
 	def concede(self, index):
+
+		gamestate = None
 
 		# Envoi vers le client : Acceptation
 		self.send_signal(index,"ACCEPT")
@@ -123,7 +145,8 @@ class Game:
 		self.__players[index][PLAYER].set_life(0)
 
 		# Envoi vers le client : Etat de la partie
-		self.send_gamestate(index)
+		gamestate = self.choose_gamestate([[index,"LIFE"]])
+		self.send_gamestate(index,gamestate)
 		
 		# Envoi vers le client : Signal de mort
 		self.send_signal(index,"DEATH")
@@ -148,19 +171,12 @@ class Game:
 			print(data,"(envoyé)")
 
 	# TODO : (à modifier plus tard selon le format JSON)
-	def send_gamestate(self, index, gamestate = None):
+	def send_gamestate(self, index, gamestate):
 
 		serialized_data = None
 
-		if(gamestate):
-
-			# Sérialisation
-			serialized_data = pickle.dumps(gamestate)
-
-		else:
-
-			# Sérialisation 
-			serialized_data = pickle.dumps([])
+		# Sérialisation
+		serialized_data = pickle.dumps(gamestate)
 
 		# Envoi vers le client : Taille du segment (1)
 		self.send_size(index,serialized_data)
@@ -257,13 +273,12 @@ class Game:
 		# Initialisation de la partie
 		for player in self.__players:
 
-			# Génération de l'état de la partie
-			gamestate = self.choose_gamestate(None)
-
 			# Envoi vers le player : ID Player (1)
 			self.send_signal(player[PLAYER].get_id(),str(player[PLAYER].get_id()))
 
 			# Envoi vers le player : Liste de Players (2)
+			gamestate = self.choose_gamestate("INIT")
+			print(gamestate)
 			self.send_gamestate(player[PLAYER].get_id(),gamestate)
 
 		# Phase Mulligan
@@ -292,9 +307,6 @@ class Game:
 
 			# DEBUG
 			self.__players[index][PLAYER].debug_print_hand()
-			print("index", index)
-			print("deck",self.__players[index][PLAYER].get_board().get_deck())
-			print("hand",self.__players[index][PLAYER].get_board().get_hand())
 
 			# Envoi vers le player : Signal de jeu (3)
 			self.send_signal(index,"PLAY")
@@ -314,14 +326,14 @@ class Game:
 				# Mélange du deck
 				self.__players[index][PLAYER].get_board().get_deck().shuffle()
 
-				# Envoi vers le client : Etat de la partie (5.1.2)
-				gamestate = self.choose_gamestate([[index,DECK,HAND]])
-				self.send_gamestate(index)
-
 				mulligan_count += 1
 
 				# Pioche (7-n) cartes
 				self.__players[index][PLAYER].draw_card(7 - mulligan_count)
+
+				# Envoi vers le client : Etat de la partie (5.1.2)
+				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
+				self.send_gamestate(index,gamestate)
 			
 			elif(data.get("type") == "SKIP_PHASE"):
 
@@ -329,8 +341,8 @@ class Game:
 				self.send_signal(index,"ACCEPT")
 
 				# Envoi vers le client : Etat de la partie (5.2.2)
-				gamestate = self.choose_gamestate([[index,DECK,HAND]])
-				self.send_gamestate(index)
+				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
+				self.send_gamestate(index,gamestate)
 
 				break
 			
@@ -461,6 +473,7 @@ class Game:
 	def effect_phase(self, index):
 
 		data = None
+		gamestate = None
 
 		while True:
 
@@ -478,7 +491,8 @@ class Game:
 				# TODO : Activation des effets
 
 				# Envoi vers le client : Etat de la partie (7.1.2)
-				self.send_gamestate(index)
+				gamestate = self.choose_gamestate("ALL")
+				self.send_gamestate(index,gamestate)
 
 				break
 
@@ -488,7 +502,8 @@ class Game:
 				self.send_signal(index,"ACCEPT")
 
 				# Envoi vers le client : Etat de la partie (7.2.2)
-				self.send_gamestate(index)
+				gamestate = self.choose_gamestate("EMPTY")
+				self.send_gamestate(index,gamestate)
 
 				break
 			
@@ -506,6 +521,7 @@ class Game:
 	def instant_phase(self, index):
 
 		data = None
+		gamestate = None
 
 		while True:
 
@@ -523,7 +539,8 @@ class Game:
 				# TODO : Activation des ephémères
 
 				# Envoi vers le client : Etat de la partie (10.1.2)
-				self.send_gamestate(index)
+				gamestate = self.choose_gamestate("ALL")
+				self.send_gamestate(index,gamestate)
 
 				break
 
@@ -533,7 +550,8 @@ class Game:
 				self.send_signal(index,"ACCEPT")
 
 				# Envoi vers le client : Etat de la partie (10.2.2)
-				self.send_gamestate(index)
+				gamestate = self.choose_gamestate("EMPTY")
+				self.send_gamestate(index,gamestate)
 
 				break
 			
@@ -551,6 +569,7 @@ class Game:
 	def draw_phase(self, index):
 
 		data = None
+		gamestate = None
 
 		while True:
 
@@ -569,7 +588,8 @@ class Game:
 				self.__players[index][PLAYER].draw_card(1)
 
 				# Envoi vers le client : Etat de la partie (13.1.2)
-				self.send_gamestate(index)
+				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
+				self.send_gamestate(index,gamestate)
 
 				break
 			
@@ -587,34 +607,46 @@ class Game:
 	def main_phase(self, index):
 
 		data = None
+		gamestate = None
+		good_action = False
 
 		while True:
 
-			# Envoi vers le client : Signal de jeu (17)
+			# Envoi vers le client : Signal de jeu
 			self.send_signal(index,"PLAY")
 
-			# Réception depuis le client : Requête d'action (18)
+			# Réception depuis le client : Requête d'action
 			data = self.recv_action(index)
 
 			if(data.get("type") == "PLAY_CARD"):
 
-				# Envoi vers le client : Acceptation (19.1.1)
-				self.send_signal(index,"ACCEPT")
-
 				# TODO : Engagement des cartes
+				good_action = self.__players[index][PLAYER].play_card(data["hand_position"])
+				
+				if(good_action):
 
-				# Envoi vers le client : Etat de la partie (19.1.2)
-				self.send_gamestate(index)
+					# Envoi vers le client : Acceptation
+					self.send_signal(index,"ACCEPT")
+
+					# Envoi vers le client : Etat de la partie
+					gamestate = self.choose_gamestate([[index,"HAND","BATTLE_ZONE","LAND_ZONE"]])
+					self.send_gamestate(index,gamestate)
+
+				else:
+
+					# Envoi vers le client : Refus
+					self.send_signal(index,"DECLINE")
 
 				break
 
 			elif(data.get("type") == "SKIP_PHASE"):
 
-				# Envoi vers le client : Acceptation (19.2.1)
+				# Envoi vers le client : Acceptation
 				self.send_signal(index,"ACCEPT")
 
-				# Envoi vers le client : Etat de la partie (19.2.2)
-				self.send_gamestate(index)
+				# Envoi vers le client : Etat de la partie
+				gamestate = self.choose_gamestate("EMPTY")
+				self.send_gamestate(index,gamestate)
 
 				break
 				
@@ -626,7 +658,7 @@ class Game:
 
 			else:
 
-				# Envoi vers le client : Refus (19.3)
+				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
 			
 	def attack_phase(self, index):

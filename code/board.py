@@ -64,8 +64,14 @@ class Board:
         self.__hand.append(Card)
         
     def empty_hand(self):
+
+        card = None
+
         while len(self.__hand) > 0:
-            self.__hand.pop(0)
+           
+            card = self.__hand.pop(0)
+
+            self.__deck.add_card(card)
            
     def discard_hand_card(self,index_card):
         self.__hand.pop(index_card)

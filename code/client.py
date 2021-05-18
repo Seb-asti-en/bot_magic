@@ -17,12 +17,13 @@ SKIP_PHASE = "7"
 CONCEDE = "8"
 
 ID = 0
-DECK = 1
-HAND = 2
-BATTLE_ZONE = 3
-LAND_ZONE = 4
-GRAVEYARD = 5
-EXILE = 6
+LIFE = 1
+DECK = 2
+HAND = 3
+BATTLE_ZONE = 4
+LAND_ZONE = 5
+GRAVEYARD = 6
+EXILE = 7
 
 def main():
 
@@ -105,6 +106,10 @@ class Client:
 	def update(self, gamestate):
 
 		for player in gamestate:
+
+			if(player[LIFE] != None):
+
+				self.__players[player[ID]].set_life(player[LIFE])
 
 			if(player[DECK]):
 
@@ -421,35 +426,41 @@ class Client:
 
 			elif(user_input == PLAY_CARD):
 
-				while True:
+				if(self.__players[self.__player_id].get_board().hand_size() > 0):
 
-					# Rafraichissement de l'écran
-					self.clear_terminal()
+					while True:
 
-					# Affichage des cartes
-					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-					for card in self.__players[self.__player_id].get_board().get_hand():
+						i = 0
 
-						print("[  " + card.get_name() + "(" + i + ")  ]")
+						# Rafraichissement de l'écran
+						self.clear_terminal()
 
-						i = i + 1
+						# Affichage des cartes
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for card in self.__players[self.__player_id].get_board().get_hand():
 
-					# Récupération de l'entrée utilisateur
-					user_input = input(">")	
+							print(card.get_name() + "(" + str(i) + ")")
 
-					if(user_input.isnumeric()):
+							i = i + 1
 
-						user_input = int(user_input)
+						# Récupération de l'entrée utilisateur
+						user_input = input(">")	
 
-						if(user_input >= 0 and user_input < self.__players[self.__player_id].get_board().hand_size()):			
+						if(user_input.isnumeric()):
 
-							request = { 
-								"player" : self.__player_id,
-								"type" : "PLAY_CARD",
-								"card" : user_input
-							}
+							user_input = int(user_input)
 
-					break
+							if(user_input >= 0 and user_input < self.__players[self.__player_id].get_board().hand_size()):			
+
+								request = { 
+									"player" : self.__player_id,
+									"type" : "PLAY_CARD",
+									"hand_position" : user_input
+								}
+
+								break
+
+				break
 				
 			elif(user_input == ATTACK):
 
@@ -486,6 +497,8 @@ class Client:
 				# Sélection des cartes attaquantes
 				while True:
 
+					i = 0
+
 					# Rafraichissement de l'écran
 					self.clear_terminal()
 
@@ -493,7 +506,7 @@ class Client:
 					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
 					for card in self.__players[self.__player_id].get_board().get_battle_zone():
 
-						print("[  " + card.get_name() + "(" + i + ")  ]")
+						print(card.get_name() + "(" + str(i) + ")")
 
 						i = i + 1
 
@@ -504,11 +517,13 @@ class Client:
 
 						user_input = int(user_input)
 
-						if(user_input >= 0 and user_input <= len(self.__players[self.__player_id].get_board().get_battle_zone())):
+						if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
 
 							request["attacker"] = user_input
 
 							break
+
+				break
 				
 			elif(user_input == BLOCK):
 
