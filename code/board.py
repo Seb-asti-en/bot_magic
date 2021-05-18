@@ -39,13 +39,13 @@ class Board:
         self.__battle_zone = battle_zone
     
     def set_land_zone(self,land_zone):
-       self.__land_zone = land_zone
+        self.__land_zone = land_zone
     
     def set_graveyard(self,graveyard):
         self.__graveyard = graveyard
 
     def set_exile(self,exile):
-       self.__exile = exile
+        self.__exile = exile
 
 
     def isempty_battle_zone(self):
@@ -69,3 +69,7 @@ class Board:
            
     def discard_hand_card(self,index_card):
         self.__hand.pop(index_card)
+
+    def hand_size(self):
+
+        return len(self.__hand)

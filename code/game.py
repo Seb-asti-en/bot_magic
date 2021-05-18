@@ -10,6 +10,14 @@ LIFE = 10
 
 DEFAULT_DECK = "Test_Tristan"
 
+ID = 0
+DECK = 1
+HAND = 2
+BATTLE_ZONE = 3
+LAND_ZONE = 4
+GRAVEYARD = 5
+EXILE = 6
+
 class Game:
 
 	def __init__(self, socket, slots = 3):
@@ -54,13 +62,52 @@ class Game:
 
 		return alive
 
-	def define_gamestate(self):
+	def choose_gamestate(self, choice):
 
 		gamestate = []
 
-		for player in self.__players:
+		if(choice):
 
-			gamestate.append(player[PLAYER])
+			# Initialisation
+			for player_choice in choice:
+
+				player_state = [player_choice[ID],None,None,None,None,None,None]
+
+				if(DECK in player_choice):
+
+					player_state[DECK] = self.__players[player_choice[ID]][PLAYER].get_board().get_deck()
+
+				if(HAND in player_choice):
+
+					player_state[HAND] = self.__players[player_choice[ID]][PLAYER].get_board().get_hand()
+
+				if(BATTLE_ZONE in player_choice):
+
+					player_state[BATTLE_ZONE] = self.__players[player_choice[ID]][PLAYER].get_board().get_battle_zone()
+
+				if(LAND_ZONE in player_choice):
+
+					player_state[LAND_ZONE] = self.__players[player_choice[ID]][PLAYER].get_board().get_land_zone()
+
+				if(GRAVEYARD in player_choice):
+
+					player_state[GRAVEYARD] = self.__players[player_choice[ID]][PLAYER].get_board().get_graveyard()
+				
+				if(EXILE in player_choice):
+
+					player_state[EXILE] = self.__players[player_choice[ID]][PLAYER].get_board().get_exile()
+
+				print(gamestate)
+
+				gamestate.append(player_state)
+
+				print(gamestate)
+
+		else:
+
+			for player in self.__players:
+
+				gamestate.append(player[PLAYER])
 
 		return gamestate
 
@@ -208,12 +255,12 @@ class Game:
 		for player in self.__players:
 
 			# Génération de l'état de la partie
-			gamestate = self.define_gamestate()
+			gamestate = self.choose_gamestate(None)
 
 			# Envoi vers le player : ID Player (1)
 			self.send_signal(player[PLAYER].get_id(),str(player[PLAYER].get_id()))
 
-			# Envoi vers le player : Objet Player (2)
+			# Envoi vers le player : Liste de Players (2)
 			self.send_gamestate(player[PLAYER].get_id(),gamestate)
 
 		# Phase Mulligan
@@ -230,6 +277,7 @@ class Game:
 
 		data = None
 		mulligan_count = 0
+		gamestate = None
 
 		# Mélange initial du deck
 		self.__players[index][PLAYER].get_board().get_deck().shuffle()
@@ -242,16 +290,16 @@ class Game:
 			# DEBUG
 			self.__players[index][PLAYER].debug_print_hand()
 
-			# Envoi vers le player : Signal de jeu (2)
+			# Envoi vers le player : Signal de jeu (3)
 			self.send_signal(index,"PLAY")
 
-			# Réception depuis le client : Requête d'action (3)
+			# Réception depuis le client : Requête d'action (4)
 			data = self.recv_action(index)
 
 			# Continuer à mulligan ?
 			if( (data.get("type") == "MULLIGAN") and (mulligan_count < 7) ):
 
-				# Envoi vers le client : Acceptation (4.1.1)
+				# Envoi vers le client : Acceptation (5.1.1)
 				self.send_signal(index,"ACCEPT")
 
 				# Défausse de la main
@@ -260,7 +308,8 @@ class Game:
 				# Mélange du deck
 				self.__players[index][PLAYER].get_board().get_deck().shuffle()
 
-				# Envoi vers le client : Etat de la partie (4.1.2)
+				# Envoi vers le client : Etat de la partie (5.1.2)
+				gamestate = self.choose_gamestate([[index,DECK,HAND]])
 				self.send_gamestate(index)
 
 				mulligan_count += 1
@@ -270,23 +319,25 @@ class Game:
 			
 			elif(data.get("type") == "SKIP_PHASE"):
 
-				# Envoi vers le client : Acceptation (4.2.1)
+				# Envoi vers le client : Acceptation (5.2.1)
 				self.send_signal(index,"ACCEPT")
 
-				# Envoi vers le client : Etat de la partie (4.2.2)
+				# Envoi vers le client : Etat de la partie (5.2.2)
+				gamestate = self.choose_gamestate([[index,DECK,HAND]])
 				self.send_gamestate(index)
 
 				break
 			
 			elif(data.get("type") == "CONCEDE"):
 
+				# Envoi vers le client : Fin de partie (5.3)
 				self.concede(index)
 
 				break
 
 			else:
 
-				# Envoi vers le client : Refus (4.4)
+				# Envoi vers le client : Refus (5.4)
 				self.send_signal(index,"DECLINE")
 
 				continue
