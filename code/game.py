@@ -6,9 +6,9 @@ DEBUG = True
 
 SOCKET = 0
 PLAYER = 1
-LIFE = 10
+PLAYER_LIFE = 10
 
-DEFAULT_DECK = "White"
+DEFAULT_DECK = "Black"
 
 ID = 0
 LIFE = 1
@@ -261,7 +261,7 @@ class Game:
 			deck = self.__deckmanager.copy_deck(0)
 
 			# Création de l'objet Player en lui passant le deck
-			player[PLAYER] = Player(player_id,LIFE,deck)
+			player[PLAYER] = Player(player_id,PLAYER_LIFE,deck)
 
 			# Incrémentation du compteur définissant l'identifiant du joueur
 			player_id += 1

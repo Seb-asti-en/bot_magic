@@ -8,7 +8,7 @@ class Player():
 		self.__id = player_id
 		self.__life = life
 		self.__board = Board(deck)
-		self.__available_mana = {'W' : 10}
+		self.__available_mana = {}
 
 	
 	############################ Getters ############################
@@ -97,18 +97,18 @@ class Player():
 				land_card = self.__board.get_hand().pop(index_card)
 				self.__board.add_land_zone(land_card)
 				self.add_mana(land_card)
-				
+				b = True	
 				
 
 			elif self.__board.get_hand()[index_card].get_type() == "Creature" or self.__board.get_hand()[index_card].get_type() == "Artifact" :
 				print("itsss creature",self.__board.get_hand()[index_card]._name)
 				self.__board.add_battle_zone(self.__board.get_hand().pop(index_card)) 
-
+				b = True
 
 			elif self.__board.get_hand()[index_card].get_type() =="Instant" :
 				print("itsss INSTANT")
 				print(self.__board.get_hand()[index_card].to_string())
-			b = True
+				b = True
 		
 		return b
 
