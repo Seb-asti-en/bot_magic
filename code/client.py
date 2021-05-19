@@ -15,6 +15,7 @@ BLOCK = "5"
 DISCARD = "6"
 SKIP_PHASE = "7"
 CONCEDE = "8"
+SHOW_GAME = "9"
 
 ID = 0
 LIFE = 1
@@ -364,6 +365,17 @@ class Client:
 
 				#input(response)
 
+			if(response == "GAME_UPDATE"):
+
+				# Réception depuis le serveur de jeu : Etat de la partie
+				gamestate = self.recv_gamestate()
+
+				# Mise à jour des informations de jeu
+				self.update(gamestate)
+				
+				if(DEBUG):
+					print("MAJ DE LA PARTIE")
+
 			elif(response == "DEATH"):
 					
 				result = "DEFEAT"
@@ -402,6 +414,7 @@ class Client:
 			print("[  DISCARD    (6)  ]")
 			print("[  SKIP_PHASE (7)  ]")
 			print("[  CONCEDE    (8)  ]")
+			print("[  SHOW_GAME  (9)  ]")
 
 			# Récupération de l'entrée utilisateur
 			user_input = input(">")
@@ -494,7 +507,7 @@ class Client:
 
 							break
 
-				# Sélection des cartes attaquantes
+				# Sélection de la carte attaquante
 				while True:
 
 					i = 0
@@ -527,10 +540,94 @@ class Client:
 				
 			elif(user_input == BLOCK):
 
-				request = { 
-					"player" : self.__player_id,
-					"type" : "BLOCK"
-				}
+				# Sélection du joueur
+				while True:
+
+					# Rafraichissement de l'écran
+					self.clear_terminal()
+
+					# Affichage de la liste des joueurs
+					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+					for player in self.__players:
+
+						print("[  Player " + str(player.get_id()) + "  ]")
+
+					# Récupération de l'entrée utilisateur
+					user_input = input(">")
+
+					if(user_input.isnumeric()):
+
+						user_input = int(user_input)
+
+						if(user_input >= 0 and user_input < len(self.__players)):
+
+							request = { 
+								"player" : self.__player_id,
+								"type" : "BLOCK",
+								"target" : user_input,
+								"ennemy_attacker" : -1,
+								"blocker" : -1
+							}
+
+							break
+
+				# Sélection de la carte attaquante à bloquer
+				while True:
+
+					i = 0
+
+					# Rafraichissement de l'écran
+					self.clear_terminal()
+
+					# Affichage de la Battle Zone ennemie
+					print("Joueur", request["target"], "(" + str(self.__players[request["target"]].get_life()) + ")")
+					for card in self.__players[request["target"]].get_board().get_battle_zone():
+
+						print(card.get_name() + "(" + str(i) + ")")
+
+						i = i + 1
+
+					# Récupération de l'entrée utilisateur
+					user_input = input(">")
+
+					if(user_input.isnumeric()):
+
+						user_input = int(user_input)
+
+						if(user_input >= 0 and user_input < len(self.__players[request["target"]].get_board().get_battle_zone())):
+
+							request["ennemy_attacker"] = user_input
+
+							break
+
+				# Sélection de la carte bloquante
+				while True:
+
+					i = 0
+
+					# Rafraichissement de l'écran
+					self.clear_terminal()
+
+					# Affichage de notre Battle Zone
+					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+					for card in self.__players[self.__player_id].get_board().get_battle_zone():
+
+						print(card.get_name() + "(" + str(i) + ")")
+
+						i = i + 1
+
+					# Récupération de l'entrée utilisateur
+					user_input = input(">")
+
+					if(user_input.isnumeric()):
+
+						user_input = int(user_input)
+
+						if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
+
+							request["blocker"] = user_input
+
+							break
 
 				break
 
@@ -560,6 +657,35 @@ class Client:
 				}
 
 				break				
+
+			elif(user_input == SHOW_GAME):
+
+				# Rafraichissement de l'écran
+				self.clear_terminal()
+
+				for player in self.__players:
+
+					print("Player", player.get_id(), "-", player.get_life(), "HP - Deck :", len(player.get_board().get_deck().get_cards()))
+
+					for card in player.get_board().get_hand():
+						
+						print("[" + card._name, end="] ")
+
+					print()
+
+					for card in player.get_board().get_land_zone():
+						
+						print("[" + card._name, end="] ")
+
+					print()
+
+					for card in player.get_board().get_battle_zone():
+						
+						print("[" + card._name, end="] ")
+
+					print()
+
+				input(">")
 
 			else:
 

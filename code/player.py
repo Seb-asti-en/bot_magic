@@ -13,23 +13,29 @@ class Player():
 	
 	############################ Getters ############################
 	def get_board(self):
+
 		return self.__board
 	
 	def get_life(self):
+
 		return self.__life
 
 	def get_id(self):
+
 		return self.__id
 	
 	def get_available_mana(self):
+
 		return self.__available_mana
 	
 
 	############################ Setter ############################
 	def set_id(self,nb_id):
+
 		self.__id = nb_id
 	
 	def set_life(self,nb_life):
+
 		self.__life = nb_life
 		
 
@@ -44,6 +50,7 @@ class Player():
 	# @param Card la carte regardé
 	##
 	def add_mana(self, Card):
+
 		for key in Card.get_identity():
 			if key in self.__available_mana:
 				self.__available_mana[key] = self.__available_mana[key] + 1
@@ -63,6 +70,7 @@ class Player():
 	# (pour l'instant) Enlève le mal d'invocation
 	##
 	def untap(self):
+
 		for card in self.__board.get_battle_zone():
 			card.set_issummoning_sickness(False)
 
@@ -71,6 +79,7 @@ class Player():
 	# @param nb_card  le nombre de card a piocher
 	##
 	def draw_card(self,nb_card=1):
+
 		#print("Eugneugneu vous piocheZ",nb_card,"carte(s) TAILLE")
 		if len(self.__board.get_deck().get_cards()) > 0:
 			for i in range(nb_card):
@@ -118,6 +127,7 @@ class Player():
 	# retourne true si elle est jouable, sinon false
 	##
 	def playable_card(self, index_card):
+
 		b = True
 		print(self.__board.get_hand()[index_card].get_mana_cost())
 		print(self.__board.get_hand()[index_card].get_identity())
@@ -146,6 +156,7 @@ class Player():
 	# permet d'utiliser des cartes
 	##	
 	def use_card(self,index_source):
+
 		pass
 
 	##
@@ -153,6 +164,7 @@ class Player():
 	# @param Card la carte a clear
 	##
 	def clear_card(self,Card):
+
 		Card.reset()
 		
 	##
@@ -178,6 +190,7 @@ class Player():
 	# @param index_src	l'index de la carte qui doit bloquer
 	##
 	def choice_block(self,Player_target,index_target,index_src):
+
 		b = False
 		if self.__board.isempty_battle_zone():
 			print("Vous n'avez pas de cartes pour vous defendre")
@@ -220,6 +233,7 @@ class Player():
 	# @param index_source l'index de la carte qui attaque
 	##
 	def direct_attack(self,Player_target,index_source):
+
 		self.deal_damage_to_player(index_source,Player_target)
 
 	##
@@ -229,12 +243,14 @@ class Player():
 	# @param index_source l'index de la carte qui attaque
 	##
 	def attack(self,Player_target,index_target,index_source):
+
 		self.deal_damage_to_card( Player_target,index_target, index_source)
 
 	##
 	# suprime le deck
 	##
 	def delete_deck(self):
+
 		for i in range( len(self.get_board().get_deck().get_cards())):
 			self.get_board().get_deck().get_cards().pop(0)
 
@@ -244,6 +260,7 @@ class Player():
 	# @param index_source carte qui inflige les dps
 	##
 	def deal_damage_to_player(self,Player_target,index_source):
+
 		source_dps = self.__board.get_battle_zone()[index_source]
 		ennemi_life = Player_target.get_life()
 
@@ -256,6 +273,7 @@ class Player():
 	# @param index_source carte qui inflige les dps
 	##
 	def deal_damage_to_card(self,Player_target,index_target,index_source):
+
 		#defini les cartes(pour que ça soit plus court a ecrire)
 		card_attk = self.__board.get_battle_zone()[index_source]
 		card_deff = Player_target.get_board().get_battle_zone()[index_target]
@@ -275,12 +293,14 @@ class Player():
 	#permet de conceder
 	##
 	def concede():
+
 		pass
 
 	##
 	# affiche  le nom des carte de la main
 	##
 	def debug_print_hand(self):
+
 		print("Hand (" + str(len(self.__board.get_hand())) + "):")
 		
 		for card in self.__board.get_hand():
@@ -295,6 +315,7 @@ class Player():
 	# affiche  le nom des carte de la battlezone
 	##
 	def debug_print_battle_zone(self):
+
 		for card in self.__board.get_battle_zone():
 			print("|",card._name,"|",end=' ')
 		print("")
@@ -302,5 +323,7 @@ class Player():
 			print("vide")
 
 	def debug_print_land_zone(self):
+		
 		print("|",self.get_available_mana(),"|")
 	
+

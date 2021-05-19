@@ -21,7 +21,7 @@ EXILE = 7
 
 class Game:
 
-	def __init__(self, socket, slots = 3):
+	def __init__(self, socket, slots = 2):
 
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
@@ -170,7 +170,6 @@ class Game:
 		if(DEBUG):
 			print(data,"(envoyé)")
 
-	# TODO : (à modifier plus tard selon le format JSON)
 	def send_gamestate(self, index, gamestate):
 
 		serialized_data = None
@@ -381,28 +380,28 @@ class Game:
 					# # Dégagement des cartes
 					player[PLAYER].untap()
 
-					# Phase Effet 1
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 1")
-					self.effect_phase(player[PLAYER].get_id())
+					# # Phase Effet 1
+					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 1")
+					# self.effect_phase(player[PLAYER].get_id())
 
-					# Phase Ephémère 1
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Ephémères 1")
-					self.instant_phase(player[PLAYER].get_id())
+					# # Phase Ephémère 1
+					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Ephémères 1")
+					# self.instant_phase(player[PLAYER].get_id())
 
 					# Phase de pioche
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de pioche")
 					self.draw_phase(player[PLAYER].get_id())
 
-					# Phase Effet 2
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 2")
-					for ennemy in self.__players:
+					# # Phase Effet 2
+					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 2")
+					# for ennemy in self.__players:
 
-						if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
+					# 	if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
 
-							print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut activer un effet")
+					# 		print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut activer un effet")
 
-							# Phase Effet 2 par ennemy
-							self.effect_phase(ennemy[PLAYER].get_id())
+					# 		# Phase Effet 2 par ennemy
+					# 		self.effect_phase(ennemy[PLAYER].get_id())
 
 					# Phase Principale
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (1)")
@@ -410,40 +409,50 @@ class Game:
 
 					# Attaquant ?
 
-					# Déclaration des monstres attaquants
+					# Déclaration des monstres attaquants / Phase Attaque
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase d'attaque")
 					self.attack_phase(player[PLAYER].get_id())
 					
-					# Phase Éphémère 2
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Éphémères 2")
+					# # Phase Éphémère 2
+					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Éphémères 2")
+					# for ennemy in self.__players:
+
+					# 	if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
+
+					# 		print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut activer un effet")
+
+					# 		# Phase Éphémère 2 par ennemy
+					# 		self.instant_phase(ennemy[PLAYER].get_id())
+
+					# Ennemi déclare les monstres bloquants / Phase Blocage
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de blocage")
 					for ennemy in self.__players:
 
 						if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
 
-							print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut activer un effet")
+							print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut bloquer des cartes")
 
-							# Phase Éphémère 2 par ennemy
-							self.instant_phase(ennemy[PLAYER].get_id())
+							# Phase de blocage par ennemy
+							self.block_phase(ennemy[PLAYER].get_id())
 
-					# Ennemi déclare les monstres bloquants
+					# # Phase Effet 3
+					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 3")
+					# self.effect_phase(player[PLAYER].get_id())
 
-			 		# Phase Effet 3
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 3")
-					self.effect_phase(player[PLAYER].get_id())
+					# # Phase Ephémère 3
+					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Ephémères 3")
+					# self.instant_phase(player[PLAYER].get_id())
 
-					# Phase Ephémère 3
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Ephémères 3")
-					self.instant_phase(player[PLAYER].get_id())
-
-			 		# Appliquer les dommages de combat (prévenir du décès avec une requête)
-
+			 		# Appliquer les dommages de combat (prévenir du décès avec une requête) / Phase Dommages
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase d'attaque")
+					self.damage_phase(player[PLAYER].get_id())
 					
 					# Phase Secondaire
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (2)")
 					self.main_phase(player[PLAYER].get_id())
 
-				 	# On retire de la vie au joueur
-					player[PLAYER].set_life(player[PLAYER].get_life() - 10)
+					# # On retire de la vie au joueur
+					# player[PLAYER].set_life(player[PLAYER].get_life() - 10)
 
 					# On vérifie s'il est en vie
 					if(player[PLAYER].get_life() <= 0):
@@ -637,8 +646,6 @@ class Game:
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
-				break
-
 			elif(data.get("type") == "SKIP_PHASE"):
 
 				# Envoi vers le client : Acceptation
@@ -663,14 +670,113 @@ class Game:
 			
 	def attack_phase(self, index):
 
-		return
-
 		data = None
+		gamestate = None
+		good_action = False
 
 		while True:
 
 			# Envoi vers le client : Signal de jeu
 			self.send_signal(index,"PLAY")
 
-			# Réception depuis le client : Requête d'action (12)
+			# Réception depuis le client : Requête d'action
 			data = self.recv_action(index)
+
+			if(data.get("type") == "ATTACK"):
+
+				good_action = self.__players[index][PLAYER].choice_attack(data["attacker"])
+				
+				if(good_action):
+
+					# Envoi vers le client : Acceptation
+					self.send_signal(index,"ACCEPT")
+
+					# Envoi vers tous les clients : Etat de la partie
+					gamestate = self.choose_gamestate([[index,"BATTLE_ZONE"]])
+					for player in self.__players :
+						self.send_gamestate(player.get_id(),gamestate)
+
+				else:
+
+					# Envoi vers le client : Refus
+					self.send_signal(index,"DECLINE")
+
+			elif(data.get("type") == "SKIP_PHASE"):
+
+				# Envoi vers le client : Acceptation
+				self.send_signal(index,"ACCEPT")
+
+				# Envoi vers le client : Etat de la partie
+				gamestate = self.choose_gamestate("EMPTY")
+				self.send_gamestate(index,gamestate)
+
+				break
+				
+			elif(data.get("type") == "CONCEDE"):
+
+				self.concede(index)
+
+				break
+
+			else:
+
+				# Envoi vers le client : Refus
+				self.send_signal(index,"DECLINE")
+
+	def block_phase(self, index):
+
+		data = None
+		gamestate = None
+		good_action = False
+
+		while True:
+
+			# Envoi vers le client : Signal de jeu
+			self.send_signal(index,"PLAY")
+
+			# Réception depuis le client : Requête d'action
+			data = self.recv_action(index)
+
+			if(data.get("type") == "BLOCK"):
+
+				good_action = self.__players[index][PLAYER].choice_block(self.__players[data["target"]][PLAYER],data["ennemy_attacker"],data["blocker"])
+				
+				if(good_action):
+
+					# Envoi vers le client : Acceptation
+					self.send_signal(index,"ACCEPT")
+
+					# Envoi vers le client : Etat de la partie
+					gamestate = self.choose_gamestate("EMPTY")
+					self.send_gamestate(index,gamestate)
+
+				else:
+
+					# Envoi vers le client : Refus
+					self.send_signal(index,"DECLINE")
+
+			elif(data.get("type") == "SKIP_PHASE"):
+
+				# Envoi vers le client : Acceptation
+				self.send_signal(index,"ACCEPT")
+
+				# Envoi vers le client : Etat de la partie
+				gamestate = self.choose_gamestate("EMPTY")
+				self.send_gamestate(index,gamestate)
+
+				break
+				
+			elif(data.get("type") == "CONCEDE"):
+
+				self.concede(index)
+
+				break
+
+			else:
+
+				# Envoi vers le client : Refus
+				self.send_signal(index,"DECLINE")
+
+	def damage_phase(self, index):
+
+		pass
