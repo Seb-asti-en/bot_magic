@@ -75,7 +75,3 @@ class Board:
            
     def discard_hand_card(self,index_card):
         self.__hand.pop(index_card)
-
-    def hand_size(self):
-
-        return len(self.__hand)

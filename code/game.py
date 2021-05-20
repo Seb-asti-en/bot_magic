@@ -12,12 +12,13 @@ DEFAULT_DECK = "Black"
 
 ID = 0
 LIFE = 1
-DECK = 2
-HAND = 3
-BATTLE_ZONE = 4
-LAND_ZONE = 5
-GRAVEYARD = 6
-EXILE = 7
+MANA = 2
+DECK = 3
+HAND = 4
+BATTLE_ZONE = 5
+LAND_ZONE = 6
+GRAVEYARD = 7
+EXILE = 8
 
 class Game:
 
@@ -78,9 +79,10 @@ class Game:
 
 			for player_choice in choice: 
 
-				player_state = [player_choice[ID],None,None,None,None,None,None,None]	
+				player_state = [player_choice[ID],None,None,None,None,None,None,None,None]	
 
-				player_state[LIFE] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
+				player_state[LIFE] = self.__players[player_state[ID]][PLAYER].get_life()
+				player_state[MANA] = self.__players[player_state[ID]][PLAYER].get_mana_pool()
 				player_state[DECK] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
 				player_state[HAND] = self.__players[player_state[ID]][PLAYER].get_board().get_hand()
 				player_state[BATTLE_ZONE] = self.__players[player_state[ID]][PLAYER].get_board().get_battle_zone()
@@ -94,17 +96,21 @@ class Game:
 
 			for player_choice in choice: 
 
-				player_state = [player_choice[ID],None,None,None,None,None,None,None]
+				player_state = [player_choice[ID],None,None,None,None,None,None,None,None]
 
 		elif(choice):
 
 			for player_choice in choice: 
 
-				player_state = [player_choice[ID],None,None,None,None,None,None,None]
+				player_state = [player_choice[ID],None,None,None,None,None,None,None,None]
 
 				if("LIFE" in player_choice):
 					
-					player_state[LIFE] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
+					player_state[LIFE] = self.__players[player_state[ID]][PLAYER].get_life()
+
+				if("MANA" in player_choice):
+
+					player_state[MANA] = self.__players[player_state[ID]][PLAYER].get_mana_pool()
 
 				if("DECK" in player_choice):
 					
@@ -617,7 +623,7 @@ class Game:
 
 		data = None
 		gamestate = None
-		good_action = False
+		is_accepted = False
 
 		while True:
 
@@ -630,15 +636,34 @@ class Game:
 			if(data.get("type") == "PLAY_CARD"):
 
 				# TODO : Engagement des cartes
-				good_action = self.__players[index][PLAYER].play_card(data["hand_position"])
+				is_accepted = self.__players[index][PLAYER].engage(data["hand_position"])
 				
-				if(good_action):
+				if(is_accepted):
 
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
 
 					# Envoi vers le client : Etat de la partie
-					gamestate = self.choose_gamestate([[index,"HAND","BATTLE_ZONE","LAND_ZONE"]])
+					gamestate = self.choose_gamestate([[index,"HAND","MANA","BATTLE_ZONE","LAND_ZONE"]])
+					self.send_gamestate(index,gamestate)
+
+				else:
+
+					# Envoi vers le client : Refus
+					self.send_signal(index,"DECLINE")
+
+			elif(data.get("type") == "TAP_LAND"):
+
+				# Tap un terrain
+				is_accepted = self.__players[index][PLAYER].tap_land(data["landzone_position"],data["color"])
+
+				if(is_accepted):
+
+					# Envoi vers le client : Acceptation
+					self.send_signal(index,"ACCEPT")
+
+					# Envoi vers le client : Etat de la partie
+					gamestate = self.choose_gamestate([[index,"MANA","LAND_ZONE"]])
 					self.send_gamestate(index,gamestate)
 
 				else:
@@ -672,7 +697,7 @@ class Game:
 
 		data = None
 		gamestate = None
-		good_action = False
+		is_accepted = False
 
 		while True:
 
@@ -684,9 +709,9 @@ class Game:
 
 			if(data.get("type") == "ATTACK"):
 
-				good_action = self.__players[index][PLAYER].choice_attack(data["attacker"])
+				is_accepted = self.__players[index][PLAYER].choice_attack(data["attacker"])
 				
-				if(good_action):
+				if(is_accepted):
 
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
@@ -727,7 +752,7 @@ class Game:
 
 		data = None
 		gamestate = None
-		good_action = False
+		is_accepted = False
 
 		while True:
 
@@ -739,9 +764,9 @@ class Game:
 
 			if(data.get("type") == "BLOCK"):
 
-				good_action = self.__players[index][PLAYER].choice_block(self.__players[data["target"]][PLAYER],data["ennemy_attacker"],data["blocker"])
+				is_accepted = self.__players[index][PLAYER].choice_block(self.__players[data["target"]][PLAYER],data["ennemy_attacker"],data["blocker"])
 				
-				if(good_action):
+				if(is_accepted):
 
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")

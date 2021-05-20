@@ -10,6 +10,15 @@ class Player():
 		self.__board = Board(deck)
 		self.__available_mana = {}
 
+		self.__mana_pool = {
+			"X" : 0,
+			"C" : 0,
+			"W" : 0,
+			"R" : 0,
+			"G" : 0,
+			"U" : 0,
+			"B" : 0
+		}
 	
 	############################ Getters ############################
 	def get_board(self):
@@ -27,7 +36,12 @@ class Player():
 	def get_available_mana(self):
 
 		return self.__available_mana
-	
+
+
+
+	def get_mana_pool(self):
+
+		return self.__mana_pool
 
 	############################ Setter ############################
 	def set_id(self,nb_id):
@@ -37,9 +51,13 @@ class Player():
 	def set_life(self,nb_life):
 
 		self.__life = nb_life
-		
 
 
+	
+	def set_mana_pool(self, mana):
+
+		self.__mana_pool = mana
+	
 	############################ Methodes ############################
 
 	### TODO: Soustrait mana quand carte jouer
@@ -189,18 +207,18 @@ class Player():
 	# @param index_target  l'index de la carte adverse a bloquer
 	# @param index_src	l'index de la carte qui doit bloquer
 	##
-	def choice_block(self,Player_target,index_target,index_src):
+	def choice_block(self,Player_target,attacker,blocker):
 
 		b = False
 		if self.__board.isempty_battle_zone():
 			print("Vous n'avez pas de cartes pour vous defendre")
-		elif index_src >= len(self.__board.get_battle_zone()) or index_src < 0:
-				print("l'index source est trop grand ou trop petit", index_src)
-		elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[index_target], self.__board.get_battle_zone()[index_src]) == True :
+		elif blocker >= len(self.__board.get_battle_zone()) or blocker < 0:
+				print("l'index source est trop grand ou trop petit", blocker)
+		elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[attacker], self.__board.get_battle_zone()[blocker]) == True :
 			b = True
-			self.__board.get_battle_zone()[index_src].set_isblocked(True)
-			if Player_target.get_board().get_battle_zone()[index_target].get_isattack() == True:
-				Player_target.get_board().get_battle_zone()[index_target].set_istarget(True)
+			self.__board.get_battle_zone()[blocker].set_isblocked(True)
+			if Player_target.get_board().get_battle_zone()[attacker].get_isattack() == True:
+				Player_target.get_board().get_battle_zone()[attacker].set_istarget(True)
 			else:
 				print("selectioner un attaquant")
 		else:
@@ -325,5 +343,168 @@ class Player():
 	def debug_print_land_zone(self):
 		
 		print("|",self.get_available_mana(),"|")
-	
 
+	def deck_size(self):
+
+		return len(self.__board.get_deck().get_cards())
+
+	def hand_size(self):
+
+		return len(self.__board.get_hand())
+
+	def battlezone_size(self):
+
+		return len(self.__board.get_battle_zone())
+
+	def landzone_size(self):
+
+		return len(self.__board.get_land_zone())
+
+	def graveyard_size(self):
+
+		return len(self.__board.get_graveyard())
+
+	def exile_size(self):
+
+		return len(self.__board.get_exile())
+
+	def tap_land(self, landzone_position, color):
+
+		is_accepted = False
+
+		# Vérification de la position de la carte
+		if(landzone_position >= 0 and landzone_position < self.landzone_size()):
+
+			# Engagement du terrain
+			is_accepted = self.get_board().get_land_zone()[landzone_position].tap(color)
+
+			if(is_accepted):
+
+				# Mise à jour du pool de mana
+				self.__mana_pool["X"] += 1
+				self.__mana_pool[color] += 1 
+
+		return is_accepted
+
+	def engage(self, hand_position):
+
+		is_accepted = False
+		mana_cost = None
+		global_cost = 0
+
+		# Vérification de la position de la carte
+		if(hand_position >= 0 and hand_position < self.hand_size()):
+
+			mana_cost = self.get_board().get_hand()[hand_position].get_mana_cost()
+
+			# Calcul du mana global
+			for color in mana_cost:
+				
+				global_cost += mana_cost[color]
+
+			# Vérification de la quantité de mana global
+			if(global_cost <= self.__mana_pool["X"]):
+
+				is_accepted = True
+
+				for color in mana_cost:
+
+						# Vérification de la quantité de mana couleur par couleur et que la clé de couleur existe
+						if(color not in self.__mana_pool or mana_cost[color] > self.__mana_pool[color]):
+
+							is_accepted = False
+
+			if(is_accepted):
+
+				# Engager la carte
+				if(self.get_board().get_hand()[hand_position].get_type() == "Land"):
+
+					is_accepted = self.move("HAND",hand_position,"LAND_ZONE")
+
+				elif(self.get_board().get_hand()[hand_position].get_type() == "Creature"):
+
+					is_accepted = self.move("HAND",hand_position,"BATTLE_ZONE")
+
+				if(is_accepted):
+
+					# Mise à jour du pool de mana
+					for color in mana_cost:
+
+						self.__mana_pool["X"] -= 1
+						self.__mana_pool[color] -= 1 
+
+					if(self.__mana_pool["X"] == 0):
+
+						for color in self.__mana_pool:
+
+							self.__mana_pool[color] = 0	
+
+		return is_accepted						
+
+	def move(self, source_zone, source_position, destination_zone):
+
+		source = None
+
+		# Parsing de la zone source
+		if(source_zone == "DECK"):
+
+			source = self.__board.get_deck().get_cards()
+
+		elif(source_zone == "HAND"):
+
+			source = self.__board.get_hand()
+
+		elif(source_zone == "BATTLE_ZONE"):
+
+			source = self.__board.get_battle_zone()
+
+		elif(source_zone == "LAND_ZONE"):
+
+			source = self.__board.get_land_zone()
+
+		elif(source_zone == "GRAVEYARD"):
+
+			source = self.__board.get_graveyard()
+
+		elif(source_zone == "EXILE"):
+
+			source = self.__board.get_exile()
+
+		else:
+
+			return False
+
+		# Parsing de la zone de destination
+		if(destination_zone == "DECK"):
+
+			destination = self.__board.get_deck().get_cards()
+
+		elif(destination_zone == "HAND"):
+
+			destination = self.__board.get_hand()
+
+		elif(destination_zone == "BATTLE_ZONE"):
+
+			destination = self.__board.get_battle_zone()
+
+		elif(destination_zone == "LAND_ZONE"):
+
+			destination = self.__board.get_land_zone()
+
+		elif(destination_zone == "GRAVEYARD"):
+
+			destination = self.__board.get_graveyard()
+
+		elif(destination_zone == "EXILE"):
+
+			destination = self.__board.get_exile()
+
+		else:
+
+			return False
+
+		# Déplacement de la carte
+		destination.append(source.pop(source_position))
+			
+		return True
+				

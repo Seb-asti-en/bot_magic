@@ -10,21 +10,22 @@ PACKET_SIZE = 1024
 MULLIGAN = "1"
 DRAW_CARD = "2"
 PLAY_CARD = "3"
-ATTACK = "4"
-BLOCK = "5"
-DISCARD = "6"
+TAP_LAND = "4"
+ATTACK = "5"
+BLOCK = "6"
 SKIP_PHASE = "7"
 CONCEDE = "8"
 SHOW_GAME = "9"
 
 ID = 0
 LIFE = 1
-DECK = 2
-HAND = 3
-BATTLE_ZONE = 4
-LAND_ZONE = 5
-GRAVEYARD = 6
-EXILE = 7
+MANA = 2
+DECK = 3
+HAND = 4
+BATTLE_ZONE = 5
+LAND_ZONE = 6
+GRAVEYARD = 7
+EXILE = 8
 
 def main():
 
@@ -112,6 +113,10 @@ class Client:
 
 				self.__players[player[ID]].set_life(player[LIFE])
 
+			if(player[MANA]):
+
+				self.__players[player[ID]].set_mana_pool(player[MANA])
+
 			if(player[DECK]):
 
 				self.__players[player[ID]].get_board().set_deck(player[DECK])
@@ -189,7 +194,6 @@ class Client:
 
 		return data
 
-	# TODO : (à modifier plus tard selon le format JSON)
 	def recv_gamestate(self):
 
 		size = 0
@@ -395,6 +399,7 @@ class Client:
 		user_input = ""
 		request = ""
 		i = 0
+		identity = []
 
 		if(DEBUG):
 			input("[CLEAR SCREEN]")
@@ -409,9 +414,9 @@ class Client:
 			print("[  MULLIGAN   (1)  ]")
 			print("[  DRAW_CARD  (2)  ]")
 			print("[  PLAY_CARD  (3)  ]")
-			print("[  ATTACK     (4)  ]")
-			print("[  BLOCK      (5)  ]")
-			print("[  DISCARD    (6)  ]")
+			print("[  TAP_LAND   (4)  ]")
+			print("[  ATTACK     (5)  ]")
+			print("[  BLOCK      (6)  ]")
 			print("[  SKIP_PHASE (7)  ]")
 			print("[  CONCEDE    (8)  ]")
 			print("[  SHOW_GAME  (9)  ]")
@@ -439,7 +444,7 @@ class Client:
 
 			elif(user_input == PLAY_CARD):
 
-				if(self.__players[self.__player_id].get_board().hand_size() > 0):
+				if(self.__players[self.__player_id].hand_size() > 0):
 
 					while True:
 
@@ -463,7 +468,7 @@ class Client:
 
 							user_input = int(user_input)
 
-							if(user_input >= 0 and user_input < self.__players[self.__player_id].get_board().hand_size()):			
+							if(user_input >= 0 and user_input < self.__players[self.__player_id].hand_size()):			
 
 								request = { 
 									"player" : self.__player_id,
@@ -472,6 +477,86 @@ class Client:
 								}
 
 								break
+
+					else:
+
+						continue
+
+				break
+
+			elif(user_input == TAP_LAND):
+
+				if(self.__players[self.__player_id].landzone_size() > 0):
+
+					while True:
+
+						i = 0
+
+						# Rafraichissement de l'écran
+						self.clear_terminal()
+
+						# Affichage des cartes
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for card in self.__players[self.__player_id].get_board().get_land_zone():
+
+							print(card.get_name() + "(" + str(i) + ")")
+
+							i = i + 1
+
+						# Récupération de l'entrée utilisateur
+						user_input = input(">")
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input >= 0 and user_input < self.__players[self.__player_id].landzone_size()):
+
+								identity = self.__players[self.__player_id].get_board().get_land_zone()[user_input].get_identity()
+
+								request = { 
+									"player" : self.__player_id,
+									"type" : "TAP_LAND",
+									"landzone_position" : user_input,
+									"color" : ""
+								}								
+
+								if(len(identity) == 1):
+
+									request["color"] = identity[0]
+
+								else:
+
+									while True:
+
+										i = 0
+
+										# Rafraichissement de l'écran
+										self.clear_terminal()
+
+										# TODO : Ajouter la gestion des mana double via un menu de selection (compliqué)
+										for color in identity:
+
+											print(color + " (" + str(i) + ")")
+
+											i += 1
+
+										# Récupération de l'entrée utilisateur
+										user_input = input(">")
+
+										if(user_input.isnumeric()):
+
+											user_input = int(user_input)
+
+											if(user_input >= 0 and user_input < len(identity)):
+
+												request["color"] = identity[user_input]
+
+								break
+
+				else:
+
+					continue
 
 				break
 				
@@ -631,15 +716,6 @@ class Client:
 
 				break
 
-			elif(user_input == DISCARD):
-
-				request = { 
-					"player" : self.__player_id,
-					"type" : "DISCARD"
-				}
-
-				break
-
 			elif(user_input == SKIP_PHASE):
 
 				request = { 
@@ -666,6 +742,7 @@ class Client:
 				for player in self.__players:
 
 					print("Player", player.get_id(), "-", player.get_life(), "HP - Deck :", len(player.get_board().get_deck().get_cards()))
+					print(player.get_mana_pool())
 
 					for card in player.get_board().get_hand():
 						

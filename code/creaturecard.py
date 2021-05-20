@@ -14,6 +14,8 @@ class CreatureCard(Card):
 		self.__tmp_life = card["Toughness"]
 		self.__tmp_damage = card["Power"]
 
+		self.__tapped = False
+
 		
 	############################ Getters ############################
 	def get_power(self):
