@@ -492,6 +492,8 @@ class Game:
 		# Dégagement des cartes
 		self.__players[index][PLAYER].disengage()
 
+		self.send_signal(index,"GAME_UPDATE")
+
 		# Envoi vers le client : Etat de la partie
 		gamestate = self.choose_gamestate([[index,"MANA","BATTLE_ZONE","LAND_ZONE"]])
 		self.send_gamestate(index,gamestate)
@@ -720,7 +722,7 @@ class Game:
 
 			if(data.get("type") == "ATTACK"):
 
-				is_accepted = self.__players[index][PLAYER].choice_attack(data["attacker"])
+				is_accepted = self.__players[index][PLAYER].attack(data["target"],data["attacker"],len(self.__players))
 				
 				if(is_accepted):
 
@@ -783,7 +785,7 @@ class Game:
 
 			if(data.get("type") == "BLOCK"):
 
-				is_accepted = self.__players[index][PLAYER].choice_block(self.__players[data["target"]][PLAYER],data["ennemy_attacker"],data["blocker"])
+				is_accepted = self.__players[index][PLAYER].block(self.__players[data["target"]][PLAYER],data["ennemy_attacker"],data["blocker"])
 				
 				if(is_accepted):
 

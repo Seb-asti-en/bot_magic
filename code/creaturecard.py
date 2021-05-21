@@ -16,6 +16,7 @@ class CreatureCard(Card):
 
 		self.__tapped = False
 		self.__summoning_sickness = True
+		self.__target = -1
 
 		
 	############################ Getters ############################
@@ -45,6 +46,8 @@ class CreatureCard(Card):
 	def set_life(self,nb_life):
 		self.__life = nb_life
 
+	def set_target(self,target):
+		self.__target = target
 
 	############################ Méthode ############################
 	##
@@ -94,6 +97,12 @@ class CreatureCard(Card):
 		self.__life = self.__toughness
 		self.__tmp_life =self.__toughness
 		self.__tmp_damage = self.__power
+
+	def tap(self):
+
+		if(not self.__tapped):
+
+			self.__tapped = True
 
 	def untap(self):
 

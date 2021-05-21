@@ -260,9 +260,9 @@ class Player():
 	# @parem index_target l'index de la carte adverse
 	# @param index_source l'index de la carte qui attaque
 	##
-	def attack(self,Player_target,index_target,index_source):
+	# def attack(self,Player_target,index_target,index_source):
 
-		self.deal_damage_to_card( Player_target,index_target, index_source)
+	# 	self.deal_damage_to_card( Player_target,index_target, index_source)
 
 	##
 	# suprime le deck
@@ -529,4 +529,56 @@ class Player():
 		for color in self.__mana_pool:
 
 			self.__mana_pool[color] = 0
-				
+
+	def attack(self,target,battlezone_position,player_count):
+
+		is_accepted = False
+		card = None
+
+		if(target >= 0 and target < player_count):
+
+			print("1")
+
+			if(battlezone_position >= 0 and battlezone_position < self.battlezone_size()):
+
+				print("2")
+
+				card = self.__board.get_battle_zone()[battlezone_position]
+
+				if(not card.is_sick() and not card.is_tapped()):
+
+					print("3")
+
+					card.tap()
+
+					card.set_target(target)
+
+					is_accepted = True
+
+		return is_accepted
+
+	# def block(self,Player_target,battlezone_position,blocker):
+
+	# 	is_accepted = False
+
+	# 	if(self.battlezone_size() > 0):
+
+
+
+
+
+	# 	b = False
+	# 	if self.__board.isempty_battle_zone():
+	# 		print("Vous n'avez pas de cartes pour vous defendre")
+	# 	elif blocker >= len(self.__board.get_battle_zone()) or blocker < 0:
+	# 			print("l'index source est trop grand ou trop petit", blocker)
+	# 	elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[attacker], self.__board.get_battle_zone()[blocker]) == True :
+	# 		b = True
+	# 		self.__board.get_battle_zone()[blocker].set_isblocked(True)
+	# 		if Player_target.get_board().get_battle_zone()[attacker].get_isattack() == True:
+	# 			Player_target.get_board().get_battle_zone()[attacker].set_istarget(True)
+	# 		else:
+	# 			print("selectioner un attaquant")
+	# 	else:
+	# 		print("vous ne pouvez pas bloquer")
+	# 	return b
