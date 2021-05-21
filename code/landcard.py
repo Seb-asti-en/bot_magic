@@ -27,3 +27,12 @@ class LandCard(Card):
 
 		return is_accepted
 
+	def untap(self):
+
+		if(self.__tapped):
+			
+			self.__tapped = False
+
+	def is_tapped(self):
+
+		return self.__tapped

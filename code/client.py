@@ -478,11 +478,7 @@ class Client:
 
 								break
 
-					else:
-
-						continue
-
-				break
+					break
 
 			elif(user_input == TAP_LAND):
 
@@ -495,11 +491,17 @@ class Client:
 						# Rafraichissement de l'écran
 						self.clear_terminal()
 
-						# Affichage des cartes
+						# Affichage de nos cartes terrain
 						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
 						for card in self.__players[self.__player_id].get_board().get_land_zone():
 
-							print(card.get_name() + "(" + str(i) + ")")
+							if(card.is_tapped()):
+								
+								print("(T)" + card.get_name() + "(" + str(i) + ")")
+
+							else:
+
+								print(card.get_name() + "(" + str(i) + ")")
 
 							i = i + 1
 
@@ -552,169 +554,197 @@ class Client:
 
 												request["color"] = identity[user_input]
 
+												break
+
 								break
 
-				else:
-
-					continue
-
-				break
+					break
 				
 			elif(user_input == ATTACK):
 
-				# Sélection du joueur
-				while True:
+				if(self.__players[self.__player_id].battlezone_size() > 0):
 
-					# Rafraichissement de l'écran
-					self.clear_terminal()
+					# Sélection du joueur
+					while True:
 
-					# Affichage de la liste des joueurs
-					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-					for player in self.__players:
+						# Rafraichissement de l'écran
+						self.clear_terminal()
 
-						print("[  Player " + str(player.get_id()) + "  ]")
+						# Affichage de la liste des joueurs
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for player in self.__players:
 
-					# Récupération de l'entrée utilisateur
-					user_input = input(">")
+							print("[  Player " + str(player.get_id()) + "  ]")
 
-					if(user_input.isnumeric()):
+						# Récupération de l'entrée utilisateur
+						user_input = input(">")
 
-						user_input = int(user_input)
+						if(user_input.isnumeric()):
 
-						if(user_input >= 0 and user_input < len(self.__players)):
+							user_input = int(user_input)
 
-							request = { 
-								"player" : self.__player_id,
-								"type" : "ATTACK",
-								"target" : user_input,
-								"attacker" : -1
-							}
+							if(user_input >= 0 and user_input < len(self.__players)):
 
-							break
+								request = { 
+									"player" : self.__player_id,
+									"type" : "ATTACK",
+									"target" : user_input,
+									"attacker" : -1
+								}
 
-				# Sélection de la carte attaquante
-				while True:
+								break
 
-					i = 0
+					# Sélection de la carte attaquante
+					while True:
 
-					# Rafraichissement de l'écran
-					self.clear_terminal()
+						i = 0
 
-					# Affichage des cartes sur notre Battle Zone
-					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-					for card in self.__players[self.__player_id].get_board().get_battle_zone():
+						# Rafraichissement de l'écran
+						self.clear_terminal()
 
-						print(card.get_name() + "(" + str(i) + ")")
+						# Affichage des cartes sur notre Battle Zone
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for card in self.__players[self.__player_id].get_board().get_battle_zone():
 
-						i = i + 1
+							if(card.is_sick()):
 
-					# Récupération de l'entrée utilisateur
-					user_input = input(">")
+								if(card.is_tapped()):
 
-					if(user_input.isnumeric()):
+									print("(S)(T)" + card.get_name() + "(" + str(i) + ")")
+								
+								else:
+								
+									print("(S)" + card.get_name() + "(" + str(i) + ")")
 
-						user_input = int(user_input)
+							else:
 
-						if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
+								if(card.is_tapped()):
 
-							request["attacker"] = user_input
+									print("(T)" + card.get_name() + "(" + str(i) + ")")
 
-							break
+								else:
 
-				break
+									print(card.get_name() + "(" + str(i) + ")")
+
+							i = i + 1
+
+						# Récupération de l'entrée utilisateur
+						user_input = input(">")
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
+
+								request["attacker"] = user_input
+
+								break
+
+					break
 				
 			elif(user_input == BLOCK):
 
-				# Sélection du joueur
-				while True:
+				if(self.__players[self.__player_id].battlezone_size() > 0):
 
-					# Rafraichissement de l'écran
-					self.clear_terminal()
+					# Sélection du joueur
+					while True:
 
-					# Affichage de la liste des joueurs
-					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-					for player in self.__players:
+						# Rafraichissement de l'écran
+						self.clear_terminal()
 
-						print("[  Player " + str(player.get_id()) + "  ]")
+						# Affichage de la liste des joueurs
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for player in self.__players:
 
-					# Récupération de l'entrée utilisateur
-					user_input = input(">")
+							print("[  Player " + str(player.get_id()) + "  ]")
 
-					if(user_input.isnumeric()):
+						# Récupération de l'entrée utilisateur
+						user_input = input(">")
 
-						user_input = int(user_input)
+						if(user_input.isnumeric()):
 
-						if(user_input >= 0 and user_input < len(self.__players)):
+							user_input = int(user_input)
 
-							request = { 
-								"player" : self.__player_id,
-								"type" : "BLOCK",
-								"target" : user_input,
-								"ennemy_attacker" : -1,
-								"blocker" : -1
-							}
+							if(user_input >= 0 and user_input < len(self.__players)):
 
-							break
+								request = { 
+									"player" : self.__player_id,
+									"type" : "BLOCK",
+									"target" : user_input,
+									"ennemy_attacker" : -1,
+									"blocker" : -1
+								}
 
-				# Sélection de la carte attaquante à bloquer
-				while True:
+								break
 
-					i = 0
+					if(self.__players[user_input].battlezone_size() > 0):
 
-					# Rafraichissement de l'écran
-					self.clear_terminal()
+						# Sélection de la carte ennemie à bloquer
+						while True:
 
-					# Affichage de la Battle Zone ennemie
-					print("Joueur", request["target"], "(" + str(self.__players[request["target"]].get_life()) + ")")
-					for card in self.__players[request["target"]].get_board().get_battle_zone():
+							i = 0
 
-						print(card.get_name() + "(" + str(i) + ")")
+							# Rafraichissement de l'écran
+							self.clear_terminal()
 
-						i = i + 1
+							# Affichage de la Battle Zone ennemie
+							print("Joueur", request["target"], "(" + str(self.__players[request["target"]].get_life()) + ")")
+							for card in self.__players[request["target"]].get_board().get_battle_zone():
 
-					# Récupération de l'entrée utilisateur
-					user_input = input(">")
+								print(card.get_name() + "(" + str(i) + ")")
 
-					if(user_input.isnumeric()):
+								i = i + 1
 
-						user_input = int(user_input)
+							# Récupération de l'entrée utilisateur
+							user_input = input(">")
 
-						if(user_input >= 0 and user_input < len(self.__players[request["target"]].get_board().get_battle_zone())):
+							if(user_input.isnumeric()):
 
-							request["ennemy_attacker"] = user_input
+								user_input = int(user_input)
 
-							break
+								if(user_input >= 0 and user_input < len(self.__players[request["target"]].get_board().get_battle_zone())):
 
-				# Sélection de la carte bloquante
-				while True:
+									request["ennemy_attacker"] = user_input
 
-					i = 0
+									break
+		
+						# Sélection de la carte bloquante
+						while True:
 
-					# Rafraichissement de l'écran
-					self.clear_terminal()
+							i = 0
 
-					# Affichage de notre Battle Zone
-					print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-					for card in self.__players[self.__player_id].get_board().get_battle_zone():
+							# Rafraichissement de l'écran
+							self.clear_terminal()
 
-						print(card.get_name() + "(" + str(i) + ")")
+							# Affichage de notre Battle Zone
+							print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+							for card in self.__players[self.__player_id].get_board().get_battle_zone():
 
-						i = i + 1
+								if(card.is_tapped()):
+									
+									print("(T)" + card.get_name() + "(" + str(i) + ")")
 
-					# Récupération de l'entrée utilisateur
-					user_input = input(">")
+								else:
 
-					if(user_input.isnumeric()):
+									print(card.get_name() + "(" + str(i) + ")")
 
-						user_input = int(user_input)
+								i = i + 1
 
-						if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
+							# Récupération de l'entrée utilisateur
+							user_input = input(">")
 
-							request["blocker"] = user_input
+							if(user_input.isnumeric()):
 
-							break
+								user_input = int(user_input)
 
-				break
+								if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
+
+									request["blocker"] = user_input
+
+									break
+
+						break
 
 			elif(user_input == SKIP_PHASE):
 
@@ -752,13 +782,37 @@ class Client:
 
 					for card in player.get_board().get_land_zone():
 						
-						print("[" + card._name, end="] ")
+						if(card.is_tapped()):
+							
+							print("[(T)" + card._name, end="] ")
+
+						else:
+							
+							print("[" + card._name, end="] ")
 
 					print()
 
 					for card in player.get_board().get_battle_zone():
-						
-						print("[" + card._name, end="] ")
+
+						if(card.is_sick()):
+
+							if(card.is_tapped()):
+
+								print("[(S)(T)" + card._name, end="] ")
+
+							else:
+							
+								print("[(S)" + card._name, end="] ")
+
+						else:
+							
+							if(card.is_tapped()):
+
+								print("[(T)" + card._name, end="] ")
+
+							else:
+								
+								print("[" + card._name, end="] ")
 
 					print()
 

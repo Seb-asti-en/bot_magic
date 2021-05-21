@@ -15,6 +15,7 @@ class CreatureCard(Card):
 		self.__tmp_damage = card["Power"]
 
 		self.__tapped = False
+		self.__summoning_sickness = True
 
 		
 	############################ Getters ############################
@@ -93,3 +94,21 @@ class CreatureCard(Card):
 		self.__life = self.__toughness
 		self.__tmp_life =self.__toughness
 		self.__tmp_damage = self.__power
+
+	def untap(self):
+
+		if(self.__tapped):
+			
+			self.__tapped = False
+
+	def cure(self):
+
+		self.__summoning_sickness = False
+
+	def is_sick(self):
+
+		return self.__summoning_sickness
+
+	def is_tapped(self):
+
+		return self.__tapped

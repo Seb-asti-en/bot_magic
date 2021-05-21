@@ -383,8 +383,8 @@ class Game:
 
 					print("Le joueur " + str(player[PLAYER].get_id()+1) + " est en vie (" + str(player[PLAYER].get_life()) + "HP)")
 
-					# # Dégagement des cartes
-					player[PLAYER].untap()
+					# Phase de départ
+					self.start_phase(player[PLAYER].get_id())
 
 					# # Phase Effet 1
 					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Effets 1")
@@ -484,6 +484,17 @@ class Game:
 
 				# Mise à jour des morts
 				self.__dead_players.append(player[PLAYER].get_id())
+
+	def start_phase(self,index):
+
+		gamestate = None
+
+		# Dégagement des cartes
+		self.__players[index][PLAYER].disengage()
+
+		# Envoi vers le client : Etat de la partie
+		gamestate = self.choose_gamestate([[index,"MANA","BATTLE_ZONE","LAND_ZONE"]])
+		self.send_gamestate(index,gamestate)
 
 	def effect_phase(self, index):
 
@@ -716,10 +727,18 @@ class Game:
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
 
-					# Envoi vers tous les clients : Etat de la partie
 					gamestate = self.choose_gamestate([[index,"BATTLE_ZONE"]])
+
+					# Envoi vers le client : Etat de la partie
+					self.send_gamestate(index,gamestate)
+
+					# Envoi vers tous les autres clients : Etat de la partie
 					for player in self.__players :
-						self.send_gamestate(player.get_id(),gamestate)
+
+						if(player[PLAYER].get_id() != index):
+
+							self.send_signal(player[PLAYER].get_id(),"GAME_UPDATE")
+							self.send_gamestate(player[PLAYER].get_id(),gamestate)
 
 				else:
 

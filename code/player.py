@@ -507,4 +507,26 @@ class Player():
 		destination.append(source.pop(source_position))
 			
 		return True
+
+	def disengage(self):
+
+		# Dégagement des cartes terrain
+		for card in self.__board.get_land_zone():
+
+			card.untap()
+
+		# Dégagement des cartes créature
+		for card in self.__board.get_battle_zone():
+
+			card.untap()
+
+			# Retrait du mal d'invocation
+			if(card.is_sick()):
+
+				card.cure()
+
+		# Remise à zéro du pool de mana
+		for color in self.__mana_pool:
+
+			self.__mana_pool[color] = 0
 				
