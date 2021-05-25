@@ -369,7 +369,7 @@ class Client:
 
 				#input(response)
 
-			if(response == "GAME_UPDATE"):
+			elif(response == "GAME_UPDATE"):
 
 				# Réception depuis le serveur de jeu : Etat de la partie
 				gamestate = self.recv_gamestate()

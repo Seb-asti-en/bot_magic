@@ -1,7 +1,7 @@
 from board import Board
-from effect import Effect 
+from effect import Effect
 
-class Player():
+class Player:
 
 	############################ Constructeur ############################
 	def __init__(self, player_id, life, deck):
@@ -530,55 +530,66 @@ class Player():
 
 			self.__mana_pool[color] = 0
 
-	def attack(self,target,battlezone_position,player_count):
+	def attack(self, target, battlezone_position, player_count):
 
 		is_accepted = False
 		card = None
 
+		# Vérification de l'index du joueur
 		if(target >= 0 and target < player_count):
 
-			print("1")
+			# Vérification que l'on ne s'attaque pas soi-même
+			if(target != self.get_id()):
 
-			if(battlezone_position >= 0 and battlezone_position < self.battlezone_size()):
+				# Vérification de l'index de la carte
+				if(battlezone_position >= 0 and battlezone_position < self.battlezone_size()):
 
-				print("2")
+					card = self.__board.get_battle_zone()[battlezone_position]
 
-				card = self.__board.get_battle_zone()[battlezone_position]
+					if(not card.is_sick() and not card.is_tapped()):
 
-				if(not card.is_sick() and not card.is_tapped()):
+						card.tap()
+						card.set_target(target)
 
-					print("3")
-
-					card.tap()
-
-					card.set_target(target)
-
-					is_accepted = True
+						is_accepted = True
 
 		return is_accepted
 
-	# def block(self,Player_target,battlezone_position,blocker):
+	def block(self, target, battlezone_position, blocker):
 
-	# 	is_accepted = False
+		is_accepted = False
+		ennemy_card = None
+		card = None
 
-	# 	if(self.battlezone_size() > 0):
+		# Vérificatiton de l'index de la carte attaquante
+		if(battlezone_position >= 0 and battlezone_position < target.battlezone_size()):
 
+			ennemy_card = target.get_board().get_battle_zone()[battlezone_position]
 
+			# Vérification que la carte attaquante nous attaque réellement
+			if(ennemy_card.is_tapped() and ennemy_card.get_target() == self.__id):
 
+				# Vérification de l'index de la carte bloquante
+				if(blocker >= 0 and blocker < self.battlezone_size()):
 
+					card = self.__board.get_battle_zone()[blocker]
 
-	# 	b = False
-	# 	if self.__board.isempty_battle_zone():
-	# 		print("Vous n'avez pas de cartes pour vous defendre")
-	# 	elif blocker >= len(self.__board.get_battle_zone()) or blocker < 0:
-	# 			print("l'index source est trop grand ou trop petit", blocker)
-	# 	elif Effect.early_choice_block(Player_target.get_board().get_battle_zone()[attacker], self.__board.get_battle_zone()[blocker]) == True :
-	# 		b = True
-	# 		self.__board.get_battle_zone()[blocker].set_isblocked(True)
-	# 		if Player_target.get_board().get_battle_zone()[attacker].get_isattack() == True:
-	# 			Player_target.get_board().get_battle_zone()[attacker].set_istarget(True)
-	# 		else:
-	# 			print("selectioner un attaquant")
-	# 	else:
-	# 		print("vous ne pouvez pas bloquer")
-	# 	return b
+					# Vérification que notre carte peut bloquer
+					if(not card.is_tapped() and not card.is_blocking()):
+
+						card.set_blocking(battlezone_position)
+
+						is_accepted = True
+
+		return is_accepted
+
+	def cleanup(self):
+
+		# Soin et retrait des bonus arrivés à échéance sur la Battle Zone
+		for card in self.__board.get_battle_zone():
+			
+			card.update()
+
+	def damage(self, power):
+
+		self.__life -= power

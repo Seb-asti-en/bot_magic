@@ -2,7 +2,7 @@ import socket, pickle, sys, os
 from deckmanager import DeckManager
 from player import Player
 
-DEBUG = True
+DEBUG = False
 
 SOCKET = 0
 PLAYER = 1
@@ -19,6 +19,8 @@ BATTLE_ZONE = 5
 LAND_ZONE = 6
 GRAVEYARD = 7
 EXILE = 8
+
+IDLE = -1
 
 class Game:
 
@@ -51,7 +53,6 @@ class Game:
 
 		os.system(command)
 
-	# Retourne le nombre de joueurs en vie
 	def players_alive(self):
 
 		alive = 0
@@ -140,6 +141,14 @@ class Game:
 
 		return gamestate
 
+	def kill_player(self, index):
+
+		# Envoi vers le client : Signal de mort
+		self.send_signal(index,"DEATH")
+
+		# Mise à jour des morts
+		self.__dead_players.append(index)
+
 	def concede(self, index):
 
 		gamestate = None
@@ -154,11 +163,8 @@ class Game:
 		gamestate = self.choose_gamestate([[index,"LIFE"]])
 		self.send_gamestate(index,gamestate)
 		
-		# Envoi vers le client : Signal de mort
-		self.send_signal(index,"DEATH")
-		
-		# Mise à jour des morts
-		self.__dead_players.append(index)
+		# Mise à mort du joueur
+		self.kill_player(index)
 
 	def send_signal(self, index, data):
 
@@ -413,9 +419,7 @@ class Game:
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (1)")
 					self.main_phase(player[PLAYER].get_id())
 
-					# Attaquant ?
-
-					# Déclaration des monstres attaquants / Phase Attaque
+					# Phase d'Attaque (Déclaration des monstres attaquants)
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase d'attaque")
 					self.attack_phase(player[PLAYER].get_id())
 					
@@ -430,7 +434,7 @@ class Game:
 					# 		# Phase Éphémère 2 par ennemy
 					# 		self.instant_phase(ennemy[PLAYER].get_id())
 
-					# Ennemi déclare les monstres bloquants / Phase Blocage
+					# Phase Blocage (Ennemi déclare les monstres bloquants)
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de blocage")
 					for ennemy in self.__players:
 
@@ -449,25 +453,17 @@ class Game:
 					# print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Ephémères 3")
 					# self.instant_phase(player[PLAYER].get_id())
 
-			 		# Appliquer les dommages de combat (prévenir du décès avec une requête) / Phase Dommages
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase d'attaque")
+			 		# Phase Dommages (Appliquer les dommages de combat (prévenir du décès avec une requête))
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Résolution des dégats")
 					self.damage_phase(player[PLAYER].get_id())
 					
 					# Phase Secondaire
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (2)")
 					self.main_phase(player[PLAYER].get_id())
 
-					# # On retire de la vie au joueur
-					# player[PLAYER].set_life(player[PLAYER].get_life() - 10)
-
-					# On vérifie s'il est en vie
-					if(player[PLAYER].get_life() <= 0):
-
-						# Envoi vers le client : Signal de mort (23)
-						self.send_signal(player[PLAYER].get_id(),"DEATH")
-
-						# Mise à jour des morts
-						self.__dead_players.append(player[PLAYER].get_id())
+					# Phase de fin
+					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de fin")
+					self.end_phase(player[PLAYER].get_id())
 
 		# Envoi des résultats
 		for player in self.__players:
@@ -479,20 +475,18 @@ class Game:
 
 			elif player[PLAYER].get_id() not in self.__dead_players:
 				
-				# Envoi vers le client : Signal de mort (24.2)
-				self.send_signal(player[PLAYER].get_id(),"DEATH")
-
-				# Mise à jour des morts
-				self.__dead_players.append(player[PLAYER].get_id())
+				# Mise à mort du joueur
+				self.kill_player(player[PLAYER].get_id())
 
 	def start_phase(self,index):
 
 		gamestate = None
 
+		# Envoi vers le client : Signal d'update
+		self.send_signal(index,"GAME_UPDATE")
+
 		# Dégagement des cartes
 		self.__players[index][PLAYER].disengage()
-
-		self.send_signal(index,"GAME_UPDATE")
 
 		# Envoi vers le client : Etat de la partie
 		gamestate = self.choose_gamestate([[index,"MANA","BATTLE_ZONE","LAND_ZONE"]])
@@ -648,7 +642,7 @@ class Game:
 
 			if(data.get("type") == "PLAY_CARD"):
 
-				# TODO : Engagement des cartes
+				# Engagement des cartes
 				is_accepted = self.__players[index][PLAYER].engage(data["hand_position"])
 				
 				if(is_accepted):
@@ -734,10 +728,10 @@ class Game:
 					# Envoi vers le client : Etat de la partie
 					self.send_gamestate(index,gamestate)
 
-					# Envoi vers tous les autres clients : Etat de la partie
+					# Envoi vers tous les autres clients en vie : Etat de la partie
 					for player in self.__players :
 
-						if(player[PLAYER].get_id() != index):
+						if(player[PLAYER].get_id() != index and player[PLAYER].get_life() > 0):
 
 							self.send_signal(player[PLAYER].get_id(),"GAME_UPDATE")
 							self.send_gamestate(player[PLAYER].get_id(),gamestate)
@@ -793,7 +787,7 @@ class Game:
 					self.send_signal(index,"ACCEPT")
 
 					# Envoi vers le client : Etat de la partie
-					gamestate = self.choose_gamestate("EMPTY")
+					gamestate = self.choose_gamestate([[index,"BATTLE_ZONE"]])
 					self.send_gamestate(index,gamestate)
 
 				else:
@@ -825,4 +819,84 @@ class Game:
 
 	def damage_phase(self, index):
 
-		pass
+		battlezone_position = 0
+		updated = []
+		blocked = False
+		choice = []
+		gamestate = None
+
+		# Stockage du joueur attaquant
+		updated.append(index)
+
+		for card in self.__players[index][PLAYER].get_board().get_battle_zone():
+
+			if(card.is_attacking()):
+
+				blocked = False
+
+				# Stockage des joueurs ciblés
+				if(card.get_target() not in updated):
+
+					updated.append(card.get_target())
+
+				for ennemy_card in self.__players[card.get_target()][PLAYER].get_board().get_battle_zone():
+
+					if(ennemy_card.get_blocking() == battlezone_position):
+
+						# Application des dommages mutuels
+						ennemy_card.damage(card.power())
+						card.damage(ennemy_card.power())
+
+						blocked = True
+
+				if(not blocked):
+
+					# Application des dommages direct
+					self.__players[card.get_target()][PLAYER].damage(card.power())
+
+			battlezone_position += 1
+
+		# Déplacement au cimetière les cartes anéanties
+		for player in self.__players:
+
+			battlezone_position = 0
+
+			for card in player[PLAYER].get_board().get_battle_zone()[:]:
+
+				if(card.toughness() <= 0):
+
+					print("Player",player[PLAYER].get_id(),"moved card",battlezone_position,"to graveyard")
+					self.__players[player[PLAYER].get_id()][PLAYER].move("BATTLE_ZONE",battlezone_position,"GRAVEYARD")
+
+				else:
+
+					battlezone_position += 1
+
+		# Préparation de l'update de jeu en fonction des joueurs ciblés
+		for player_id in updated:
+
+			choice.append([player_id,"LIFE","BATTLE_ZONE","GRAVEYARD"])
+
+		gamestate = self.choose_gamestate(choice)
+
+		# Envoi à tous les clients en vie : Etat de jeu
+		for player in self.__players:
+
+			if(player[PLAYER].get_life() > 0):
+				
+				self.send_signal(player[PLAYER].get_id(),"GAME_UPDATE")
+				self.send_gamestate(player[PLAYER].get_id(),gamestate)
+
+	def end_phase(self, index):
+
+		# Vérification si le joueur n'a plus de vie
+		if(self.__players[index][PLAYER].get_life() <= 0):
+
+			# Mise à mort du joueur
+			self.kill_player(index)
+
+		else:
+
+			# Application des soins
+			self.__players[index][PLAYER].cleanup()
+
