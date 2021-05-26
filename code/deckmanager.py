@@ -48,10 +48,10 @@ class DeckManager:
 		
 		#Ajoute chaque carte du json_all_cards grace au json_deck
 		for deck_card in card:
-			print("JSON/Cards/" + str(deck_card["Id"]) + ".json")
+			#print("JSON/Cards/" + str(deck_card["Id"]) + ".json")
 			try:
 				with open("JSON/Cards/" + str(deck_card["Id"]) + ".json") as file:
-					print("Je suis le roi du monde et aussi ",str(deck_card["Id"]))
+					#print("Je suis le roi du monde et aussi ",str(deck_card["Id"]))
 					id_card = json.load(file)
 			except OSError:
 				sys.exit("Impossible d'ouvrir le fichier decks JSON")

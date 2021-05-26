@@ -3,7 +3,7 @@
 import socket, pickle, sys, json, os
 from player import Player
 
-DEBUG = True
+DEBUG = False
 
 PACKET_SIZE = 1024
 

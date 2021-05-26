@@ -3,6 +3,7 @@ from deckmanager import DeckManager
 from player import Player
 
 DEBUG = False
+LOGS = True
 
 SOCKET = 0
 PLAYER = 1
@@ -149,6 +150,10 @@ class Game:
 		# Mise à jour des morts
 		self.__dead_players.append(index)
 
+		if(LOGS):
+
+			print("Joueur",index+1,"est une sombre merde, il est mort comme un chien")
+
 	def concede(self, index):
 
 		gamestate = None
@@ -162,6 +167,10 @@ class Game:
 		# Envoi vers le client : Etat de la partie
 		gamestate = self.choose_gamestate([[index,"LIFE"]])
 		self.send_gamestate(index,gamestate)
+
+		if(LOGS):
+
+			print("Joueur",index+1,"renonce à la victoire")
 		
 		# Mise à mort du joueur
 		self.kill_player(index)
@@ -253,12 +262,21 @@ class Game:
 
 	def wait_client(self):
 
+		i = 1
+
 		# Mise en écoute de la socket TCP
 		self.__socket.listen(self.__slots)
 
 		# Connexions des joueurs
 		while not self.is_full():
+			
 			self.__players.append([self.__socket.accept()[0],None])
+
+			if(LOGS):
+				
+				print("Connexion du Joueur",i)
+
+			i += 1
 
 	def choose_deck(self):
 
@@ -277,6 +295,10 @@ class Game:
 			# Incrémentation du compteur définissant l'identifiant du joueur
 			player_id += 1
 
+			if(LOGS):
+
+				print("Joueur",player[PLAYER].get_id()+1,"a choisi le deck",DEFAULT_DECK)
+
 	def start(self):
 
 		gamestate = None
@@ -289,14 +311,11 @@ class Game:
 
 			# Envoi vers le player : Liste de Players (2)
 			gamestate = self.choose_gamestate("INIT")
-			print(gamestate)
+
 			self.send_gamestate(player[PLAYER].get_id(),gamestate)
 
 		# Phase Mulligan
-		for player in self.__players:
-
-			# Rafraichissement de l'écran
-			self.clear_terminal()			
+		for player in self.__players:		
 		
 			# Exécution de la phase
 			print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Mulligan")
@@ -315,9 +334,6 @@ class Game:
 		self.__players[index][PLAYER].draw_card(7)
 
 		while True:
-
-			# DEBUG
-			self.__players[index][PLAYER].debug_print_hand()
 
 			# Envoi vers le player : Signal de jeu (3)
 			self.send_signal(index,"PLAY")
@@ -345,6 +361,10 @@ class Game:
 				# Envoi vers le client : Etat de la partie (5.1.2)
 				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
 				self.send_gamestate(index,gamestate)
+
+				if(LOGS):
+					
+					print("Joueur",index+1,"veut continuer le mulligan")
 			
 			elif(data.get("type") == "SKIP_PHASE"):
 
@@ -354,6 +374,10 @@ class Game:
 				# Envoi vers le client : Etat de la partie (5.2.2)
 				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
 				self.send_gamestate(index,gamestate)
+
+				if(LOGS):
+					
+					print("Joueur",index+1,"a terminé le mulligan")
 
 				break
 			
@@ -369,15 +393,16 @@ class Game:
 				# Envoi vers le client : Refus (5.4)
 				self.send_signal(index,"DECLINE")
 
+				if(LOGS):
+					
+					print("Joueur",index+1,"dit n'importe quoi")
+
 				continue
 
 	def turn(self): 
 
 		data = None
 		land_played = False
-
-		# Rafraichissement de l'écran
-		self.clear_terminal()
 
 		while self.players_alive() > 1:
 
@@ -444,7 +469,7 @@ class Game:
 
 						if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
 
-							print("L'ennemi", ennemy[PLAYER].get_id()+1, "peut bloquer des cartes")
+							print("Joueur", ennemy[PLAYER].get_id()+1, "peut bloquer les cartes du Joueur", player[PLAYER].get_id()+1)
 
 							# Phase de blocage par ennemy
 							self.block_phase(ennemy[PLAYER].get_id())
@@ -474,8 +499,12 @@ class Game:
 
 			if(player[PLAYER].get_life() > 0):
 				
-				# Envoi vers le client : Signal de mort (24.1)
+				# Envoi vers le client : Signal de victoire
 				self.send_signal(player[PLAYER].get_id(),"VICTORY")
+
+				if(LOGS):
+
+					print("Joueur",player[PLAYER].get_id()+1,"a remporté la partie")
 
 			elif player[PLAYER].get_id() not in self.__dead_players:
 				
@@ -495,6 +524,10 @@ class Game:
 		# Envoi vers le client : Etat de la partie
 		gamestate = self.choose_gamestate([[index,"MANA","BATTLE_ZONE","LAND_ZONE"]])
 		self.send_gamestate(index,gamestate)
+
+		if(LOGS):
+
+			print("Dégagement des cartes du Joueur",index+1)
 
 	def effect_phase(self, index):
 
@@ -617,6 +650,10 @@ class Game:
 				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
 				self.send_gamestate(index,gamestate)
 
+				if(LOGS):
+
+					print("Joueur",index+1,"se décide à piocher")
+
 				break
 			
 			elif(data.get("type") == "CONCEDE"):
@@ -629,6 +666,10 @@ class Game:
 
 				# Envoi vers le client : Refus (13.2)
 				self.send_signal(index,"DECLINE")
+
+				if(LOGS):
+
+					print("Joueur",index+1,"dit n'importe quoi")
 
 	def main_phase(self, index, land_played):
 
@@ -648,8 +689,6 @@ class Game:
 
 				# Engagement des cartes
 				is_accepted,land_played = self.__players[index][PLAYER].engage(data["hand_position"],land_played)
-				
-				if():
 
 				if(is_accepted):
 
@@ -665,6 +704,10 @@ class Game:
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
+					if(LOGS):
+
+						print("Joueur",index+1,"n'a pas le droit de poser",self.__players[index][PLAYER].get_board().get_hand()[data["hand_position"]].get_name())
+
 			elif(data.get("type") == "TAP_LAND"):
 
 				# Tap un terrain
@@ -679,10 +722,18 @@ class Game:
 					gamestate = self.choose_gamestate([[index,"MANA","LAND_ZONE"]])
 					self.send_gamestate(index,gamestate)
 
+					if(LOGS):
+
+						print("Joueur",index+1,"tap le terrain",self.__players[index][PLAYER].get_board().get_land_zone()[data["landzone_position"]].get_name())
+
 				else:
 
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
+
+					if(LOGS):
+
+						print("Joueur",index+1,"n'a pas le droit de tap",self.__players[index][PLAYER].get_board().get_land_zone()[data["landzone_position"]].get_name(),"de nouveau")
 
 			elif(data.get("type") == "SKIP_PHASE"):
 
@@ -692,6 +743,10 @@ class Game:
 				# Envoi vers le client : Etat de la partie
 				gamestate = self.choose_gamestate("EMPTY")
 				self.send_gamestate(index,gamestate)
+
+				if(LOGS):
+
+					print("Joueur",index+1,"termine la phase")
 
 				break
 				
@@ -705,6 +760,10 @@ class Game:
 
 				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
+
+				if(LOGS):
+
+					print("Joueur",index+1,"dit n'importe quoi")
 
 		return land_played
 			
@@ -731,6 +790,10 @@ class Game:
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
 
+					if(LOGS):
+
+						print("Joueur",index+1,"déclare attaquer le Joueur",data["target"]+1,"avec",self.__players[index][PLAYER].get_board().get_battle_zone()[data["attacker"]].get_name())
+					
 					gamestate = self.choose_gamestate([[index,"BATTLE_ZONE"]])
 
 					# Envoi vers le client : Etat de la partie
@@ -749,6 +812,10 @@ class Game:
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
+					if(LOGS):
+
+						print("Joueur",index+1,"n'a pas le droit d'attaquer le Joueur",data["target"]+1,"avec cette carte")
+
 			elif(data.get("type") == "SKIP_PHASE"):
 
 				# Envoi vers le client : Acceptation
@@ -757,6 +824,10 @@ class Game:
 				# Envoi vers le client : Etat de la partie
 				gamestate = self.choose_gamestate("EMPTY")
 				self.send_gamestate(index,gamestate)
+
+				if(LOGS):
+
+					print("Joueur",index+1,"termine la phase")
 
 				break
 				
@@ -770,6 +841,10 @@ class Game:
 
 				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
+
+				if(LOGS):
+
+					print("Joueur",index+1,"dit n'importe quoi")
 
 	def block_phase(self, index):
 
@@ -794,6 +869,10 @@ class Game:
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
 
+					if(LOGS):
+
+						print("Joueur",index+1,"déclare bloquer la carte",self.__players[data["target"]][PLAYER].get_board().get_battle_zone()[data["ennemy_attacker"]].get_name(),"du Joueur",data["target"],"avec",self.__players[index][PLAYER].get_board().get_battle_zone()[data["blocker"]].get_name())
+
 					# Envoi vers le client : Etat de la partie
 					gamestate = self.choose_gamestate([[index,"BATTLE_ZONE"]])
 					self.send_gamestate(index,gamestate)
@@ -803,6 +882,10 @@ class Game:
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
+					if(LOGS):
+
+						print("Joueur",index+1,"n'a pas le droit de bloquer le Joueur",data["target"]+1,"avec cette carte")
+
 			elif(data.get("type") == "SKIP_PHASE"):
 
 				# Envoi vers le client : Acceptation
@@ -811,6 +894,10 @@ class Game:
 				# Envoi vers le client : Etat de la partie
 				gamestate = self.choose_gamestate("EMPTY")
 				self.send_gamestate(index,gamestate)
+
+				if(LOGS):
+
+					print("Joueur",index+1,"termine la phase")
 
 				break
 				
@@ -824,6 +911,10 @@ class Game:
 
 				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
+
+				if(LOGS):
+
+					print("Joueur",index+1,"dit n'importe quoi")
 
 	def damage_phase(self, index):
 
@@ -855,12 +946,21 @@ class Game:
 						ennemy_card.damage(card.power())
 						card.damage(ennemy_card.power())
 
+						if(LOGS):
+
+							print(f"La carte {card.get_name()}(J{index+1}) inflige {card.power()} dommage(s) à {ennemy_card.get_name()}(J{card.get_target()+1})")
+							print(f"La carte {ennemy_card.get_name()}(J{card.get_target()+1}) inflige {ennemy_card.power()} dommage(s) à {card.get_name()}(J{index+1})")
+
 						blocked = True
 
 				if(not blocked):
 
 					# Application des dommages direct
 					self.__players[card.get_target()][PLAYER].damage(card.power())
+
+					if(LOGS):
+
+						print(f"Joueur {index+1} inflige {card.power()} dommage(s) direct au Joueur {card.get_target()+1}")
 
 			battlezone_position += 1
 
@@ -873,8 +973,11 @@ class Game:
 
 				if(card.toughness() <= 0):
 
-					print("Player",player[PLAYER].get_id(),"moved card",battlezone_position,"to graveyard")
 					self.__players[player[PLAYER].get_id()][PLAYER].move("BATTLE_ZONE",battlezone_position,"GRAVEYARD")
+
+					if(LOGS):
+
+						print(f"La carte {card.get_name()} a été détruite, elle est envoyée au cimetière")
 
 				else:
 
@@ -907,4 +1010,8 @@ class Game:
 
 			# Application des soins
 			self.__players[index][PLAYER].cleanup()
+
+			if(LOGS):
+
+				print("Les créatures du Joueur",index+1,"reçoivent des soins")
 

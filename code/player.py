@@ -2,6 +2,8 @@ from board import Board
 from effect import Effect
 from landcard import LandCard
 
+LOGS = True
+
 class Player:
 
 	############################ Constructeur ############################
@@ -433,9 +435,17 @@ class Player:
 
 					is_accepted = self.move("HAND",hand_position,"LAND_ZONE")
 
+					if(LOGS and is_accepted):
+
+						print("Joueur",self.get_id()+1,"pose le terrain",self.__board.get_land_zone()[-1].get_name())
+
 				elif(self.get_board().get_hand()[hand_position].get_type() == "Creature"):
 
 					is_accepted = self.move("HAND",hand_position,"BATTLE_ZONE")
+
+					if(LOGS and is_accepted):
+
+						print("Joueur",self.get_id()+1,"pose",self.__board.get_battle_zone()[-1].get_name(),"sur le champ de bataille")
 
 				if(is_accepted):
 
