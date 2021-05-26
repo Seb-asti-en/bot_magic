@@ -374,6 +374,7 @@ class Game:
 	def turn(self): 
 
 		data = None
+		land_played = False
 
 		# Rafraichissement de l'écran
 		self.clear_terminal()
@@ -383,6 +384,9 @@ class Game:
 			for player in self.__players:
 
 				print("Tour du joueur", player[PLAYER].get_id()+1)
+
+				# Permission de poser un terrain
+				land_played = False
 
 				# Vérification si le joueur est encore en vie
 				if (self.players_alive() > 1) and (player[PLAYER].get_life() > 0):
@@ -417,7 +421,7 @@ class Game:
 
 					# Phase Principale
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (1)")
-					self.main_phase(player[PLAYER].get_id())
+					land_played = self.main_phase(player[PLAYER].get_id(),land_played)
 
 					# Phase d'Attaque (Déclaration des monstres attaquants)
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase d'attaque")
@@ -459,7 +463,7 @@ class Game:
 					
 					# Phase Secondaire
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (2)")
-					self.main_phase(player[PLAYER].get_id())
+					land_played = self.main_phase(player[PLAYER].get_id(),land_played)
 
 					# Phase de fin
 					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de fin")
@@ -626,7 +630,7 @@ class Game:
 				# Envoi vers le client : Refus (13.2)
 				self.send_signal(index,"DECLINE")
 
-	def main_phase(self, index):
+	def main_phase(self, index, land_played):
 
 		data = None
 		gamestate = None
@@ -643,8 +647,10 @@ class Game:
 			if(data.get("type") == "PLAY_CARD"):
 
 				# Engagement des cartes
-				is_accepted = self.__players[index][PLAYER].engage(data["hand_position"])
+				is_accepted,land_played = self.__players[index][PLAYER].engage(data["hand_position"],land_played)
 				
+				if():
+
 				if(is_accepted):
 
 					# Envoi vers le client : Acceptation
@@ -699,6 +705,8 @@ class Game:
 
 				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
+
+		return land_played
 			
 	def attack_phase(self, index):
 

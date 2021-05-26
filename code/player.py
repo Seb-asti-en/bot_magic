@@ -1,5 +1,6 @@
 from board import Board
 from effect import Effect
+from landcard import LandCard
 
 class Player:
 
@@ -386,7 +387,7 @@ class Player:
 
 		return is_accepted
 
-	def engage(self, hand_position):
+	def engage(self, hand_position, land_played):
 
 		is_accepted = False
 		mana_cost = None
@@ -397,22 +398,33 @@ class Player:
 
 			mana_cost = self.get_board().get_hand()[hand_position].get_mana_cost()
 
-			# Calcul du mana global
-			for color in mana_cost:
+			# Vérification du type de carte
+			if(type(self.get_board().get_hand()[hand_position]) is LandCard):
 				
-				global_cost += mana_cost[color]
+				# Vérification de la possibilité d'engager un terrain
+				if(not land_played):
 
-			# Vérification de la quantité de mana global
-			if(global_cost <= self.__mana_pool["X"]):
+					is_accepted = True
+					land_played = True
 
-				is_accepted = True
+			else:
 
+				# Calcul du mana global
 				for color in mana_cost:
+					
+					global_cost += mana_cost[color]
 
-						# Vérification de la quantité de mana couleur par couleur et que la clé de couleur existe
-						if(color not in self.__mana_pool or mana_cost[color] > self.__mana_pool[color]):
+				# Vérification de la quantité de mana global
+				if(global_cost <= self.__mana_pool["X"]):
 
-							is_accepted = False
+					is_accepted = True
+
+					for color in mana_cost:
+
+							# Vérification de la quantité de mana couleur par couleur et que la clé de couleur existe
+							if(color not in self.__mana_pool or mana_cost[color] > self.__mana_pool[color]):
+
+								is_accepted = False
 
 			if(is_accepted):
 
@@ -439,7 +451,7 @@ class Player:
 
 							self.__mana_pool[color] = 0	
 
-		return is_accepted						
+		return [is_accepted, land_played]
 
 	def move(self, source_zone, source_position, destination_zone):
 
