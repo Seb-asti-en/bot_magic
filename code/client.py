@@ -3,7 +3,7 @@
 import socket, pickle, sys, json, os
 from player import Player
 
-DEBUG = True
+DEBUG = False
 
 PACKET_SIZE = 1024
 
@@ -101,31 +101,31 @@ class Client:
 
 				self.__players[player[ID]].set_life(player[LIFE])
 
-			if(player[MANA]):
+			if(player[MANA] != None):
 
 				self.__players[player[ID]].set_mana_pool(player[MANA])
 
-			if(player[DECK]):
+			if(player[DECK] != None):
 
 				self.__players[player[ID]].get_board().set_deck(player[DECK])
 
-			if(player[HAND]):
+			if(player[HAND] != None):
 
 				self.__players[player[ID]].get_board().set_hand(player[HAND])
 
-			if(player[BATTLE_ZONE]):
+			if(player[BATTLE_ZONE] != None):
 
 				self.__players[player[ID]].get_board().set_battle_zone(player[BATTLE_ZONE])
 
-			if(player[LAND_ZONE]):
+			if(player[LAND_ZONE] != None):
 
 				self.__players[player[ID]].get_board().set_land_zone(player[LAND_ZONE])
 
-			if(player[GRAVEYARD]):
+			if(player[GRAVEYARD] != None):
 
 				self.__players[player[ID]].get_board().set_graveyard(player[GRAVEYARD])
 
-			if(player[EXILE]):
+			if(player[EXILE] != None):
 
 				self.__players[player[ID]].get_board().set_exile(player[EXILE])
 
