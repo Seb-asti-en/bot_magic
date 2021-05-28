@@ -43,19 +43,7 @@ def main():
 	result = client.play()
 
 	# Affichage des résultats de la partie
-	if(result == "VICTORY"):
-
-		print("Victory !")
-
-	elif(result == "DEFEAT"):
-
-		print("Defeat.")
-
-	else:
-
-		print("Quelque chose has gone terribly mal (:")
-
-	input("Appuyez sur ENTER pour quitter")
+	client.get_result(result)
 
 	# Déconnexion du serveur
 	client.disconnect()
@@ -402,7 +390,7 @@ class Client:
 		identity = []
 
 		if(DEBUG):
-			input("[CLEAR SCREEN]")
+			self.get_input("[CLEAR SCREEN]")
 
 		while True :
 
@@ -422,7 +410,7 @@ class Client:
 			print("[  SHOW_GAME  (9)  ]")
 
 			# Récupération de l'entrée utilisateur
-			user_input = input(">")
+			user_input = self.get_input(">")
 
 			if(user_input == MULLIGAN):
 
@@ -816,15 +804,32 @@ class Client:
 
 					print()
 
-				input(">")
+				self.get_input(">")
 
 			else:
 
-				input("Erreur lors de la saisie, appuyez sur Entrée pour revenir au menu")
+				self.get_input("Erreur lors de la saisie, appuyez sur Entrée pour revenir au menu")
 
 		#input(request)
 
 		return request
+
+	# Affichage des résultats de la partie
+	def get_result(self, result):
+		if(result == "VICTORY"):
+			print("Victory !")
+
+		elif(result == "DEFEAT"):
+			print("Defeat.")
+
+		else:
+			print("Quelque chose has gone terribly mal (:")
+
+		self.get_input("Appuyez sur ENTER pour quitter")
+
+	def get_input(self, param):
+		given_input = input(param)
+		return given_input
 
 if __name__ == "__main__":
 	try:
