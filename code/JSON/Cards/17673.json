@@ -1,14 +1,27 @@
 {
-    "Id": 17673,
-    "Name": "Blossom Dryad",
-    "Colors": "G",
-    "Mana_cost": "{2}{G}",
-    "Identity": "G",
-    "Text": "{T}: Untap target land.",
-    "Power": 2.0,
-    "Toughness": 2.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Dryad",
-    "Supertype": null
+    "Id":17673,
+    "Name":"Blossom Dryad",
+    "Colors":"G",
+    "Mana_cost":"{2}{G}",
+    "Identity":"G",
+    "Text":"{T}: Untap target land.",
+	"Evergreen":[],
+    "Effect":[
+        {
+            "Name":"blossom_dryad",
+            "Target":"tapped land",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                "Cost_name":"tap",
+                "Cost_quantity":1
+            },
+            "Temporality":"activation"
+        }
+    ],
+    "Power":2.0,
+    "Toughness":2.0,
+    "Type":"Creature",
+    "Subtype":"Dryad",
+    "Supertype":null
 }

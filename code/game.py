@@ -9,7 +9,7 @@ SOCKET = 0
 PLAYER = 1
 PLAYER_LIFE = 10
 
-DEFAULT_DECK = "Black"
+DEFAULT_DECK = "White"
 
 ID = 0
 LIFE = 1
@@ -22,6 +22,10 @@ GRAVEYARD = 7
 EXILE = 8
 
 IDLE = -1
+
+TARGET_ID = 0
+TARGET_TYPE = 1
+TARGET_POSITION = 2
 
 class Game:
 
@@ -79,26 +83,24 @@ class Game:
 
 		elif(choice == "ALL"):
 
-			for player_choice in choice: 
+			for player in self.__players:
 
-				player_state = [player_choice[ID],None,None,None,None,None,None,None,None]	
+				player_state = [player[PLAYER].get_id(),None,None,None,None,None,None,None,None]	
 
-				player_state[LIFE] = self.__players[player_state[ID]][PLAYER].get_life()
-				player_state[MANA] = self.__players[player_state[ID]][PLAYER].get_mana_pool()
-				player_state[DECK] = self.__players[player_state[ID]][PLAYER].get_board().get_deck()
-				player_state[HAND] = self.__players[player_state[ID]][PLAYER].get_board().get_hand()
-				player_state[BATTLE_ZONE] = self.__players[player_state[ID]][PLAYER].get_board().get_battle_zone()
-				player_state[LAND_ZONE] = self.__players[player_state[ID]][PLAYER].get_board().get_land_zone()
-				player_state[GRAVEYARD] = self.__players[player_state[ID]][PLAYER].get_board().get_graveyard()
-				player_state[EXILE] = self.__players[player_state[ID]][PLAYER].get_board().get_exile()
+				player_state[LIFE] = player[PLAYER].get_life()
+				player_state[MANA] = player[PLAYER].get_mana_pool()
+				player_state[DECK] = player[PLAYER].get_board().get_deck()
+				player_state[HAND] = player[PLAYER].get_board().get_hand()
+				player_state[BATTLE_ZONE] = player[PLAYER].get_board().get_battle_zone()
+				player_state[LAND_ZONE] = player[PLAYER].get_board().get_land_zone()
+				player_state[GRAVEYARD] = player[PLAYER].get_board().get_graveyard()
+				player_state[EXILE] = player[PLAYER].get_board().get_exile()
 
 				gamestate.append(player_state)
 
 		elif(choice == "EMPTY"):
 
-			for player_choice in choice: 
-
-				player_state = [player_choice[ID],None,None,None,None,None,None,None,None]
+			gamestate.append([None,None,None,None,None,None,None,None,None])
 
 		elif(choice):
 
@@ -174,6 +176,211 @@ class Game:
 		
 		# Mise à mort du joueur
 		self.kill_player(index)
+
+	def use_effect(self, index, card_zone, card_position, temporality):
+
+		is_accepted = True
+		data = None
+		selections_buffer = None
+		card = None
+		fitting_effects = []
+		target_card = None
+
+		# Envoi vers le client : Signal de jeu
+		self.send_signal(index,"PLAY")
+
+		# Réception depuis le client : Paramètres pour chaque effet (SELECT)
+		data = self.recv_action(index)
+
+		# Vérification du type d'action
+		if(data["type"] == "SELECT"):
+
+			# Copie du choix de cible pour garder l'intégrité lors des vérification
+			selections_buffer = data["selections"][:]
+
+			# Récupération de la carte
+			if(card_zone == "HAND"):
+
+				card = self.__players[index][PLAYER].get_board().get_hand()[card_position]
+
+			elif(card_zone == "LAND_ZONE"):
+
+				card = self.__players[index][PLAYER].get_board().get_land_zone()[card_position]
+
+			elif(card_zone == "BATTLE_ZONE"):
+
+				card = self.__players[index][PLAYER].get_board().get_battle_zone()[card_position]
+
+			# Récupération des effets à la bonne temporalité
+			for effect in card.get_effect():
+
+				# Vérification de la temporalité
+				if(effect.get_temporality() == temporality):
+
+					# Ajout à la liste des effets valides pour cette temporalité
+					fitting_effects.append(effect)
+
+			# Vérification qu'il y ait au moins un effet valide
+			if(len(fitting_effects) > 0):
+
+				# # Vérification du coût par effet
+				# for effect in fitting_effects:
+
+				# 	# Récupération du type de coût de l'effet
+				# 	cost_type = effect.get
+
+				for effect in fitting_effects:
+
+					# Vérification qu'il reste au moins une sélection
+					if(len(selections_buffer) > 0):
+
+						# Vérification du type de cible
+						if("player" in effect.get_target()):
+
+							# Vérification du formatage
+							if(selections_buffer[0][TARGET_TYPE] == "PLAYER"):
+
+								# Vérification du joueur visé
+								if(selections_buffer[0][TARGET_ID] >= 0 and selections_buffer[0][TARGET_ID] < len(self.__players) and selections_buffer[0][TARGET_ID] not in self.__dead_players):
+
+									# Mise à jour de la sélection
+									selections_buffer.pop(0)
+
+								else:
+
+									is_accepted = False
+
+									break
+
+							else:
+
+								is_accepted = False
+
+								break
+
+						elif("creature" in effect.get_target()):
+							
+							# La cible est la carte elle même
+							if("self" in effect.get_target()):
+
+								# Vérification du formatage : index joueur
+								if(selections_buffer[0][TARGET_ID] == index):
+
+									# Vérification du formatage : zone, position
+									if(selections_buffer[0][TARGET_TYPE] == card_zone and selections_buffer[0][TARGET_POSITION] == card_position):
+									
+										# Mise à jour de la sélection
+										selections_buffer.pop(0)
+
+									else:
+
+										is_accepted = False
+
+										break
+
+								else:
+
+									is_accepted = False
+
+									break
+
+							else :
+
+								# Vérification du formatage : index joueur
+								if(selections_buffer[0][TARGET_ID] >= 0 and selections_buffer[0][TARGET_ID] < len(self.__players)):
+
+									# Vérification du formatage : zone, position	
+									if(selections_buffer[0][TARGET_TYPE] == "BATTLE_ZONE" and selections_buffer[0][TARGET_POSITION] >= 0 and selections_buffer[0][TARGET_POSITION] < self.__players[selections_buffer[0][TARGET_ID]][PLAYER].battlezone_size()):
+
+										target_card = self.__players[selections_buffer[0][TARGET_ID]][PLAYER].get_board().get_battle_zone()[selections_buffer[0][TARGET_POSITION]]
+
+										# La cible doit être en train d'attaquer
+										if("attack" in effect.get_target()):
+
+											if(not target_card.is_attacking()):
+
+												is_accepted = False
+
+												break
+
+										# La cible doit être en train de bloquer
+										elif("block" in effect.get_target()):
+
+											if(not target_card.is_blocking()):
+
+												is_accepted = False
+
+												break
+
+										# La cible doit être engagée
+										elif("tapped" in effect.get_target()):
+
+											if(not target_card.is_tapped()):
+
+												is_accepted = False
+
+												break																						
+
+										# Mise à jour de la sélection
+										selections_buffer.pop(0)
+
+									else:
+
+										is_accepted = False
+
+										break
+
+								else:
+
+									is_accepted = False
+
+									break
+
+						elif("move" in effect.get_target()):	
+							pass			
+
+				# Vérification de l'intégrité de la sélection du client pour activer les effets
+				if(is_accepted and len(selections_buffer) == 0):
+
+					for effect in fitting_effects:
+
+						# Vérification du type de cible
+						if("player" in effect.get_target()):
+												
+							# Activation de l'effet
+							effect.effect(self.__players[data["selections"][0][TARGET_ID]][PLAYER])
+
+						elif("creature" in effect.get_target()):
+							
+							# Activation de l'effet
+							effect.effect(self.__players[data["selections"][0][TARGET_ID]][PLAYER].get_board().get_battle_zone()[data["selections"][0][TARGET_POSITION]])
+
+						elif("move" in effect.get_target()):
+							pass
+
+						# Mise à jour
+						data["selections"].pop(0)
+
+				else:
+					
+					is_accepted = False
+
+					if(LOGS):
+
+						print(f"La sélection de cibles du Joueur {index+1} est incorrecte")
+
+			# Vérification que la carte ne soit ni une créature ni un terrain dans le cas où elle n'a pas d'effet valide
+			elif(card.get_type() != "Creature" and card.get_type() != "Land"):
+
+				is_accepted = False
+
+		else:
+
+			if(LOGS):
+
+				print(f"Joueur {index+1} dit n'importe quoi")
+
+		return is_accepted
 
 	def send_signal(self, index, data):
 
@@ -332,6 +539,11 @@ class Game:
 
 		# Pioche 7 cartes
 		self.__players[index][PLAYER].draw_card(7)
+
+		# Envoi vers le player : Etat de la partie initiale
+		self.send_signal(index,"GAME_UPDATE")
+		gamestate = self.choose_gamestate([[index,"HAND","DECK"]])
+		self.send_gamestate(index,gamestate)
 
 		while True:
 
@@ -676,6 +888,8 @@ class Game:
 		data = None
 		gamestate = None
 		is_accepted = False
+		card = None
+		card_name = ""
 
 		while True:
 
@@ -692,12 +906,74 @@ class Game:
 
 				if(is_accepted):
 
+					# Récupération de la carte
+					card = self.__players[index][PLAYER].get_board().get_hand()[data["hand_position"]]
+
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
 
 					# Envoi vers le client : Etat de la partie
-					gamestate = self.choose_gamestate([[index,"HAND","MANA","BATTLE_ZONE","LAND_ZONE"]])
+					gamestate = self.choose_gamestate("EMPTY")
 					self.send_gamestate(index,gamestate)
+
+					# Vérification que la carte possède un effet
+					if(len(card.get_effect()) > 0):
+
+						if(LOGS):
+
+							print(f"Joueur {index+1} doit sélectionner des cibles pour les effets de cette carte")
+
+						is_accepted = self.use_effect(index,"HAND",data["hand_position"],"play")
+
+					if(is_accepted):
+
+						# Mise à jour du mana du joueur
+						self.__players[index][PLAYER].consume_mana(card.get_mana_cost())
+
+						# Récupération du nom de la carte
+						card_name = card.get_name()
+
+						# Déplacement de la carte
+						if(card.get_type() == "Land"):
+
+							# Invocation sur le terrain	
+							is_accepted = self.__players[index][PLAYER].move("HAND",data["hand_position"],"LAND_ZONE")
+
+							if(LOGS and is_accepted):
+
+								print(f"Joueur {index+1} pose le terrain {card_name}")	
+								
+						elif(card.get_type() == "Creature"):
+
+							# Invocation sur le terrain	
+							is_accepted = self.__players[index][PLAYER].move("HAND",data["hand_position"],"BATTLE_ZONE")
+
+							if(LOGS and is_accepted):
+
+								print(f"Joueur {index+1} pose {card_name} sur le champ de bataille")	
+
+						elif(card.get_type() in ["Artifact","Enchantment","Instant","Sorcery"]):
+
+							# Envoi au cimetière
+							is_accepted = self.__players[index][PLAYER].move("HAND",data["hand_position"],"GRAVEYARD")
+
+					if(is_accepted):
+
+						# Envoi vers le client : Acceptation
+						self.send_signal(index,"ACCEPT")
+
+						# Envoi vers le client : Etat de la partie
+						gamestate = self.choose_gamestate("ALL")
+						self.send_gamestate(index,gamestate)
+
+					else:
+
+						# Envoi vers le client : Refus
+						self.send_signal(index,"DECLINE")	
+
+						if(LOGS):
+
+							print(f"Joueur {index+1} n'a pas rempli les conditions pour engager {card.get_name()}")													
 
 				else:
 
@@ -706,7 +982,7 @@ class Game:
 
 					if(LOGS):
 
-						print("Joueur",index+1,"n'a pas le droit de poser",self.__players[index][PLAYER].get_board().get_hand()[data["hand_position"]].get_name())
+						print(f"Joueur {index+1} n'a pas assez de mana pour cette carte")
 
 			elif(data.get("type") == "TAP_LAND"):
 
@@ -1014,4 +1290,52 @@ class Game:
 			if(LOGS):
 
 				print("Les créatures du Joueur",index+1,"reçoivent des soins")
+		
+
+
+
+# elif "move" in card.get_effect()[0].get_target():
+
+# 	if "tapped" in card.get_effect()[0].get_target():
+	
+# 		pass
+	
+# 		#regarde mes carte creature en tapped
+	
+# 	card.get_effect()[0].effect(player1,2)
+
+# elif "land" in card.get_effect()[0].get_target():
+	
+# 	land = None
+	
+# 	if "tapped" in card.get_effect()[0].get_target():
+	
+# 		while (b == True or y == -1):
+	
+# 			y = input("choisi ton index de land tapped")
+	
+# 			if y.isnumeric():
+	
+# 				y = int(y)
+	
+# 				if player1.get_board().get_land_zone()[y].get_tapped() == True:
+	
+# 					land = player1.get_board().get_land_zone()[y]
+# 					b = False
+	
+# 				elif y == -1:
+	
+# 					print("Error")
+# 					break
+	
+# 	else:
+	
+# 		y = input("choisi l'index de la carte land")
+	
+# 		if y.isnumeric():
+	
+# 			y = int(y)
+# 			land = player1.get_board().get_land_zone()[y]
+	
+# 	card.get_effect()[0].effect(land)
 

@@ -1,14 +1,15 @@
 {
-    "Id": 1202,
-    "Name": "Giant Spider",
-    "Colors": "G",
-    "Mana_cost": "{3}{G}",
-    "Identity": "G",
-    "Text": "Reach (This creature can block creatures with flying.)",
-    "Power": 2.0,
-    "Toughness": 4.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Spider",
-    "Supertype": null
+    "Id":1202,
+    "Name":"Giant Spider",
+    "Colors":"G",
+    "Mana_cost":"{3}{G}",
+    "Identity":"G",
+    "Text":"Reach (This creature can block creatures with flying.)",
+	"Evergreen":["reach"],
+    "Effect":[],
+    "Power":2.0,
+    "Toughness":4.0,
+    "Type":"Creature",
+    "Subtype":"Spider",
+    "Supertype":null
 }

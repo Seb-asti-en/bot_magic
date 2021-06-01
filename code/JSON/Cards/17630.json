@@ -1,14 +1,23 @@
 {
-    "Id": 17630,
-    "Name": "Walk the Plank",
-    "Colors": "B",
-    "Mana_cost": "{B}{B}",
-    "Identity": "B",
-    "Text": "Destroy target non-Merfolk creature.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Sorcery",
-    "Type ID": 14,
-    "Subtype": null,
-    "Supertype": null
+    "Id":17630,
+    "Name":"Walk the Plank",
+    "Colors":"B",
+    "Mana_cost":"{B}{B}",
+    "Identity":"B",
+    "Text":"Destroy target non-Merfolk creature.",
+    "Effect":[
+        {
+            "Name":"walk_the_plank",
+            "Target":"move",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Sorcery",
+    "Subtype":null,
+    "Supertype":null
 }

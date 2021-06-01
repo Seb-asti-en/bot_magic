@@ -1,14 +1,23 @@
 {
-    "Id": 17525,
-    "Name": "Legion's Judgment",
-    "Colors": "W",
-    "Mana_cost": "{2}{W}",
-    "Identity": "W",
-    "Text": "Destroy target creature with power 4 or greater.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Sorcery",
-    "Type ID": 14,
-    "Subtype": null,
-    "Supertype": null
+    "Id":17525,
+    "Name":"Legion's Judgment",
+    "Colors":"W",
+    "Mana_cost":"{2}{W}",
+    "Identity":"W",
+    "Text":"Destroy target creature with power 4 or greater.",
+    "Effect":[
+        {
+            "Name":"legions_judgment",
+            "Target":"move",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Sorcery",
+    "Subtype":null,
+    "Supertype":null
 }

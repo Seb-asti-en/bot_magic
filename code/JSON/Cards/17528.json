@@ -1,14 +1,15 @@
 {
-    "Id": 17528,
-    "Name": "Looming Altisaur",
-    "Colors": "W",
-    "Mana_cost": "{3}{W}",
-    "Identity": "W",
-    "Text": "",
-    "Power": 1.0,
-    "Toughness": 7.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Dinosaur",
-    "Supertype": null
+    "Id":17528,
+    "Name":"Looming Altisaur",
+    "Colors":"W",
+    "Mana_cost":"{3}{W}",
+    "Identity":"W",
+    "Text":"",
+	"Evergreen":[],
+    "Effect":[],
+    "Power":1.0,
+    "Toughness":7.0,
+    "Type":"Creature",
+    "Subtype":"Dinosaur",
+    "Supertype":null
 }

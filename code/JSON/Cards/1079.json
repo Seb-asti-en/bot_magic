@@ -1,14 +1,17 @@
 {
-    "Id": 1079,
-    "Name": "Ancient Crab",
-    "Colors": "U",
-    "Mana_cost": "{1}{U}{U}",
-    "Identity": "U",
-    "Text": "",
-    "Power": 1.0,
-    "Toughness": 5.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Crab",
-    "Supertype": null
+    "Id":1079,
+    "Name":"Ancient Crab",
+    "Colors":"U",
+    "Mana_cost":"{1}{U}{U}",
+    "Identity":"U",
+    "Text":"",
+	"Evergreen":[],
+    "Effect":[
+        
+    ],
+    "Power":1.0,
+    "Toughness":5.0,
+    "Type":"Creature",
+    "Subtype":"Crab",
+    "Supertype":null
 }

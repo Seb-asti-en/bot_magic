@@ -1,14 +1,12 @@
 {
-    "Id": 199,
-    "Name": "Forest",
-    "Colors": "",
-    "Mana_cost": "",
-    "Identity": "G",
-    "Text": "",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Land",
-    "Type ID": 8,
-    "Subtype": "Forest",
-    "Supertype": "Basic"
+    "Id":199,
+    "Name":"Forest",
+    "Colors":"",
+    "Mana_cost":"",
+    "Identity":"G",
+    "Text":"",
+    "Effect":[],
+    "Type":"Land",
+    "Subtype":"Forest",
+    "Supertype":"Basic"
 }

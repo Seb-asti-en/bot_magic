@@ -1,14 +1,23 @@
 {
-    "Id": 17627,
-    "Name": "Vanquish the Weak",
-    "Colors": "B",
-    "Mana_cost": "{2}{B}",
-    "Identity": "B",
-    "Text": "Destroy target creature with power 3 or less.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":17627,
+    "Name":"Vanquish the Weak",
+    "Colors":"B",
+    "Mana_cost":"{2}{B}",
+    "Identity":"B",
+    "Text":"Destroy target creature with power 3 or less.",
+    "Effect":[
+        {
+            "Name":"vanquish_the_weak",
+            "Target":"move",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

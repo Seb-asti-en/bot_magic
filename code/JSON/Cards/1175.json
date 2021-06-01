@@ -1,14 +1,15 @@
 {
-    "Id": 1175,
-    "Name": "Hyena Pack",
-    "Colors": "R",
-    "Mana_cost": "{2}{R}{R}",
-    "Identity": "R",
-    "Text": "",
-    "Power": 3.0,
-    "Toughness": 4.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Hyena",
-    "Supertype": null
+    "Id":1175,
+    "Name":"Hyena Pack",
+    "Colors":"R",
+    "Mana_cost":"{2}{R}{R}",
+    "Identity":"R",
+    "Text":"",
+	"Evergreen":[],
+    "Effect":[],
+    "Power":3.0,
+    "Toughness":4.0,
+    "Type":"Creature",
+    "Subtype":"Hyena",
+    "Supertype":null
 }

@@ -5,15 +5,28 @@
     "Mana_cost": "{3}",
     "Identity": "",
     "Text": "When Filigree Familiar enters the battlefield, you gain 2 life.\nWhen Filigree Familiar dies, draw a card.",
+	"Effect":[
+		{
+			"Name": "filigree_familiar",
+			"Target": "player",
+			"Nb_target": 1,
+			"Temporary": 0,
+			"Activable":{},
+			"Temporality": "play"
+		},{
+			"Name": "filigree_familiar_die",
+			"Target": "player",
+			"Nb_target": 1,
+			"Temporary": 0,
+			"Activable":{},
+			"Temporality": "die"
+		}
+	],
     "Power": 2.0,
     "Toughness": 2.0,
     "Type": [
         "Artifact",
         "Creature"
-    ],
-    "Type ID": [
-        1,
-        3
     ],
     "Subtype": "Fox",
     "Supertype": null

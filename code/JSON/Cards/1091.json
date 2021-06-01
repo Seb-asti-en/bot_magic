@@ -1,14 +1,23 @@
 {
-    "Id": 1091,
-    "Name": "Essence Scatter",
-    "Colors": "U",
-    "Mana_cost": "{1}{U}",
-    "Identity": "U",
-    "Text": "Counter target creature spell.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":1091,
+    "Name":"Essence Scatter",
+    "Colors":"U",
+    "Mana_cost":"{1}{U}",
+    "Identity":"U",
+    "Text":"Counter target creature spell.",
+    "Effect":[
+        {
+            "Name":"essence_scatter",
+            "Target":"capacity",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

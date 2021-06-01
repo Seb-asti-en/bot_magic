@@ -398,9 +398,10 @@ class Player:
 		# Vérification de la position de la carte
 		if(hand_position >= 0 and hand_position < self.hand_size()):
 
+			# Récupération du coût de la carte
 			mana_cost = self.get_board().get_hand()[hand_position].get_mana_cost()
 
-			# Vérification du type de carte
+			# Vérification si la carte est un terrain
 			if(type(self.get_board().get_hand()[hand_position]) is LandCard):
 				
 				# Vérification de la possibilité d'engager un terrain
@@ -428,38 +429,55 @@ class Player:
 
 								is_accepted = False
 
+			# On continue si le mana nécessaire peut être consommé
 			if(is_accepted):
 
-				# Engager la carte
-				if(self.get_board().get_hand()[hand_position].get_type() == "Land"):
+				# Récupération de la carte
+				card = self.get_board().get_hand()[hand_position]
 
-					is_accepted = self.move("HAND",hand_position,"LAND_ZONE")
+				if(card.get_type() == "Land"):
 
-					if(LOGS and is_accepted):
+					if(LOGS):
 
-						print("Joueur",self.get_id()+1,"pose le terrain",self.__board.get_land_zone()[-1].get_name())
+						print(f"Joueur {self.get_id()+1} tente de poser le terrain {card.get_name()}")	
+						
+				elif(card.get_type() == "Creature"):
 
-				elif(self.get_board().get_hand()[hand_position].get_type() == "Creature"):
+					if(LOGS):
 
-					is_accepted = self.move("HAND",hand_position,"BATTLE_ZONE")
+						print(f"Joueur {self.get_id()+1} tente de poser {card.get_name()} sur le champ de bataille")		
 
-					if(LOGS and is_accepted):
+				elif(card.get_type() == "Artifact"):
 
-						print("Joueur",self.get_id()+1,"pose",self.__board.get_battle_zone()[-1].get_name(),"sur le champ de bataille")
+					if(LOGS):
 
-				if(is_accepted):
+						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Artefact)")	
+				
+				elif(card.get_type() == "Enchantment"):
 
-					# Mise à jour du pool de mana
-					for color in mana_cost:
+					if(LOGS):
 
-						self.__mana_pool["X"] -= 1
-						self.__mana_pool[color] -= 1 
+						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Enchantement)")
 
-					if(self.__mana_pool["X"] == 0):
+				elif(card.get_type() == "Instant"):
 
-						for color in self.__mana_pool:
+					if(LOGS):
 
-							self.__mana_pool[color] = 0	
+						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Éphémère)")		
+
+				elif(card.get_type() == "Sorcery"):
+
+					if(LOGS):
+
+						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Rituel)")	
+
+				else:
+
+					is_accepted = False	
+
+					if(LOGS):
+
+						print(f"Joueur {self.get_id()+1} tente d'utiliser une carte invalide")
 
 		return [is_accepted, land_played]
 
@@ -615,3 +633,22 @@ class Player:
 	def damage(self, power):
 
 		self.__life -= power
+
+	def consume_mana(self, mana_cost):
+
+		# Retrait du mana par couleur
+		for color in mana_cost:
+
+			self.__mana_pool["X"] -= 1
+			self.__mana_pool[color] -= 1 
+
+		# Si le mana tampon (X) arrive à 0, on vide le mana pour toutes les couleurs
+		if(self.__mana_pool["X"] <= 0):
+
+			for color in self.__mana_pool:
+
+				self.__mana_pool[color] = 0	
+
+			if(LOGS):
+
+				print(f"Joueur {self.get_id()+1} n'a plus de mana")				

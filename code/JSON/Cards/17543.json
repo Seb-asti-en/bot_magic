@@ -1,14 +1,23 @@
 {
-    "Id": 17543,
-    "Name": "Slash of Talons",
-    "Colors": "W",
-    "Mana_cost": "{W}",
-    "Identity": "W",
-    "Text": "Slash of Talons deals 2 damage to target attacking or blocking creature.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":17543,
+    "Name":"Slash of Talons",
+    "Colors":"W",
+    "Mana_cost":"{W}",
+    "Identity":"W",
+    "Text":"Slash of Talons deals 2 damage to target attacking or blocking creature.",
+    "Effect":[
+        {
+            "Name":"slash_of_talons",
+            "Target":"creature attack or creature block",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

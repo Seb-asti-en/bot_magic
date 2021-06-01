@@ -1,14 +1,28 @@
 {
-    "Id": 1153,
-    "Name": "Wasteland Scorpion",
-    "Colors": "B",
-    "Mana_cost": "{2}{B}",
-    "Identity": "B",
-    "Text": "Deathtouch\nCycling {2} ({2}, Discard this card: Draw a card.)",
-    "Power": 2.0,
-    "Toughness": 2.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Scorpion",
-    "Supertype": null
+    "Id":1153,
+    "Name":"Wasteland Scorpion",
+    "Colors":"B",
+    "Mana_cost":"{2}{B}",
+    "Identity":"B",
+    "Text":"Deathtouch\nCycling {2} ({2}, Discard this card: Draw a card.)",
+	"Evergreen":["deathtouch"],
+    "Effect":[
+        {
+            "Name":"draw_card",
+            "Target":"player",
+			"Nb_target": 1,
+            "Nb_draw_card":1,
+			"Temporary": 0,
+            "Activable":{
+                "Cost_name":"mana",
+				"Cost_quantity":"{2}"
+            },
+            "Temporality":"activation"
+        }
+    ],
+    "Power":2.0,
+    "Toughness":2.0,
+    "Type":"Creature",
+	"Subtype":"Scorpion",
+    "Supertype":null
 }

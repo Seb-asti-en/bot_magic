@@ -1,14 +1,33 @@
 {
-    "Id": 1139,
-    "Name": "Painful Lesson",
-    "Colors": "B",
-    "Mana_cost": "{2}{B}",
-    "Identity": "B",
-    "Text": "Target player draws two cards and loses 2 life.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Sorcery",
-    "Type ID": 14,
-    "Subtype": null,
-    "Supertype": null
+    "Id":1139,
+    "Name":"Painful Lesson",
+    "Colors":"B",
+    "Mana_cost":"{2}{B}",
+    "Identity":"B",
+    "Text":"Target player draws two cards and loses 2 life.",
+    "Effect":[
+        {
+            "Name":"draw_card",
+            "Target":"player",
+			"Nb_target": 2,
+            "Nb_draw_card":2,
+			"Temporary": 0,
+            "Activable":{    
+            },
+            "Temporality":"play"
+        },
+        {
+            "Name":"painful_lesson",
+            "Target":"player",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Sorcery",
+    "Subtype":null,
+    "Supertype":null
 }

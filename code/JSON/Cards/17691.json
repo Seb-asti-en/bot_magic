@@ -1,17 +1,30 @@
 {
-    "Id": 17691,
-    "Name": "Jungle Delver",
-    "Colors": "G",
-    "Mana_cost": "{G}",
-    "Identity": "G",
-    "Text": "{3}{G}: Put a +1/+1 counter on Jungle Delver.",
-    "Power": 1.0,
-    "Toughness": 1.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": [
+    "Id":17691,
+    "Name":"Jungle Delver",
+    "Colors":"G",
+    "Mana_cost":"{G}",
+    "Identity":"G",
+    "Text":"{3}{G}: Put a +1/+1 counter on Jungle Delver.",
+	"Evergreen":[],
+    "Effect":[
+        {
+            "Name":"jungle_delver",
+            "Target":"creature self",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                "Cost_name":"mana",
+                "Cost_quantity":"{3}{G}"
+            },
+            "Temporality":"activation"
+        }
+    ],
+    "Power":1.0,
+    "Toughness":1.0,
+    "Type":"Creature",
+    "Subtype":[
         "Merfolk",
         "Warrior"
     ],
-    "Supertype": null
+    "Supertype":null
 }

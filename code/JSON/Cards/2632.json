@@ -5,15 +5,24 @@
     "Mana_cost": "{4}",
     "Identity": "U",
     "Text": "{U}: Dukhara Peafowl gains flying until end of turn.",
+	"Effect":[
+		{
+			"Name": "dukhara_peafowl",
+			"Target": "self",
+			"Nb_target": 1,
+			"Temporary": 1,
+			"Activable":{
+				"Cost_name": "mana",
+				"Cost_quantity":"{U}"
+			},
+			"Temporality": "activation"
+		}
+	],
     "Power": 2.0,
     "Toughness": 4.0,
     "Type": [
         "Artifact",
         "Creature"
-    ],
-    "Type ID": [
-        1,
-        3
     ],
     "Subtype": "Bird",
     "Supertype": null

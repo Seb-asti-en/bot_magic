@@ -1,8 +1,6 @@
 ############################ Import ############################
 import json, sys, copy
 from creaturecard  import CreatureCard
-from sorcerycard import SorceryCard
-from instantcard import InstantCard
 from landcard import LandCard
 from deck import Deck
 from card import Card
@@ -62,9 +60,9 @@ class DeckManager:
  				elif "Land" in id_card["Type"]:
  					deck.add_card(LandCard(id_card))
  				elif "Instant" in id_card["Type"]:
- 					deck.add_card(InstantCard(id_card))
+ 					deck.add_card(Card(id_card))
  				elif "Sorcery" in id_card["Type"] :
- 					deck.add_card(SorceryCard(id_card))
+ 					deck.add_card(Card(id_card))
  				elif "Enchantment" in id_card["Type"]:
  					deck.add_card(Card(id_card))
  				elif "Artifact" in id_card["Type"]:

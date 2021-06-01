@@ -1,14 +1,23 @@
 {
-    "Id": 11151,
-    "Name": "Demystify",
-    "Colors": "W",
-    "Mana_cost": "{W}",
-    "Identity": "W",
-    "Text": "Destroy target enchantment.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":11151,
+    "Name":"Demystify",
+    "Colors":"W",
+    "Mana_cost":"{W}",
+    "Identity":"W",
+    "Text":"Destroy target enchantment.",
+    "Effect":[
+        {
+            "Name":"demystify",
+            "Target":"enchantment",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

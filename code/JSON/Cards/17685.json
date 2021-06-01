@@ -1,14 +1,15 @@
 {
-    "Id": 17685,
-    "Name": "Grazing Whiptail",
-    "Colors": "G",
-    "Mana_cost": "{2}{G}{G}",
-    "Identity": "G",
-    "Text": "Reach",
-    "Power": 3.0,
-    "Toughness": 4.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Dinosaur",
-    "Supertype": null
+    "Id":17685,
+    "Name":"Grazing Whiptail",
+    "Colors":"G",
+    "Mana_cost":"{2}{G}{G}",
+    "Identity":"G",
+    "Text":"Reach",
+	"Evergreen":["reach"],
+    "Effect":[],
+    "Power":3.0,
+    "Toughness":4.0,
+    "Type":"Creature",
+    "Subtype":"Dinosaur",
+    "Supertype":null
 }

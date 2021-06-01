@@ -1,14 +1,23 @@
 {
-    "Id": 1058,
-    "Name": "Impeccable Timing",
-    "Colors": "W",
-    "Mana_cost": "{1}{W}",
-    "Identity": "W",
-    "Text": "Impeccable Timing deals 3 damage to target attacking or blocking creature.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":1058,
+    "Name":"Impeccable Timing",
+    "Colors":"W",
+    "Mana_cost":"{1}{W}",
+    "Identity":"W",
+    "Text":"Impeccable Timing deals 3 damage to target attacking or blocking creature.",
+    "Effect":[
+        {
+            "Name":"impeccable_timing",
+            "Target":"creature attack",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

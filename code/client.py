@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 
-import socket, pickle, sys, json, os
+import socket, pickle, sys, json, os, random, time
 from player import Player
 
 DEBUG = False
 
 PACKET_SIZE = 1024
 
-MULLIGAN = "1"
-DRAW_CARD = "2"
+SHOW_GAME = "S"
+MULLIGAN = "0"
+DRAW_CARD = "1"
+TAP_LAND = "2"
 PLAY_CARD = "3"
-TAP_LAND = "4"
-ATTACK = "5"
-BLOCK = "6"
-SKIP_PHASE = "7"
-CONCEDE = "8"
-SHOW_GAME = "9"
+USE_EFFECT = "4"
+SELECT = "5"
+ATTACK = "6"
+BLOCK = "7"
+SKIP_PHASE = "8"
+CONCEDE = "9"
+
+HUMAN = "1"
+BOT_RANDOM = "2"
+BOT_SKIP = "3"
 
 ID = 0
 LIFE = 1
@@ -26,6 +32,18 @@ BATTLE_ZONE = 5
 LAND_ZONE = 6
 GRAVEYARD = 7
 EXILE = 8
+
+SELECTION_PLAYER = 0
+SELECTION_DECK = 1
+SELECTION_HAND = 2
+SELECTION_BATTLEZONE = 3
+SELECTION_LANDZONE = 4
+SELECTION_GRAVEYARD = 5
+SELECTION_EXILE = 6
+
+TARGET_ID = 0
+TARGET_TYPE = 1
+TARGET_POSITION = 2
 
 def main():
 
@@ -43,7 +61,19 @@ def main():
 	result = client.play()
 
 	# Affichage des résultats de la partie
-	client.get_result(result)
+	if(result == "VICTORY"):
+
+		print("Victory !")
+
+	elif(result == "DEFEAT"):
+
+		print("Defeat.")
+
+	else:
+
+		print("Quelque chose has gone terribly mal (:")
+
+	input("Appuyez sur ENTER pour quitter")
 
 	# Déconnexion du serveur
 	client.disconnect()
@@ -61,6 +91,7 @@ class Client:
 		self.__game_netconfig = None
 		self.__player_id = -1
 		self.__players = []
+		self.__behaviour = ""
 
 		try:
 			with open("JSON/ip_config.json") as file:
@@ -76,13 +107,56 @@ class Client:
 
 	def main_menu(self):
 
-		self.clear_terminal()
+		main_input = ""
+		behaviour_input = ""
 
-		print("[      Nouvelle partie (1)     ]")
-		print("[   Rejoindre une partie (2)   ]")
-		print("[         Quitter (3)          ]")
+		while True:
 
-		return input(">")
+			self.clear_terminal()
+
+			print("[      Nouvelle partie (1)     ]")
+			print("[   Rejoindre une partie (2)   ]")
+			print("[         Quitter (3)          ]")
+
+			main_input = input(">")
+
+			if(main_input.isnumeric() and int(main_input) in range(1,4)):
+
+					break
+
+		if(int(main_input) in range(1,3)):
+
+			while True:
+
+				self.clear_terminal()
+
+				print("HUMAN (1)")
+				print("BOT_RANDOM (2)")
+				print("BOT_SKIP (3)")
+
+				behaviour_input = input(">")
+
+				if(behaviour_input.isnumeric()):
+
+					if(behaviour_input == HUMAN):
+
+						self.__behaviour = "HUMAN"
+
+						break
+
+					elif(behaviour_input == BOT_RANDOM):
+
+						self.__behaviour = "BOT_RANDOM"
+
+						break
+
+					elif(behaviour_input == BOT_SKIP):
+
+						self.__behaviour = "BOT_SKIP"
+
+						break
+
+		return main_input
 
 	def clear_terminal(self):
 
@@ -223,6 +297,32 @@ class Client:
 		self.__game_socket.close()
 		self.__server_socket.close()
 
+	def input(self, min_value, max_value):
+
+		input_value = -1
+
+		if(self.__behaviour == "HUMAN"):
+
+			input_value = input(">")
+
+		elif(self.__behaviour == "BOT_RANDOM"):
+
+			input_value = random.randint(min_value,max_value)
+
+			# time.sleep(0.25)
+
+		elif(self.__behaviour == "BOT_SKIP"):
+
+			if(random.randint(0,10) > 2):
+
+				input_value = 8
+
+			else:
+
+				input_value = 1
+
+		return str(input_value)
+
 	# Connexion au serveur UDP
 	def connect_server(self):
 
@@ -342,20 +442,21 @@ class Client:
 				# Réception depuis le serveur de jeu : Acceptation / Refus (5)
 				response = self.recv_signal()
 
+				# En cas d'acceptation
+				if(response == "ACCEPT"):
+
+					# Réception depuis le serveur de jeu : Etat de la partie (6)
+					gamestate = self.recv_gamestate()
+
+					# Mise à jour des informations de jeu
+					self.update(gamestate)
+					
+					if(DEBUG):
+						print("MAJ DE LA PARTIE")	
+
 				# En cas de refus, on recommence
-				if(response == "DECLINE"):
+				elif(response == "DECLINE"):
 					continue
-
-				# Réception depuis le serveur de jeu : Etat de la partie (6)
-				gamestate = self.recv_gamestate()
-
-				# Mise à jour des informations de jeu
-				self.update(gamestate)
-				
-				if(DEBUG):
-					print("MAJ DE LA PARTIE")
-
-				#input(response)
 
 			elif(response == "GAME_UPDATE"):
 
@@ -388,9 +489,10 @@ class Client:
 		request = ""
 		i = 0
 		identity = []
+		selecting = True
 
 		if(DEBUG):
-			self.get_input("[CLEAR SCREEN]")
+			input("[CLEAR SCREEN]")
 
 		while True :
 
@@ -399,360 +501,22 @@ class Client:
 
 			# Affichage initial
 			print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-			print("[  MULLIGAN   (1)  ]")
-			print("[  DRAW_CARD  (2)  ]")
+			print("[  SHOW_GAME  (S)  ]")
+			print("[  MULLIGAN   (0)  ]")
+			print("[  DRAW_CARD  (1)  ]")
+			print("[  TAP_LAND   (2)  ]")
 			print("[  PLAY_CARD  (3)  ]")
-			print("[  TAP_LAND   (4)  ]")
-			print("[  ATTACK     (5)  ]")
-			print("[  BLOCK      (6)  ]")
-			print("[  SKIP_PHASE (7)  ]")
-			print("[  CONCEDE    (8)  ]")
-			print("[  SHOW_GAME  (9)  ]")
+			print("[  USE_EFFECT (4)  ]")
+			print("[  SELECT     (5)  ]")
+			print("[  ATTACK     (6)  ]")
+			print("[  BLOCK      (7)  ]")
+			print("[  SKIP_PHASE (8)  ]")
+			print("[  CONCEDE    (9)  ]")
 
 			# Récupération de l'entrée utilisateur
-			user_input = self.get_input(">")
+			user_input = self.input(0,8)
 
-			if(user_input == MULLIGAN):
-
-				request = { 
-					"player" : self.__player_id,
-					"type" : "MULLIGAN"
-				}
-
-				break
-
-			elif(user_input == DRAW_CARD):
-				
-				request = { 
-					"player" : self.__player_id,
-					"type" : "DRAW_CARD"
-				}
-
-				break
-
-			elif(user_input == PLAY_CARD):
-
-				if(self.__players[self.__player_id].hand_size() > 0):
-
-					while True:
-
-						i = 0
-
-						# Rafraichissement de l'écran
-						self.clear_terminal()
-
-						# Affichage des cartes
-						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-						for card in self.__players[self.__player_id].get_board().get_hand():
-
-							print(card.get_name() + "(" + str(i) + ")")
-
-							i = i + 1
-
-						# Récupération de l'entrée utilisateur
-						user_input = input(">")	
-
-						if(user_input.isnumeric()):
-
-							user_input = int(user_input)
-
-							if(user_input >= 0 and user_input < self.__players[self.__player_id].hand_size()):			
-
-								request = { 
-									"player" : self.__player_id,
-									"type" : "PLAY_CARD",
-									"hand_position" : user_input
-								}
-
-								break
-
-					break
-
-			elif(user_input == TAP_LAND):
-
-				if(self.__players[self.__player_id].landzone_size() > 0):
-
-					while True:
-
-						i = 0
-
-						# Rafraichissement de l'écran
-						self.clear_terminal()
-
-						# Affichage de nos cartes terrain
-						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-						for card in self.__players[self.__player_id].get_board().get_land_zone():
-
-							if(card.is_tapped()):
-								
-								print("(T)" + card.get_name() + "(" + str(i) + ")")
-
-							else:
-
-								print(card.get_name() + "(" + str(i) + ")")
-
-							i = i + 1
-
-						# Récupération de l'entrée utilisateur
-						user_input = input(">")
-
-						if(user_input.isnumeric()):
-
-							user_input = int(user_input)
-
-							if(user_input >= 0 and user_input < self.__players[self.__player_id].landzone_size()):
-
-								identity = self.__players[self.__player_id].get_board().get_land_zone()[user_input].get_identity()
-
-								request = { 
-									"player" : self.__player_id,
-									"type" : "TAP_LAND",
-									"landzone_position" : user_input,
-									"color" : ""
-								}								
-
-								if(len(identity) == 1):
-
-									request["color"] = identity[0]
-
-								else:
-
-									while True:
-
-										i = 0
-
-										# Rafraichissement de l'écran
-										self.clear_terminal()
-
-										# TODO : Ajouter la gestion des mana double via un menu de selection (compliqué)
-										for color in identity:
-
-											print(color + " (" + str(i) + ")")
-
-											i += 1
-
-										# Récupération de l'entrée utilisateur
-										user_input = input(">")
-
-										if(user_input.isnumeric()):
-
-											user_input = int(user_input)
-
-											if(user_input >= 0 and user_input < len(identity)):
-
-												request["color"] = identity[user_input]
-
-												break
-
-								break
-
-					break
-				
-			elif(user_input == ATTACK):
-
-				if(self.__players[self.__player_id].battlezone_size() > 0):
-
-					# Sélection du joueur
-					while True:
-
-						# Rafraichissement de l'écran
-						self.clear_terminal()
-
-						# Affichage de la liste des joueurs
-						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-						for player in self.__players:
-
-							print("[  Player " + str(player.get_id()) + "  ]")
-
-						# Récupération de l'entrée utilisateur
-						user_input = input(">")
-
-						if(user_input.isnumeric()):
-
-							user_input = int(user_input)
-
-							if(user_input >= 0 and user_input < len(self.__players)):
-
-								request = { 
-									"player" : self.__player_id,
-									"type" : "ATTACK",
-									"target" : user_input,
-									"attacker" : -1
-								}
-
-								break
-
-					# Sélection de la carte attaquante
-					while True:
-
-						i = 0
-
-						# Rafraichissement de l'écran
-						self.clear_terminal()
-
-						# Affichage des cartes sur notre Battle Zone
-						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-						for card in self.__players[self.__player_id].get_board().get_battle_zone():
-
-							if(card.is_sick()):
-
-								if(card.is_tapped()):
-
-									print("(S)(T)" + card.get_name() + "(" + str(i) + ")")
-								
-								else:
-								
-									print("(S)" + card.get_name() + "(" + str(i) + ")")
-
-							else:
-
-								if(card.is_tapped()):
-
-									print("(T)" + card.get_name() + "(" + str(i) + ")")
-
-								else:
-
-									print(card.get_name() + "(" + str(i) + ")")
-
-							i = i + 1
-
-						# Récupération de l'entrée utilisateur
-						user_input = input(">")
-
-						if(user_input.isnumeric()):
-
-							user_input = int(user_input)
-
-							if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
-
-								request["attacker"] = user_input
-
-								break
-
-					break
-				
-			elif(user_input == BLOCK):
-
-				if(self.__players[self.__player_id].battlezone_size() > 0):
-
-					# Sélection du joueur
-					while True:
-
-						# Rafraichissement de l'écran
-						self.clear_terminal()
-
-						# Affichage de la liste des joueurs
-						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-						for player in self.__players:
-
-							print("[  Player " + str(player.get_id()) + "  ]")
-
-						# Récupération de l'entrée utilisateur
-						user_input = input(">")
-
-						if(user_input.isnumeric()):
-
-							user_input = int(user_input)
-
-							if(user_input >= 0 and user_input < len(self.__players)):
-
-								request = { 
-									"player" : self.__player_id,
-									"type" : "BLOCK",
-									"target" : user_input,
-									"ennemy_attacker" : -1,
-									"blocker" : -1
-								}
-
-								break
-
-					if(self.__players[user_input].battlezone_size() > 0):
-
-						# Sélection de la carte ennemie à bloquer
-						while True:
-
-							i = 0
-
-							# Rafraichissement de l'écran
-							self.clear_terminal()
-
-							# Affichage de la Battle Zone ennemie
-							print("Joueur", request["target"], "(" + str(self.__players[request["target"]].get_life()) + ")")
-							for card in self.__players[request["target"]].get_board().get_battle_zone():
-
-								print(card.get_name() + "(" + str(i) + ")")
-
-								i = i + 1
-
-							# Récupération de l'entrée utilisateur
-							user_input = input(">")
-
-							if(user_input.isnumeric()):
-
-								user_input = int(user_input)
-
-								if(user_input >= 0 and user_input < len(self.__players[request["target"]].get_board().get_battle_zone())):
-
-									request["ennemy_attacker"] = user_input
-
-									break
-		
-						# Sélection de la carte bloquante
-						while True:
-
-							i = 0
-
-							# Rafraichissement de l'écran
-							self.clear_terminal()
-
-							# Affichage de notre Battle Zone
-							print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
-							for card in self.__players[self.__player_id].get_board().get_battle_zone():
-
-								if(card.is_tapped()):
-									
-									print("(T)" + card.get_name() + "(" + str(i) + ")")
-
-								else:
-
-									print(card.get_name() + "(" + str(i) + ")")
-
-								i = i + 1
-
-							# Récupération de l'entrée utilisateur
-							user_input = input(">")
-
-							if(user_input.isnumeric()):
-
-								user_input = int(user_input)
-
-								if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
-
-									request["blocker"] = user_input
-
-									break
-
-						break
-
-			elif(user_input == SKIP_PHASE):
-
-				request = { 
-					"player" : self.__player_id,
-					"type" : "SKIP_PHASE"
-				}
-
-				break
-
-			elif(user_input == CONCEDE):
-
-				request = { 
-					"player" : self.__player_id,
-					"type" : "CONCEDE"
-				}
-
-				break				
-
-			elif(user_input == SHOW_GAME):
+			if(user_input == SHOW_GAME):
 
 				# Rafraichissement de l'écran
 				self.clear_terminal()
@@ -804,32 +568,621 @@ class Client:
 
 					print()
 
-				self.get_input(">")
+				input(">")
+
+			elif(user_input == MULLIGAN):
+
+				request = { 
+					"player" : self.__player_id,
+					"type" : "MULLIGAN"
+				}
+
+				break
+
+			elif(user_input == DRAW_CARD):
+				
+				request = { 
+					"player" : self.__player_id,
+					"type" : "DRAW_CARD"
+				}
+
+				break
+
+			elif(user_input == TAP_LAND):
+
+				if(self.__players[self.__player_id].landzone_size() > 0):
+
+					while True:
+
+						i = 0
+
+						# Rafraichissement de l'écran
+						self.clear_terminal()
+
+						# Affichage de nos cartes terrain
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for card in self.__players[self.__player_id].get_board().get_land_zone():
+
+							if(card.is_tapped()):
+								
+								print("(T)" + card.get_name() + "(" + str(i) + ")")
+
+							else:
+
+								print(card.get_name() + "(" + str(i) + ")")
+
+							i = i + 1
+
+						# Récupération de l'entrée utilisateur
+						user_input = self.input(0,self.__players[self.__player_id].landzone_size()-1)
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input >= 0 and user_input < self.__players[self.__player_id].landzone_size()):
+
+								identity = self.__players[self.__player_id].get_board().get_land_zone()[user_input].get_identity()
+
+								request = { 
+									"player" : self.__player_id,
+									"type" : "TAP_LAND",
+									"landzone_position" : user_input,
+									"color" : ""
+								}								
+
+								if(len(identity) == 1):
+
+									request["color"] = identity[0]
+
+								else:
+
+									while True:
+
+										i = 0
+
+										# Rafraichissement de l'écran
+										self.clear_terminal()
+
+										# TODO : Ajouter la gestion des mana double via un menu de selection (compliqué)
+										for color in identity:
+
+											print(color + " (" + str(i) + ")")
+
+											i += 1
+
+										# Récupération de l'entrée utilisateur
+										user_input = self.input(0,len(identity)-1)
+
+										if(user_input.isnumeric()):
+
+											user_input = int(user_input)
+
+											if(user_input >= 0 and user_input < len(identity)):
+
+												request["color"] = identity[user_input]
+
+												break
+
+								break
+
+					break
+
+			elif(user_input == PLAY_CARD):
+
+				if(self.__players[self.__player_id].hand_size() > 0):
+
+					while True:
+
+						i = 0
+
+						# Rafraichissement de l'écran
+						self.clear_terminal()
+
+						# Affichage des cartes
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for card in self.__players[self.__player_id].get_board().get_hand():
+
+							print(card.get_name() + "(" + str(i) + ")")
+
+							i = i + 1
+
+						# Récupération de l'entrée utilisateur
+						user_input = self.input(0,self.__players[self.__player_id].hand_size()-1)	
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input >= 0 and user_input < self.__players[self.__player_id].hand_size()):			
+
+								request = { 
+									"player" : self.__player_id,
+									"type" : "PLAY_CARD",
+									"hand_position" : user_input
+								}
+
+								break
+					break
+
+			elif(user_input == USE_EFFECT):
+
+				print("y'a r")
+				
+			elif(user_input == SELECT):
+
+				request = { 
+					"player" : self.__player_id,
+					"type" : "SELECT",
+					"selections" : []
+				}
+
+				selecting = True
+
+				while selecting:
+
+					# Choix du joueur
+					while True:
+
+						i = 0
+
+						# Rafraichissement de l'écran
+						self.clear_terminal()
+
+						# Affichage des joueurs
+						for player in self.__players:
+
+							print(f"PLAYER {player.get_id()} ({i})")
+
+							i = i + 1 
+						print(f"STOP ({i})")
+
+						# Récupération de l'entrée utilisateur
+						user_input = self.input(0,i)
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input == i):
+
+								selecting = False
+
+								break
+
+							elif(user_input >= 0 and user_input < len(self.__players)):
+
+								request["selections"].append([])
+
+								request["selections"][-1].append(user_input)
+
+								# Choix de la zone
+								while True:
+
+									# Rafraichissement de l'écran
+									self.clear_terminal()
+
+									# Affichage des zones
+									print("PLAYER (0)")
+									print("DECK (1)")
+									print("HAND (2)")
+									print("BATTLE_ZONE (3)")
+									print("LAND_ZONE (4)")
+									print("GRAVEYARD (5)")
+									print("EXILE (6)")
+
+									# Récupération de l'entrée utilisateur
+									user_input = self.input(0,6)
+
+									if(user_input.isnumeric()):
+
+										user_input = int(user_input)
+
+										if(user_input == SELECTION_PLAYER):
+
+											request["selections"][-1].append("PLAYER")
+
+											break										
+
+										elif(user_input == SELECTION_DECK):
+
+											request["selections"][-1].append("DECK")
+
+											break
+
+										elif(user_input == SELECTION_HAND):
+
+											request["selections"][-1].append("HAND")
+
+											# Vérification que l'on soit le joueur concerné et qu'on possède des cartes
+											if(request["selections"][-1][TARGET_ID] == self.__player_id and self.__players[self.__player_id].hand_size() > 0):
+
+												# Choix de la carte
+												while True:
+
+													i = 0
+
+													# Rafraichissement de l'écran
+													self.clear_terminal()
+
+													# Affichage des cartes
+													for card in self.__players[self.__player_id].get_board().get_hand():
+														
+														print(f"{card.get_name()} ({i})")
+
+														i = i + 1
+
+													# Récupération de l'entrée utilisateur
+													user_input = self.input(0,self.__players[self.__player_id].hand_size()-1)
+
+													if(user_input.isnumeric()):
+
+														user_input = int(user_input)
+
+														if(user_input >= 0 and user_input < self.__players[self.__player_id].hand_size()):	
+
+															request["selections"][-1].append(user_input)
+
+															break
+											break
+
+										elif(user_input == SELECTION_BATTLEZONE):
+
+											# Vérification qu'il y ait des cartes dans la zone
+											if(self.__players[self.__player_id].battlezone_size() > 0):
+
+												request["selections"][-1].append("BATTLE_ZONE")
+
+												# Choix de la carte
+												while True:
+
+													i = 0
+
+													# Rafraichissement de l'écran
+													self.clear_terminal()
+
+													# Affichage des cartes
+													for card in self.__players[self.__player_id].get_board().get_battle_zone():
+														
+														print(f"{card.get_name()} ({i})")
+
+														i = i + 1
+
+													# Récupération de l'entrée utilisateur
+													user_input = self.input(0,self.__players[self.__player_id].battlezone_size()-1)
+
+													if(user_input.isnumeric()):
+
+														user_input = int(user_input)
+
+														if(user_input >= 0 and user_input < self.__players[self.__player_id].battlezone_size()):	
+
+															request["selections"][-1].append(user_input)
+
+															break
+												break
+
+										elif(user_input == SELECTION_LANDZONE):
+
+											# Vérification qu'il y ait des cartes dans la zone
+											if(self.__players[self.__player_id].landzone_size() > 0):
+
+												request["selections"][-1].append("LAND_ZONE")
+
+												# Choix de la carte
+												while True:
+
+													i = 0
+
+													# Rafraichissement de l'écran
+													self.clear_terminal()
+
+													# Affichage des cartes
+													for card in self.__players[self.__player_id].get_board().get_land_zone():
+														
+														print(f"{card.get_name()} ({i})")
+
+														i = i + 1
+
+													# Récupération de l'entrée utilisateur
+													user_input = self.input(0,self.__players[self.__player_id].landzone_size()-1)
+
+													if(user_input.isnumeric()):
+
+														user_input = int(user_input)
+
+														if(user_input >= 0 and user_input < self.__players[self.__player_id].landzone_size()):	
+
+															request["selections"][-1].append(user_input)
+
+															break
+												break
+
+										elif(user_input == SELECTION_GRAVEYARD):
+
+											# Vérification qu'il y ait des cartes dans la zone
+											if(self.__players[self.__player_id].graveyard_size() > 0):
+
+												request["selections"][-1].append("GRAVEYARD")
+
+												# Choix de la carte
+												while True:
+
+													i = 0
+
+													# Rafraichissement de l'écran
+													self.clear_terminal()
+
+													# Affichage des cartes
+													for card in self.__players[self.__player_id].get_board().get_graveyard():
+														
+														print(f"{card.get_name()} ({i})")
+
+														i = i + 1
+
+													# Récupération de l'entrée utilisateur
+													user_input = self.input(0,self.__players[self.__player_id].graveyard_size()-1)
+
+													if(user_input.isnumeric()):
+
+														user_input = int(user_input)
+
+														if(user_input >= 0 and user_input < self.__players[self.__player_id].graveyard_size()):	
+
+															request["selections"][-1].append(user_input)
+
+															break
+												break
+
+										elif(user_input == SELECTION_EXILE):
+
+											# Vérification qu'il y ait des cartes dans la zone
+											if(self.__players[self.__player_id].exile_size() > 0):
+
+												request["selections"][-1].append("EXILE")
+
+												# Choix de la carte
+												while True:
+
+													i = 0
+
+													# Rafraichissement de l'écran
+													self.clear_terminal()
+
+													# Affichage des cartes
+													for card in self.__players[self.__player_id].get_board().get_exile():
+														
+														print(f"{card.get_name()} ({i})")
+
+														i = i + 1
+
+													# Récupération de l'entrée utilisateur
+													user_input = self.input(0,exile_size()-1)
+
+													if(user_input.isnumeric()):
+
+														user_input = int(user_input)
+
+														if(user_input >= 0 and user_input < self.__players[self.__player_id].exile_size()):	
+
+															request["selections"][-1].append(user_input)
+
+															break
+												break
+								break
+				break
+
+			elif(user_input == ATTACK):
+
+				if(self.__players[self.__player_id].battlezone_size() > 0):
+
+					# Sélection du joueur
+					while True:
+
+						# Rafraichissement de l'écran
+						self.clear_terminal()
+
+						# Affichage de la liste des joueurs
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for player in self.__players:
+
+							print("[  Player " + str(player.get_id()) + "  ]")
+
+						# Récupération de l'entrée utilisateur
+						user_input = self.input(0,len(self.__players)-1)
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input >= 0 and user_input < len(self.__players)):
+
+								request = { 
+									"player" : self.__player_id,
+									"type" : "ATTACK",
+									"target" : user_input,
+									"attacker" : -1
+								}
+
+								break
+
+					# Sélection de la carte attaquante
+					while True:
+
+						i = 0
+
+						# Rafraichissement de l'écran
+						self.clear_terminal()
+
+						# Affichage des cartes sur notre Battle Zone
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for card in self.__players[self.__player_id].get_board().get_battle_zone():
+
+							if(card.is_sick()):
+
+								if(card.is_tapped()):
+
+									print("(S)(T)" + card.get_name() + "(" + str(i) + ")")
+								
+								else:
+								
+									print("(S)" + card.get_name() + "(" + str(i) + ")")
+
+							else:
+
+								if(card.is_tapped()):
+
+									print("(T)" + card.get_name() + "(" + str(i) + ")")
+
+								else:
+
+									print(card.get_name() + "(" + str(i) + ")")
+
+							i = i + 1
+
+						# Récupération de l'entrée utilisateur
+						user_input = self.input(0,self.__players[self.__player_id].battlezone_size()-1)
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
+
+								request["attacker"] = user_input
+
+								break
+
+					break
+				
+			elif(user_input == BLOCK):
+
+				if(self.__players[self.__player_id].battlezone_size() > 0):
+
+					# Sélection du joueur
+					while True:
+
+						# Rafraichissement de l'écran
+						self.clear_terminal()
+
+						# Affichage de la liste des joueurs
+						print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+						for player in self.__players:
+
+							print("[  Player " + str(player.get_id()) + "  ]")
+
+						# Récupération de l'entrée utilisateur
+						user_input = self.input(0,len(self.__players)-1)
+
+						if(user_input.isnumeric()):
+
+							user_input = int(user_input)
+
+							if(user_input >= 0 and user_input < len(self.__players)):
+
+								request = { 
+									"player" : self.__player_id,
+									"type" : "BLOCK",
+									"target" : user_input,
+									"ennemy_attacker" : -1,
+									"blocker" : -1
+								}
+
+								break
+
+					if(self.__players[user_input].battlezone_size() > 0):
+
+						# Sélection de la carte ennemie à bloquer
+						while True:
+
+							i = 0
+
+							# Rafraichissement de l'écran
+							self.clear_terminal()
+
+							# Affichage de la Battle Zone ennemie
+							print("Joueur", request["target"], "(" + str(self.__players[request["target"]].get_life()) + ")")
+							for card in self.__players[request["target"]].get_board().get_battle_zone():
+
+								print(card.get_name() + "(" + str(i) + ")")
+
+								i = i + 1
+
+							# Récupération de l'entrée utilisateur
+							user_input = self.input(0,self.__players[request["target"]].battlezone_size()-1)
+
+							if(user_input.isnumeric()):
+
+								user_input = int(user_input)
+
+								if(user_input >= 0 and user_input < len(self.__players[request["target"]].get_board().get_battle_zone())):
+
+									request["ennemy_attacker"] = user_input
+
+									break
+		
+						# Sélection de la carte bloquante
+						while True:
+
+							i = 0
+
+							# Rafraichissement de l'écran
+							self.clear_terminal()
+
+							# Affichage de notre Battle Zone
+							print("Joueur", self.__player_id, "(" + str(self.__players[self.__player_id].get_life()) + ")")
+							for card in self.__players[self.__player_id].get_board().get_battle_zone():
+
+								if(card.is_tapped()):
+									
+									print("(T)" + card.get_name() + "(" + str(i) + ")")
+
+								else:
+
+									print(card.get_name() + "(" + str(i) + ")")
+
+								i = i + 1
+
+							# Récupération de l'entrée utilisateur
+							user_input = self.input(0,self.__players[self.__player_id].battlezone_size()-1)
+
+							if(user_input.isnumeric()):
+
+								user_input = int(user_input)
+
+								if(user_input >= 0 and user_input < len(self.__players[self.__player_id].get_board().get_battle_zone())):
+
+									request["blocker"] = user_input
+
+									break
+
+						break
+
+			elif(user_input == SKIP_PHASE):
+
+				request = { 
+					"player" : self.__player_id,
+					"type" : "SKIP_PHASE"
+				}
+
+				break
+
+			elif(user_input == CONCEDE):
+
+				request = { 
+					"player" : self.__player_id,
+					"type" : "CONCEDE"
+				}
+
+				break				
 
 			else:
 
-				self.get_input("Erreur lors de la saisie, appuyez sur Entrée pour revenir au menu")
+				input("Erreur lors de la saisie, appuyez sur Entrée pour revenir au menu")
 
 		#input(request)
 
 		return request
-
-	# Affichage des résultats de la partie
-	def get_result(self, result):
-		if(result == "VICTORY"):
-			print("Victory !")
-
-		elif(result == "DEFEAT"):
-			print("Defeat.")
-
-		else:
-			print("Quelque chose has gone terribly mal (:")
-
-		self.get_input("Appuyez sur ENTER pour quitter")
-
-	def get_input(self, param):
-		given_input = input(param)
-		return given_input
 
 if __name__ == "__main__":
 	try:
@@ -837,11 +1190,3 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		print ('Interrupted')
 		sys.exit(0)
-
-# # Apparently safe user-input
-# while True:
-# 	try:
-# 		user_input = input()
-# 		break
-# 	except ValueError:
-# 		continue

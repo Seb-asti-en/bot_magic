@@ -1,14 +1,26 @@
 {
-    "Id": 1068,
-    "Name": "Sparring Mummy",
-    "Colors": "W",
-    "Mana_cost": "{3}{W}",
-    "Identity": "W",
-    "Text": "When Sparring Mummy enters the battlefield, untap target creature.",
-    "Power": 3.0,
-    "Toughness": 3.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Zombie",
-    "Supertype": null
+    "Id":1068,
+    "Name":"Sparring Mummy",
+    "Colors":"W",
+    "Mana_cost":"{3}{W}",
+    "Identity":"W",
+    "Text":"When Sparring Mummy enters the battlefield, untap target creature.",
+	"Evergreen":[],
+    "Effect":[
+        {
+            "Name":"sparring_mummy",
+            "Target":"tappped creature",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"enter"
+        }
+    ],
+    "Power":3.0,
+    "Toughness":3.0,
+    "Type":"Creature",
+    "Subtype":"Zombie",
+    "Supertype":null
 }

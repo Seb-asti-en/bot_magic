@@ -1,17 +1,30 @@
 {
-    "Id": 17594,
-    "Name": "Blight Keeper",
-    "Colors": "B",
-    "Mana_cost": "{B}",
-    "Identity": "B",
-    "Text": "Flying\r\n{7}{B}, {T}, Sacrifice Blight Keeper: Target opponent loses 4 life and you gain 4 life.",
-    "Power": 1.0,
-    "Toughness": 1.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": [
+    "Id":17594,
+    "Name":"Blight Keeper",
+    "Colors":"B",
+    "Mana_cost":"{B}",
+    "Identity":"B",
+    "Text":"Flying\r\n{7}{B}, {T}, Sacrifice Blight Keeper: Target opponent loses 4 life and you gain 4 life.",
+    "Evergreen":["flying"],
+    "Effect":[
+        {
+            "Name":"blight_keeper",
+            "Target":"player",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                "Cost_name":"tap",
+                "Cost_quantity":1
+            },
+            "Temporality":"activation"
+        }
+    ],
+    "Power":1.0,
+    "Toughness":1.0,
+    "Type":"Creature",
+    "Subtype":[
         "Imp",
         "Bat"
     ],
-    "Supertype": null
+    "Supertype":null
 }

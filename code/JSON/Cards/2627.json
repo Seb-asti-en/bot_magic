@@ -5,15 +5,13 @@
     "Mana_cost": "{2}",
     "Identity": "",
     "Text": "Defender\nReach (This creature can block creatures with flying.)",
+	"Evergreen":["defender","reach"],
+	"Effect":[],
     "Power": 0.0,
     "Toughness": 4.0,
     "Type": [
         "Artifact",
         "Creature"
-    ],
-    "Type ID": [
-        1,
-        3
     ],
     "Subtype": "Wall",
     "Supertype": null

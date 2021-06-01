@@ -1,14 +1,33 @@
 {
-    "Id": 1093,
-    "Name": "Galestrike",
-    "Colors": "U",
-    "Mana_cost": "{2}{U}",
-    "Identity": "U",
-    "Text": "Return target tapped creature to its owner's hand.\nDraw a card.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":1093,
+    "Name":"Galestrike",
+    "Colors":"U",
+    "Mana_cost":"{2}{U}",
+    "Identity":"U",
+    "Text":"Return target tapped creature to its owner's hand.\nDraw a card.",
+    "Effect":[
+        {
+            "Name":"galestrike",
+            "Target":"tapped move",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        },{
+            "Name":"draw_card",
+            "Target":"player",
+			"Nb_target": 1,
+            "Nb_draw_card":1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

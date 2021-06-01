@@ -1,14 +1,26 @@
 {
-    "Id": 17567,
-    "Name": "Overflowing Insight",
-    "Colors": "U",
-    "Mana_cost": "{4}{U}{U}{U}",
-    "Identity": "U",
-    "Text": "Target player draws seven cards.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Sorcery",
-    "Type ID": 14,
-    "Subtype": null,
-    "Supertype": null
+    "Id":17567,
+    "Name":"Overflowing Insight",
+    "Colors":"U",
+    "Mana_cost":"{4}{U}{U}{U}",
+    "Identity":"U",
+    "Text":"Target player draws seven cards.",
+    "Effect":[
+        {
+            "Name":"draw_card",
+            "Target":"player",
+			"Nb_target": 1,
+            "Nb_draw_card":7,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Power":0.0,
+    "Toughness":0.0,
+    "Type":"Sorcery",
+    "Subtype":null,
+    "Supertype":null
 }

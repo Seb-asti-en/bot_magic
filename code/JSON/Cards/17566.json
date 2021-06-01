@@ -1,14 +1,23 @@
 {
-    "Id": 17566,
-    "Name": "One With the Wind",
-    "Colors": "U",
-    "Mana_cost": "{1}{U}",
-    "Identity": "U",
-    "Text": "Enchant creature\nEnchanted creature gets +2/+2 and has flying.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Enchantment",
-    "Type ID": 6,
-    "Subtype": "Aura",
-    "Supertype": null
+    "Id":17566,
+    "Name":"One With the Wind",
+    "Colors":"U",
+    "Mana_cost":"{1}{U}",
+    "Identity":"U",
+    "Text":"Enchant creature\nEnchanted creature gets +2/+2 and has flying.",
+    "Effect":[
+        {
+            "Name":"one_with_the_wind",
+            "Target":"creature",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Enchantment",
+    "Subtype":"Aura",
+    "Supertype":null
 }

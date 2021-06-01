@@ -1,17 +1,30 @@
 {
-    "Id": 1179,
-    "Name": "Minotaur Sureshot",
-    "Colors": "R",
-    "Mana_cost": "{2}{R}",
-    "Identity": "R",
-    "Text": "Reach (This creature can block creatures with flying.)\n{1}{R}: Minotaur Sureshot gets +1/+0 until end of turn.",
-    "Power": 2.0,
-    "Toughness": 3.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": [
+    "Id":1179,
+    "Name":"Minotaur Sureshot",
+    "Colors":"R",
+    "Mana_cost":"{2}{R}",
+    "Identity":"R",
+    "Text":"Reach (This creature can block creatures with flying.)\n{1}{R}: Minotaur Sureshot gets +1/+0 until end of turn.",
+	"Evergreen":["reach"],
+    "Effect":[
+        {
+            "Name":"minotaur_sureshot",
+            "Target":"creature self",
+			"Nb_target": 1,
+			"Temporary": 1,
+            "Activable":{
+                "Cost_name":"mana",
+                "Cost_quantity":"{1}{R}"
+            },
+            "Temporality":"activation"
+        }
+    ],
+    "Power":2.0,
+    "Toughness":3.0,
+    "Type":"Creature",
+    "Subtype":[
         "Archer",
         "Minotaur"
     ],
-    "Supertype": null
+    "Supertype":null
 }

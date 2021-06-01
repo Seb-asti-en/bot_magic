@@ -1,14 +1,23 @@
 {
-    "Id": 1083,
-    "Name": "Cancel",
-    "Colors": "U",
-    "Mana_cost": "{1}{U}{U}",
-    "Identity": "U",
-    "Text": "Counter target spell.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":1083,
+    "Name":"Cancel",
+    "Colors":"U",
+    "Mana_cost":"{1}{U}{U}",
+    "Identity":"U",
+    "Text":"Counter target spell.",
+    "Effect":[
+        {
+            "Name":"cancel",
+            "Target":"effect",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

@@ -1,14 +1,23 @@
 {
-    "Id": 5762,
-    "Name": "Lightning Strike",
-    "Colors": "R",
-    "Mana_cost": "{1}{R}",
-    "Identity": "R",
-    "Text": "Lightning Strike deals 3 damage to target creature or player.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":5762,
+    "Name":"Lightning Strike",
+    "Colors":"R",
+    "Mana_cost":"{1}{R}",
+    "Identity":"R",
+    "Text":"Lightning Strike deals 3 damage to target creature or player.",
+    "Effect":[
+        {
+            "Name":"lightning_strike",
+            "Target": "creature or player",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

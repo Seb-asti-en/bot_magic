@@ -1,17 +1,18 @@
 {
-    "Id": 17589,
-    "Name": "Wind Strider",
-    "Colors": "U",
-    "Mana_cost": "{4}{U}",
-    "Identity": "U",
-    "Text": "Flash\nFlying",
-    "Power": 3.0,
-    "Toughness": 3.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": [
+    "Id":17589,
+    "Name":"Wind Strider",
+    "Colors":"U",
+    "Mana_cost":"{4}{U}",
+    "Identity":"U",
+    "Text":"Flash\nFlying",
+	"Evergreen":["flash","flying"],
+    "Effect":[],
+    "Power":3.0,
+    "Toughness":3.0,
+    "Type":"Creature",
+    "Subtype":[
         "Merfolk",
         "Wizard"
     ],
-    "Supertype": null
+    "Supertype":null
 }

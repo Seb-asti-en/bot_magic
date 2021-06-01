@@ -1,14 +1,23 @@
 {
-    "Id": 3983,
-    "Name": "Sure Strike",
-    "Colors": "R",
-    "Mana_cost": "{1}{R}",
-    "Identity": "R",
-    "Text": "Target creature gets +3/+0 and gains first strike until end of turn.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":3983,
+    "Name":"Sure Strike",
+    "Colors":"R",
+    "Mana_cost":"{1}{R}",
+    "Identity":"R",
+    "Text":"Target creature gets +3/+0 and gains first strike until end of turn.",
+    "Effect":[
+        {
+            "Name":"sure_strike",
+            "Target":"creature",
+			"Nb_target": 1,
+			"Temporary": 1,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }

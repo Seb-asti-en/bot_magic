@@ -1,17 +1,30 @@
 {
-    "Id": 1157,
-    "Name": "Bloodlust Inciter",
-    "Colors": "R",
-    "Mana_cost": "{R}",
-    "Identity": "R",
-    "Text": "{T}: Target creature gains haste until end of turn.",
-    "Power": 1.0,
-    "Toughness": 1.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": [
+    "Id":1157,
+    "Name":"Bloodlust Inciter",
+    "Colors":"R",
+    "Mana_cost":"{R}",
+    "Identity":"R",
+    "Text":"{T}: Target creature gains haste until end of turn.",
+	"Evergreen":[],
+    "Effect":[
+        {
+            "Name":"bloodlust_inciter",
+            "Target":"creature",
+			"Nb_target": 1,
+			"Temporary": 1,
+            "Activable":{
+                "Cost_name":"tap",
+                "Cost_quantity":1
+            },
+            "Temporality":"activation"
+        }
+    ],
+    "Power":1.0,
+    "Toughness":1.0,
+    "Type":"Creature",
+    "Subtype":[
         "Human",
         "Warrior"
     ],
-    "Supertype": null
+    "Supertype":null
 }

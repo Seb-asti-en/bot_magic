@@ -1,14 +1,23 @@
 {
-    "Id": 1160,
-    "Name": "By Force",
-    "Colors": "R",
-    "Mana_cost": "{X}{R}",
-    "Identity": "R",
-    "Text": "Destroy X target artifacts.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Sorcery",
-    "Type ID": 14,
-    "Subtype": null,
-    "Supertype": null
+    "Id":1160,
+    "Name":"By Force",
+    "Colors":"R",
+    "Mana_cost":"{X}{R}",
+    "Identity":"R",
+    "Text":"Destroy X target artifacts.",
+    "Effect":[
+        {
+            "Name":"by_force",
+            "Target":"artifacts",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Sorcery",
+    "Subtype":null,
+    "Supertype":null
 }

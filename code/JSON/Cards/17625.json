@@ -1,14 +1,21 @@
 {
-    "Id": 17625,
-    "Name": "Spreading Rot",
-    "Colors": "B",
-    "Mana_cost": "{4}{B}",
-    "Identity": "B",
-    "Text": "Destroy target land. Its controller loses 2 life.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Sorcery",
-    "Type ID": 14,
-    "Subtype": null,
-    "Supertype": null
+    "Id":17625,
+    "Name":"Spreading Rot",
+    "Colors":"B",
+    "Mana_cost":"{4}{B}",
+    "Identity":"B",
+    "Text":"Destroy target land. Its controller loses 2 life.",
+    "Effect":[
+        {
+            "Name":"spreading_rot",
+            "Target":"move land",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{},
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Sorcery",
+    "Subtype":null,
+    "Supertype":null
 }

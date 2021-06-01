@@ -1,14 +1,15 @@
 {
-    "Id": 17638,
-    "Name": "Charging Monstrosaur",
-    "Colors": "R",
-    "Mana_cost": "{4}{R}",
-    "Identity": "R",
-    "Text": "Trample, haste",
-    "Power": 5.0,
-    "Toughness": 5.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Dinosaur",
-    "Supertype": null
+    "Id":17638,
+    "Name":"Charging Monstrosaur",
+    "Colors":"R",
+    "Mana_cost":"{4}{R}",
+    "Identity":"R",
+    "Text":"Trample, haste",
+	"Evergreen":["trample","haste"],
+    "Effect":[],
+    "Power":5.0,
+    "Toughness":5.0,
+    "Type":"Creature",
+    "Subtype":"Dinosaur",
+    "Supertype":null
 }

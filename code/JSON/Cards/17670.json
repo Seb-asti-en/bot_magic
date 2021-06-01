@@ -1,14 +1,15 @@
 {
-    "Id": 17670,
-    "Name": "Ancient Brontodon",
-    "Colors": "G",
-    "Mana_cost": "{6}{G}{G}",
-    "Identity": "G",
-    "Text": "",
-    "Power": 9.0,
-    "Toughness": 9.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Dinosaur",
-    "Supertype": null
+    "Id":17670,
+    "Name":"Ancient Brontodon",
+    "Colors":"G",
+    "Mana_cost":"{6}{G}{G}",
+    "Identity":"G",
+    "Text":"",
+	"Evergreen":[],
+    "Effect":[],
+    "Power":9.0,
+    "Toughness":9.0,
+    "Type":"Creature",
+    "Subtype":"Dinosaur",
+    "Supertype":null
 }

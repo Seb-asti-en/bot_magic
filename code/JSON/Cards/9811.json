@@ -1,14 +1,23 @@
 {
-    "Id": 9811,
-    "Name": "Mark of the Vampire",
-    "Colors": "B",
-    "Mana_cost": "{3}{B}",
-    "Identity": "B",
-    "Text": "Enchant creature\nEnchanted creature gets +2/+2 and has lifelink. (Damage dealt by the creature also causes its controller to gain that much life.)",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Enchantment",
-    "Type ID": 6,
-    "Subtype": "Aura",
-    "Supertype": null
+    "Id":9811,
+    "Name":"Mark of the Vampire",
+    "Colors":"B",
+    "Mana_cost":"{3}{B}",
+    "Identity":"B",
+    "Text":"Enchant creature\nEnchanted creature gets +2/+2 and has lifelink. (Damage dealt by the creature also causes its controller to gain that much life.)",
+    "Effect":[
+        {
+            "Name":"mark_of_the_vampire",
+            "Target":"creature",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Enchantment",
+    "Subtype":"Aura",
+    "Supertype":null
 }

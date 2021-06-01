@@ -1,14 +1,15 @@
 {
-    "Id": 17648,
-    "Name": "Nest Robber",
-    "Colors": "R",
-    "Mana_cost": "{1}{R}",
-    "Identity": "R",
-    "Text": "Haste",
-    "Power": 2.0,
-    "Toughness": 1.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Dinosaur",
-    "Supertype": null
+    "Id":17648,
+    "Name":"Nest Robber",
+    "Colors":"R",
+    "Mana_cost":"{1}{R}",
+    "Identity":"R",
+    "Text":"Haste",
+	"Evergreen":["haste"],
+    "Effect":[],
+    "Power":2.0,
+    "Toughness":1.0,
+    "Type":"Creature",
+    "Subtype":"Dinosaur",
+    "Supertype":null
 }

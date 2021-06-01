@@ -1,14 +1,27 @@
 {
-    "Id": 1052,
-    "Name": "Fan Bearer",
-    "Colors": "W",
-    "Mana_cost": "{W}",
-    "Identity": "W",
-    "Text": "{2}, {T}: Tap target creature.",
-    "Power": 1.0,
-    "Toughness": 2.0,
-    "Type": "Creature",
-    "Type ID": 3,
-    "Subtype": "Zombie",
-    "Supertype": null
+    "Id":1052,
+    "Name":"Fan Bearer",
+    "Colors":"W",
+    "Mana_cost":"{W}",
+    "Identity":"W",
+    "Text":"{2}, {T}: Tap target creature.",
+	"Evergreen":[],
+    "Effect":[
+        {
+            "Name":"fan_bearer",
+            "Target":"creature",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                "Cost_name":"mana",
+                "Cost_quantity":"{2}"
+            },
+            "Temporality":"activation"
+        }
+    ],
+    "Power":1.0,
+    "Toughness":2.0,
+    "Type":"Creature",
+    "Subtype":"Zombie",
+    "Supertype":null
 }

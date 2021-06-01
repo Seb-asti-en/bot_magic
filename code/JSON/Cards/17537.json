@@ -1,14 +1,33 @@
 {
-    "Id": 17537,
-    "Name": "Ritual of Rejuvenation",
-    "Colors": "W",
-    "Mana_cost": "{2}{W}",
-    "Identity": "W",
-    "Text": "You gain 4 life.\nDraw a card.",
-    "Power": 0.0,
-    "Toughness": 0.0,
-    "Type": "Instant",
-    "Type ID": 7,
-    "Subtype": null,
-    "Supertype": null
+    "Id":17537,
+    "Name":"Ritual of Rejuvenation",
+    "Colors":"W",
+    "Mana_cost":"{2}{W}",
+    "Identity":"W",
+    "Text":"You gain 4 life.\nDraw a card.",
+    "Effect":[
+        {
+            "Name":"ritual_of_rejuvenation",
+            "Target":"player",
+			"Nb_target": 1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        },{
+            "Name":"draw_card",
+            "Target":"player",
+			"Nb_target": 1,
+            "Nb_draw_card":1,
+			"Temporary": 0,
+            "Activable":{
+                
+            },
+            "Temporality":"play"
+        }
+    ],
+    "Type":"Instant",
+    "Subtype":null,
+    "Supertype":null
 }
