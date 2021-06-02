@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import socket, pickle, sys, json, os
 from threading import Thread
 from game import Game
@@ -44,7 +43,7 @@ class Server:
 			# Réception depuis le serveur : requête initiale (1)
 			request,client_netconfig = self.__socket.recvfrom(PACKET_SIZE)
 
-			print("Message reçu :", request, "de", client_netconfig)
+			# print(f"Message reçu : {request} de {client_netconfig[0]}:{client_netconfig[1]}")
 
 			# Traitement de l'information reçue
 
@@ -60,6 +59,8 @@ class Server:
 				# Si au moins un serveur de jeu est ouvert
 				if len(available_games) > 0:
 
+					print(f"Le client {client_netconfig[0]}:{client_netconfig[1]} rejoint la partie")
+
 					# Envoi vers le serveur : réponse (2)
 					self.__socket.sendto(pickle.dumps(("ACCEPT",available_games[0].netconfig())),client_netconfig)
 
@@ -69,14 +70,21 @@ class Server:
 					# Envoi vers le serveur : réponse (2)
 					self.__socket.sendto(pickle.dumps(("DECLINE","Pas de partie disponible")),client_netconfig)
 
+					print(f"Le client {client_netconfig[0]}:{client_netconfig[1]} tente de rejoindre une partie, mais aucune n'est disponible")
+
 			# Demande de création d'une partie
 			elif request.decode() == "NEW_GAME":
+
+				print(f"Le client {client_netconfig[0]}:{client_netconfig[1]} crée une nouvelle partie")
+
 				game_netconfig = self.create_game()
 
 				# Envoi vers le serveur : réponse (2)
 				self.__socket.sendto(pickle.dumps(("ACCEPT",game_netconfig)),client_netconfig)
 
 			else:
+
+				print(f"Le client {client_netconfig[0]}:{client_netconfig[1]} a émis une requête invalide")
 
 				# Envoi vers le serveur : réponse (2)
 				self.__socket.sendto(pickle.dumps(("DECLINE","Requête invalide")),client_netconfig)
@@ -86,8 +94,6 @@ class Server:
 		tcp_socket = None
 		game_thread = None
 
-		print("create_game")
-
 		# Création de la socket pour le serveur de jeu
 		tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		tcp_socket.bind(('', 0))
@@ -96,8 +102,8 @@ class Server:
 		game = Game(tcp_socket)
 
 		# Création du thread
+		print("Création du thread de la partie")
 		game_thread = Thread(target = self.game_thread, args = (game,))
-		print("Le thread a été créé")
 
 		# Lancement du thread
 		game_thread.start()
@@ -109,7 +115,7 @@ class Server:
 
 	def game_thread(self, game):
 
-		print("Lancement du thread (", game.get_socket(), ")")
+		print(f"Lancement de la partie {game.get_socket().getsockname()[1]}")
 
 		game.wait_client()
 

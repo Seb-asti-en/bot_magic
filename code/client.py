@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import socket, pickle, sys, json, os, random, time
 from player import Player
 

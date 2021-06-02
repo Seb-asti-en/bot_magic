@@ -2,7 +2,6 @@ from board import Board
 from effect import Effect
 from landcard import LandCard
 
-LOGS = True
 
 class Player:
 
@@ -111,7 +110,7 @@ class Player:
 
 		return is_accepted
 
-	def engage(self, hand_position, land_played):
+	def engage(self, hand_position, land_played, logfile):
 
 		is_accepted = False
 		mana_cost = None
@@ -159,47 +158,33 @@ class Player:
 
 				if(card.get_type() == "Land"):
 
-					if(LOGS):
-
-						print(f"Joueur {self.get_id()+1} tente de poser le terrain {card.get_name()}")	
+					logfile.write(f"Joueur {self.get_id()+1} tente de poser le terrain {card.get_name()}")	
 						
 				elif(card.get_type() == "Creature"):
 
-					if(LOGS):
-
-						print(f"Joueur {self.get_id()+1} tente de poser {card.get_name()} sur le champ de bataille")		
+					logfile.write(f"Joueur {self.get_id()+1} tente de poser {card.get_name()} sur le champ de bataille")		
 
 				elif(card.get_type() == "Artifact"):
 
-					if(LOGS):
-
-						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Artefact)")	
+					logfile.write(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Artefact)")	
 				
 				elif(card.get_type() == "Enchantment"):
 
-					if(LOGS):
-
-						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Enchantement)")
+					logfile.write(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Enchantement)")
 
 				elif(card.get_type() == "Instant"):
 
-					if(LOGS):
-
-						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Éphémère)")		
+					logfile.write(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Éphémère)")		
 
 				elif(card.get_type() == "Sorcery"):
 
-					if(LOGS):
-
-						print(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Rituel)")	
+					logfile.write(f"Joueur {self.get_id()+1} tente d'utiliser {card.get_name()} (Rituel)")	
 
 				else:
 
 					is_accepted = False	
 
-					if(LOGS):
-
-						print(f"Joueur {self.get_id()+1} tente d'utiliser une carte invalide")
+					logfile.write(f"Joueur {self.get_id()+1} tente d'utiliser une carte invalide")
 
 		return [is_accepted, land_played]
 
@@ -356,7 +341,7 @@ class Player:
 
 		self.__life -= power
 
-	def consume_mana(self, mana_cost):
+	def consume_mana(self, mana_cost, logfile):
 
 		# Retrait du mana par couleur
 		for color in mana_cost:
@@ -371,6 +356,4 @@ class Player:
 
 				self.__mana_pool[color] = 0	
 
-			if(LOGS):
-
-				print(f"Joueur {self.get_id()+1} n'a plus de mana")				
+			logfile.write(f"Joueur {self.get_id()+1} a consommé tout son mana")				

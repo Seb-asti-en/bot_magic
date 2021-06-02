@@ -1,9 +1,9 @@
 import socket, pickle, sys, os
 from deckmanager import DeckManager
 from player import Player
+from log import Log
 
 DEBUG = False
-LOGS = True
 
 SOCKET = 0
 PLAYER = 1
@@ -29,13 +29,17 @@ TARGET_POSITION = 2
 
 class Game:
 
-	def __init__(self, socket, slots = 2):
+	def __init__(self, socket, slots = 5):
 
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
 		self.__slots = slots
 		self.__players = []
 		self.__dead_players = []
+		self.__log = Log()
+
+		# Création du fichier de log
+		self.__log.start(socket.getsockname()[1])
 
 	def get_socket(self):
 		return self.__socket
@@ -152,9 +156,7 @@ class Game:
 		# Mise à jour des morts
 		self.__dead_players.append(index)
 
-		if(LOGS):
-
-			print("Joueur",index+1,"est une sombre merde, il est mort comme un chien")
+		self.__log.write(f"Joueur {index+1} est une sombre merde, il est mort comme un chien")
 
 	def concede(self, index):
 
@@ -170,9 +172,7 @@ class Game:
 		gamestate = self.choose_gamestate([[index,"LIFE"]])
 		self.send_gamestate(index,gamestate)
 
-		if(LOGS):
-
-			print("Joueur",index+1,"renonce à la victoire")
+		self.__log.write(f"Joueur {index+1} renonce à la victoire")
 		
 		# Mise à mort du joueur
 		self.kill_player(index)
@@ -378,9 +378,7 @@ class Game:
 					
 					is_accepted = False
 
-					if(LOGS):
-
-						print(f"La sélection de cibles du Joueur {index+1} est incorrecte")
+					self.__log.write(f"La sélection de cibles du Joueur {index+1} est incorrecte")
 
 			# Vérification que la carte ne soit ni une créature ni un terrain dans le cas où elle n'a pas d'effet valide
 			elif(card.get_type() != "Creature" and card.get_type() != "Land"):
@@ -389,9 +387,7 @@ class Game:
 
 		else:
 
-			if(LOGS):
-
-				print(f"Joueur {index+1} dit n'importe quoi")
+			self.__log.write(f"Joueur {index+1} dit n'importe quoi")
 
 		return is_accepted
 
@@ -492,9 +488,7 @@ class Game:
 			
 			self.__players.append([self.__socket.accept()[0],None])
 
-			if(LOGS):
-				
-				print("Connexion du Joueur",i)
+			self.__log.write(f"Connexion du Joueur {i}")
 
 			i += 1
 
@@ -515,9 +509,7 @@ class Game:
 			# Incrémentation du compteur définissant l'identifiant du joueur
 			player_id += 1
 
-			if(LOGS):
-
-				print("Joueur",player[PLAYER].get_id()+1,"a choisi le deck",DEFAULT_DECK)
+			self.__log.write(f"Joueur {player[PLAYER].get_id()+1} a choisi le deck {DEFAULT_DECK}")
 
 	def start(self):
 
@@ -538,7 +530,7 @@ class Game:
 		for player in self.__players:		
 		
 			# Exécution de la phase
-			print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase Mulligan")
+			self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}] Phase Mulligan")
 			self.mulligan(player[PLAYER].get_id())
 
 	def mulligan(self, index):
@@ -587,9 +579,7 @@ class Game:
 				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
 				self.send_gamestate(index,gamestate)
 
-				if(LOGS):
-					
-					print("Joueur",index+1,"veut continuer le mulligan")
+				self.__log.write(f"Joueur {index+1} veut continuer le mulligan")
 			
 			elif(data.get("type") == "SKIP_PHASE"):
 
@@ -600,9 +590,7 @@ class Game:
 				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
 				self.send_gamestate(index,gamestate)
 
-				if(LOGS):
-					
-					print("Joueur",index+1,"a terminé le mulligan")
+				self.__log.write(f"Joueur {index+1} a terminé le mulligan")
 
 				break
 			
@@ -618,9 +606,7 @@ class Game:
 				# Envoi vers le client : Refus (5.4)
 				self.send_signal(index,"DECLINE")
 
-				if(LOGS):
-					
-					print("Joueur",index+1,"dit n'importe quoi")
+				self.__log.write(f"Joueur {index+1} dit n'importe quoi")
 
 				continue
 
@@ -633,7 +619,7 @@ class Game:
 
 			for player in self.__players:
 
-				print("Tour du joueur", player[PLAYER].get_id()+1)
+				self.__log.write(f"Tour du joueur {player[PLAYER].get_id()+1}")
 
 				# Permission de poser un terrain
 				land_played = False
@@ -641,7 +627,7 @@ class Game:
 				# Vérification si le joueur est encore en vie
 				if (self.players_alive() > 1) and (player[PLAYER].get_life() > 0):
 
-					print("Le joueur " + str(player[PLAYER].get_id()+1) + " est en vie (" + str(player[PLAYER].get_life()) + "HP)")
+					self.__log.write(f"Le joueur {player[PLAYER].get_id()+1} est en vie ({player[PLAYER].get_life()}HP)")
 
 					# Phase de départ
 					self.start_phase(player[PLAYER].get_id())
@@ -655,7 +641,7 @@ class Game:
 					# self.instant_phase(player[PLAYER].get_id())
 
 					# Phase de pioche
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de pioche")
+					self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}] Phase de pioche")
 					self.draw_phase(player[PLAYER].get_id())
 
 					# # Phase Effet 2
@@ -670,11 +656,11 @@ class Game:
 					# 		self.effect_phase(ennemy[PLAYER].get_id())
 
 					# Phase Principale
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (1)")
+					self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}] Phase principale (1)")
 					land_played = self.main_phase(player[PLAYER].get_id(),land_played)
 
 					# Phase d'Attaque (Déclaration des monstres attaquants)
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase d'attaque")
+					self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}] Phase d'attaque")
 					self.attack_phase(player[PLAYER].get_id())
 					
 					# # Phase Éphémère 2
@@ -689,12 +675,12 @@ class Game:
 					# 		self.instant_phase(ennemy[PLAYER].get_id())
 
 					# Phase Blocage (Ennemi déclare les monstres bloquants)
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de blocage")
+					self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}]  Phase de blocage")
 					for ennemy in self.__players:
 
 						if (ennemy[PLAYER].get_id() != player[PLAYER].get_id()) and (ennemy[PLAYER].get_life() > 0):
 
-							print("Joueur", ennemy[PLAYER].get_id()+1, "peut bloquer les cartes du Joueur", player[PLAYER].get_id()+1)
+							self.__log.write(f"Joueur {ennemy[PLAYER].get_id()+1} peut bloquer les cartes du Joueur {player[PLAYER].get_id()+1}")
 
 							# Phase de blocage par ennemy
 							self.block_phase(ennemy[PLAYER].get_id())
@@ -708,15 +694,15 @@ class Game:
 					# self.instant_phase(player[PLAYER].get_id())
 
 			 		# Phase Dommages (Appliquer les dommages de combat (prévenir du décès avec une requête))
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Résolution des dégats")
+					self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}]  Résolution des dégats")
 					self.damage_phase(player[PLAYER].get_id())
 					
 					# Phase Secondaire
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase principale (2)")
+					self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}]  Phase principale (2)")
 					land_played = self.main_phase(player[PLAYER].get_id(),land_played)
 
 					# Phase de fin
-					print("[PLAYER " + str(player[PLAYER].get_id()+1) + "] Phase de fin")
+					self.__log.write(f"[JOUEUR {player[PLAYER].get_id()+1}]  Phase de fin")
 					self.end_phase(player[PLAYER].get_id())
 
 		# Envoi des résultats
@@ -727,9 +713,7 @@ class Game:
 				# Envoi vers le client : Signal de victoire
 				self.send_signal(player[PLAYER].get_id(),"VICTORY")
 
-				if(LOGS):
-
-					print("Joueur",player[PLAYER].get_id()+1,"a remporté la partie")
+				self.__log.write(f"Joueur {player[PLAYER].get_id()+1} a remporté la partie")
 
 			elif player[PLAYER].get_id() not in self.__dead_players:
 				
@@ -750,105 +734,103 @@ class Game:
 		gamestate = self.choose_gamestate([[index,"MANA","BATTLE_ZONE","LAND_ZONE"]])
 		self.send_gamestate(index,gamestate)
 
-		if(LOGS):
+		self.__log.write(f"Dégagement des cartes du Joueur {index+1}")
 
-			print("Dégagement des cartes du Joueur",index+1)
+	# def effect_phase(self, index):
 
-	def effect_phase(self, index):
+	# 	data = None
+	# 	gamestate = None
 
-		data = None
-		gamestate = None
+	# 	while True:
 
-		while True:
+	# 		# Envoi vers le client : Signal de jeu (5)
+	# 		self.send_signal(index,"PLAY")
 
-			# Envoi vers le client : Signal de jeu (5)
-			self.send_signal(index,"PLAY")
+	# 		# Réception depuis le client : Requête d'action (6)
+	# 		data = self.recv_action(index)
 
-			# Réception depuis le client : Requête d'action (6)
-			data = self.recv_action(index)
+	# 		if(data.get("type") == "USE_EFFECT"):
 
-			if(data.get("type") == "USE_EFFECT"):
+	# 			# Envoi vers le client : Acceptation (7.1.1)
+	# 			self.send_signal(index,"ACCEPT")
 
-				# Envoi vers le client : Acceptation (7.1.1)
-				self.send_signal(index,"ACCEPT")
+	# 			# TODO : Activation des effets
 
-				# TODO : Activation des effets
+	# 			# Envoi vers le client : Etat de la partie (7.1.2)
+	# 			gamestate = self.choose_gamestate("ALL")
+	# 			self.send_gamestate(index,gamestate)
 
-				# Envoi vers le client : Etat de la partie (7.1.2)
-				gamestate = self.choose_gamestate("ALL")
-				self.send_gamestate(index,gamestate)
+	# 			break
 
-				break
+	# 		elif(data.get("type") == "SKIP_PHASE"):
 
-			elif(data.get("type") == "SKIP_PHASE"):
+	# 			# Envoi vers le client : Acceptation (7.2.1)
+	# 			self.send_signal(index,"ACCEPT")
 
-				# Envoi vers le client : Acceptation (7.2.1)
-				self.send_signal(index,"ACCEPT")
+	# 			# Envoi vers le client : Etat de la partie (7.2.2)
+	# 			gamestate = self.choose_gamestate("EMPTY")
+	# 			self.send_gamestate(index,gamestate)
 
-				# Envoi vers le client : Etat de la partie (7.2.2)
-				gamestate = self.choose_gamestate("EMPTY")
-				self.send_gamestate(index,gamestate)
-
-				break
+	# 			break
 			
-			elif(data.get("type") == "CONCEDE"):
+	# 		elif(data.get("type") == "CONCEDE"):
 
-				self.concede(index)
+	# 			self.concede(index)
 
-				break
+	# 			break
 
-			else:
+	# 		else:
 
-				# Envoi vers le client : Refus (7.3)
-				self.send_signal(index,"DECLINE")
+	# 			# Envoi vers le client : Refus (7.3)
+	# 			self.send_signal(index,"DECLINE")
 
-	def instant_phase(self, index):
+	# def instant_phase(self, index):
 
-		data = None
-		gamestate = None
+	# 	data = None
+	# 	gamestate = None
 
-		while True:
+	# 	while True:
 
-			# Envoi vers le client : Signal de jeu (8)
-			self.send_signal(index,"PLAY")
+	# 		# Envoi vers le client : Signal de jeu (8)
+	# 		self.send_signal(index,"PLAY")
 
-			# Réception depuis le client : Requête d'action (9)
-			data = self.recv_action(index)
+	# 		# Réception depuis le client : Requête d'action (9)
+	# 		data = self.recv_action(index)
 
-			if(data.get("type") == "INSTANT"):
+	# 		if(data.get("type") == "INSTANT"):
 
-				# Envoi vers le client : Acceptation (10.1.1)
-				self.send_signal(index,"ACCEPT")
+	# 			# Envoi vers le client : Acceptation (10.1.1)
+	# 			self.send_signal(index,"ACCEPT")
 
-				# TODO : Activation des ephémères
+	# 			# TODO : Activation des ephémères
 
-				# Envoi vers le client : Etat de la partie (10.1.2)
-				gamestate = self.choose_gamestate("ALL")
-				self.send_gamestate(index,gamestate)
+	# 			# Envoi vers le client : Etat de la partie (10.1.2)
+	# 			gamestate = self.choose_gamestate("ALL")
+	# 			self.send_gamestate(index,gamestate)
 
-				break
+	# 			break
 
-			elif(data.get("type") == "SKIP_PHASE"):
+	# 		elif(data.get("type") == "SKIP_PHASE"):
 
-				# Envoi vers le client : Acceptation (10.2.1)
-				self.send_signal(index,"ACCEPT")
+	# 			# Envoi vers le client : Acceptation (10.2.1)
+	# 			self.send_signal(index,"ACCEPT")
 
-				# Envoi vers le client : Etat de la partie (10.2.2)
-				gamestate = self.choose_gamestate("EMPTY")
-				self.send_gamestate(index,gamestate)
+	# 			# Envoi vers le client : Etat de la partie (10.2.2)
+	# 			gamestate = self.choose_gamestate("EMPTY")
+	# 			self.send_gamestate(index,gamestate)
 
-				break
+	# 			break
 			
-			elif(data.get("type") == "CONCEDE"):
+	# 		elif(data.get("type") == "CONCEDE"):
 
-				self.concede(index)
+	# 			self.concede(index)
 
-				break
+	# 			break
 
-			else:
+	# 		else:
 
-				# Envoi vers le client : Refus (10.3)
-				self.send_signal(index,"DECLINE")
+	# 			# Envoi vers le client : Refus (10.3)
+	# 			self.send_signal(index,"DECLINE")
 
 	def draw_phase(self, index):
 
@@ -875,9 +857,7 @@ class Game:
 				gamestate = self.choose_gamestate([[index,"DECK","HAND"]])
 				self.send_gamestate(index,gamestate)
 
-				if(LOGS):
-
-					print("Joueur",index+1,"se décide à piocher")
+				self.__log.write(f"Joueur {index+1} se décide à piocher")
 
 				break
 			
@@ -892,9 +872,7 @@ class Game:
 				# Envoi vers le client : Refus (13.2)
 				self.send_signal(index,"DECLINE")
 
-				if(LOGS):
-
-					print("Joueur",index+1,"dit n'importe quoi")
+				self.__log.write(f"Joueur {index+1} dit n'importe quoi")
 
 	def main_phase(self, index, land_played):
 
@@ -915,7 +893,7 @@ class Game:
 			if(data.get("type") == "PLAY_CARD"):
 
 				# Engagement des cartes
-				is_accepted,land_played = self.__players[index][PLAYER].engage(data["hand_position"],land_played)
+				is_accepted,land_played = self.__players[index][PLAYER].engage(data["hand_position"],land_played,self.__log)
 
 				if(is_accepted):
 
@@ -932,16 +910,14 @@ class Game:
 					# Vérification que la carte possède un effet
 					if(len(card.get_effect()) > 0):
 
-						if(LOGS):
-
-							print(f"Joueur {index+1} doit sélectionner des cibles pour les effets de cette carte")
+						self.__log.write(f"Joueur {index+1} doit sélectionner des cibles pour les effets de cette carte")
 
 						is_accepted = self.use_effect(index,"HAND",data["hand_position"],"play")
 
 					if(is_accepted):
 
 						# Mise à jour du mana du joueur
-						self.__players[index][PLAYER].consume_mana(card.get_mana_cost())
+						self.__players[index][PLAYER].consume_mana(card.get_mana_cost(),self.__log)
 
 						# Récupération du nom de la carte
 						card_name = card.get_name()
@@ -952,18 +928,18 @@ class Game:
 							# Invocation sur le terrain	
 							is_accepted = self.__players[index][PLAYER].move("HAND",data["hand_position"],"LAND_ZONE")
 
-							if(LOGS and is_accepted):
+							if(is_accepted):
 
-								print(f"Joueur {index+1} pose le terrain {card_name}")	
+								self.__log.write(f"Joueur {index+1} pose le terrain {card_name}")	
 								
 						elif(card.get_type() == "Creature"):
 
 							# Invocation sur le terrain	
 							is_accepted = self.__players[index][PLAYER].move("HAND",data["hand_position"],"BATTLE_ZONE")
 
-							if(LOGS and is_accepted):
+							if(is_accepted):
 
-								print(f"Joueur {index+1} pose {card_name} sur le champ de bataille")	
+								self.__log.write(f"Joueur {index+1} pose {card_name} sur le champ de bataille")	
 
 						elif(card.get_type() in ["Artifact","Enchantment","Instant","Sorcery"]):
 
@@ -984,18 +960,14 @@ class Game:
 						# Envoi vers le client : Refus
 						self.send_signal(index,"DECLINE")	
 
-						if(LOGS):
-
-							print(f"Joueur {index+1} n'a pas rempli les conditions pour engager {card.get_name()}")													
+						self.__log.write(f"Joueur {index+1} n'a pas rempli les conditions pour engager {card.get_name()}")													
 
 				else:
 
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
-					if(LOGS):
-
-						print(f"Joueur {index+1} n'a pas assez de mana pour cette carte")
+					self.__log.write(f"Joueur {index+1} n'a pas assez de mana pour cette carte")
 
 			elif(data.get("type") == "TAP_LAND"):
 
@@ -1011,18 +983,14 @@ class Game:
 					gamestate = self.choose_gamestate([[index,"MANA","LAND_ZONE"]])
 					self.send_gamestate(index,gamestate)
 
-					if(LOGS):
-
-						print("Joueur",index+1,"tap le terrain",self.__players[index][PLAYER].get_board().get_land_zone()[data["landzone_position"]].get_name())
+					self.__log.write(f"Joueur {index+1} tap le terrain {self.__players[index][PLAYER].get_board().get_land_zone()[data['landzone_position']].get_name()}")
 
 				else:
 
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
-					if(LOGS):
-
-						print("Joueur",index+1,"n'a pas le droit de tap",self.__players[index][PLAYER].get_board().get_land_zone()[data["landzone_position"]].get_name(),"de nouveau")
+					self.__log.write(f"Joueur {index+1} n'a pas le droit de tap {self.__players[index][PLAYER].get_board().get_land_zone()[data['landzone_position']].get_name()} de nouveau")
 
 			elif(data.get("type") == "SKIP_PHASE"):
 
@@ -1033,9 +1001,7 @@ class Game:
 				gamestate = self.choose_gamestate("EMPTY")
 				self.send_gamestate(index,gamestate)
 
-				if(LOGS):
-
-					print("Joueur",index+1,"termine la phase")
+				self.__log.write(f"Joueur {index+1} termine la phase")
 
 				break
 				
@@ -1050,9 +1016,7 @@ class Game:
 				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
 
-				if(LOGS):
-
-					print("Joueur",index+1,"dit n'importe quoi")
+				self.__log.write(f"Joueur {index+1} dit n'importe quoi")
 
 		return land_played
 			
@@ -1079,9 +1043,7 @@ class Game:
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
 
-					if(LOGS):
-
-						print("Joueur",index+1,"déclare attaquer le Joueur",data["target"]+1,"avec",self.__players[index][PLAYER].get_board().get_battle_zone()[data["attacker"]].get_name())
+					self.__log.write(f"Joueur {index+1} déclare attaquer le Joueur {data['target']+1} avec {self.__players[index][PLAYER].get_board().get_battle_zone()[data['attacker']].get_name()}")
 					
 					gamestate = self.choose_gamestate([[index,"BATTLE_ZONE"]])
 
@@ -1101,9 +1063,7 @@ class Game:
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
-					if(LOGS):
-
-						print("Joueur",index+1,"n'a pas le droit d'attaquer le Joueur",data["target"]+1,"avec cette carte")
+					self.__log.write(f"Joueur {index+1} n'a pas le droit d'attaquer le Joueur {data['target']+1} avec cette carte")
 
 			elif(data.get("type") == "SKIP_PHASE"):
 
@@ -1114,9 +1074,7 @@ class Game:
 				gamestate = self.choose_gamestate("EMPTY")
 				self.send_gamestate(index,gamestate)
 
-				if(LOGS):
-
-					print("Joueur",index+1,"termine la phase")
+				self.__log.write(f"Joueur {index+1} termine la phase")
 
 				break
 				
@@ -1131,9 +1089,7 @@ class Game:
 				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
 
-				if(LOGS):
-
-					print("Joueur",index+1,"dit n'importe quoi")
+				self.__log.write(f"Joueur {index+1} dit n'importe quoi")
 
 	def block_phase(self, index):
 
@@ -1158,9 +1114,7 @@ class Game:
 					# Envoi vers le client : Acceptation
 					self.send_signal(index,"ACCEPT")
 
-					if(LOGS):
-
-						print("Joueur",index+1,"déclare bloquer la carte",self.__players[data["target"]][PLAYER].get_board().get_battle_zone()[data["ennemy_attacker"]].get_name(),"du Joueur",data["target"],"avec",self.__players[index][PLAYER].get_board().get_battle_zone()[data["blocker"]].get_name())
+					self.__log.write(f"Joueur {index+1} déclare bloquer la carte {self.__players[data['target']][PLAYER].get_board().get_battle_zone()[data['ennemy_attacker']].get_name()} du Joueur {data['target']} avec {self.__players[index][PLAYER].get_board().get_battle_zone()[data['blocker']].get_name()}")
 
 					# Envoi vers le client : Etat de la partie
 					gamestate = self.choose_gamestate([[index,"BATTLE_ZONE"]])
@@ -1171,9 +1125,7 @@ class Game:
 					# Envoi vers le client : Refus
 					self.send_signal(index,"DECLINE")
 
-					if(LOGS):
-
-						print("Joueur",index+1,"n'a pas le droit de bloquer le Joueur",data["target"]+1,"avec cette carte")
+					self.__log.write(f"Joueur {index+1} n'a pas le droit de bloquer le Joueur {data['target']+1} avec cette carte")
 
 			elif(data.get("type") == "SKIP_PHASE"):
 
@@ -1184,9 +1136,7 @@ class Game:
 				gamestate = self.choose_gamestate("EMPTY")
 				self.send_gamestate(index,gamestate)
 
-				if(LOGS):
-
-					print("Joueur",index+1,"termine la phase")
+				self.__log.write(f"Joueur {index+1} termine la phase")
 
 				break
 				
@@ -1201,9 +1151,7 @@ class Game:
 				# Envoi vers le client : Refus
 				self.send_signal(index,"DECLINE")
 
-				if(LOGS):
-
-					print("Joueur",index+1,"dit n'importe quoi")
+				self.__log.write(f"Joueur {index+1} dit n'importe quoi")
 
 	def damage_phase(self, index):
 
@@ -1235,10 +1183,8 @@ class Game:
 						ennemy_card.damage(card.power())
 						card.damage(ennemy_card.power())
 
-						if(LOGS):
-
-							print(f"La carte {card.get_name()}(J{index+1}) inflige {card.power()} dommage(s) à {ennemy_card.get_name()}(J{card.get_target()+1})")
-							print(f"La carte {ennemy_card.get_name()}(J{card.get_target()+1}) inflige {ennemy_card.power()} dommage(s) à {card.get_name()}(J{index+1})")
+						self.__log.write(f"La carte {card.get_name()}(J{index+1}) inflige {card.power()} dommage(s) à {ennemy_card.get_name()}(J{card.get_target()+1})")
+						self.__log.write(f"La carte {ennemy_card.get_name()}(J{card.get_target()+1}) inflige {ennemy_card.power()} dommage(s) à {card.get_name()}(J{index+1})")
 
 						blocked = True
 
@@ -1247,9 +1193,7 @@ class Game:
 					# Application des dommages direct
 					self.__players[card.get_target()][PLAYER].damage(card.power())
 
-					if(LOGS):
-
-						print(f"Joueur {index+1} inflige {card.power()} dommage(s) direct au Joueur {card.get_target()+1}")
+					self.__log.write(f"Joueur {index+1} inflige {card.power()} dommage(s) direct au Joueur {card.get_target()+1}")
 
 			battlezone_position += 1
 
@@ -1264,9 +1208,7 @@ class Game:
 
 					self.__players[player[PLAYER].get_id()][PLAYER].move("BATTLE_ZONE",battlezone_position,"GRAVEYARD")
 
-					if(LOGS):
-
-						print(f"La carte {card.get_name()} a été détruite, elle est envoyée au cimetière")
+					self.__log.write(f"La carte {card.get_name()} a été détruite, elle est envoyée au cimetière")
 
 				else:
 
@@ -1300,9 +1242,7 @@ class Game:
 			# Application des soins
 			self.__players[index][PLAYER].cleanup()
 
-			if(LOGS):
-
-				print("Les créatures du Joueur",index+1,"reçoivent des soins")
+			self.__log.write(f"Les créatures du Joueur {index+1} reçoivent des soins")
 		
 
 
