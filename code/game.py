@@ -29,7 +29,7 @@ TARGET_POSITION = 2
 
 class Game:
 
-	def __init__(self, socket, slots = 5):
+	def __init__(self, socket, slots = 2):
 
 		self.__socket = socket
 		self.__deckmanager = DeckManager()
