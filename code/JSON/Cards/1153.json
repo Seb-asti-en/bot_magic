@@ -8,14 +8,14 @@
 	"Evergreen":["deathtouch"],
     "Effect":[
         {
-            "Name":"draw_card",
+            "Name":"cycling",
             "Target":"player",
 			"Nb_target": 1,
             "Nb_draw_card":1,
 			"Temporary": 0,
             "Activable":{
-                "Cost_name":"mana",
-				"Cost_quantity":"{2}"
+                "Cost_name":["mana", "discard"],
+				"Cost_quantity":["{2}", 1]
             },
             "Temporality":"activation"
         }

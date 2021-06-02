@@ -13,6 +13,8 @@
             "Nb_draw_card":2,
 			"Temporary": 0,
             "Activable":{    
+                "Cost_name":[],
+				"Cost_quantity":[] 
             },
             "Temporality":"play"
         },

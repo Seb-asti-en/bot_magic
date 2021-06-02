@@ -9,6 +9,7 @@ class Deck:
         self.__cards = cards
 
     ############################ Getters ############################
+
     def get_name(self):
         return self.__name
     
@@ -16,6 +17,7 @@ class Deck:
         return self.__cards
 
     ############################ Setters ############################
+    
     def set_name(self,name):
         self.__name = name
 

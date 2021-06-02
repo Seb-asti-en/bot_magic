@@ -336,8 +336,21 @@ class Game:
 
 									break
 
-						elif("move" in effect.get_target()):	
-							pass			
+						elif("move" in effect.get_target()):
+							is_accepted = False
+							break
+							
+						#other targets
+						else:
+							is_accepted = False
+
+							break
+					
+					#empty selection
+					else:
+						is_accepted = False
+
+						break
 
 				# Vérification de l'intégrité de la sélection du client pour activer les effets
 				if(is_accepted and len(selections_buffer) == 0):

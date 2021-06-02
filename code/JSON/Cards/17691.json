@@ -13,8 +13,8 @@
 			"Nb_target": 1,
 			"Temporary": 0,
             "Activable":{
-                "Cost_name":"mana",
-                "Cost_quantity":"{3}{G}"
+                "Cost_name":["mana"],
+                "Cost_quantity":["{3}{G}"]
             },
             "Temporality":"activation"
         }

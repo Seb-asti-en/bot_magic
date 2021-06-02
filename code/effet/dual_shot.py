@@ -2,9 +2,9 @@ from effect import Effect
 
 class DualShot(Effect):
 
-  def __init__(self,name,target,temporality):
-    super().__init__(name,target,temporality)
+	def __init__(self,name,target,temporality, activable):
+		super().__init__(name,target,temporality, activable)
 
 
-  def effect(self, creature):
-    creature.damage(1)
+	def effect(self, creature):
+		creature.damage(1)

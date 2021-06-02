@@ -21,7 +21,8 @@
 			"Nb_target": 1,
 			"Temporary": 0,
             "Activable":{
-                
+                "Cost_name":[],
+				"Cost_quantity":[] 
             },
             "Temporality":"play"
         }

@@ -1,17 +1,19 @@
+from activable import Activable
 
 class Effect:
 
-	############################ constructeur ############################
-	def __init__(self,name,target,temporality):
+	############################ Constructeur ############################
+	def __init__(self,name,target,temporality, activable):
 		self.__name = name
 		self.__target = target
-		#self.__activable = Activable("lirejson","lirejson")
-		#self.__nb_target = nb_target
+		self.__activable = self.init_activable(activable)
+		# self.__nb_target = nb_target
 		self.__temporality = temporality
 
 
 
 	############################ Getter ############################
+
 	def get_name(self):
 		return self.__name
 
@@ -29,4 +31,16 @@ class Effect:
 
 	def get_activable(self):
 		return self.__activable
+
+	def init_activable(self, activable):
+		retour = None
+		if "Cost_name" in activable and "Cost_quantity" in activable:
+			retour = Activable(activable)
+		return retour
+
+	def is_activable(self):
+		return self.__activable != None
+
+
+
 

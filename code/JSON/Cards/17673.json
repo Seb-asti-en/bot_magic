@@ -13,8 +13,8 @@
 			"Nb_target": 1,
 			"Temporary": 0,
             "Activable":{
-                "Cost_name":"tap",
-                "Cost_quantity":1
+                "Cost_name":["tap"],
+                "Cost_quantity":[1]
             },
             "Temporality":"activation"
         }

@@ -1,26 +1,17 @@
 #!/usr/bin/env python3
 
-import socket, pickle, sys, json, os, sandbox
+import socket, pickle, sys, json, os
 from threading import Thread
 from game import Game
 
 PACKET_SIZE = 1024
 
 def main():
-	
+
 	server = None
-	choice = ""
 
 	server = Server()
-	choice = server.menu()
-
-	if(choice == "MAIN"):
-
-		server.run()
-
-	elif(choice == "SANDBOX"):
-
-		sandbox.main()
+	server.run()
 
 class Server:
 
@@ -37,45 +28,6 @@ class Server:
 
 		# Nommage de la socket UDP
 		self.__socket.bind((json_string['host_server'], int(json_string['port_server'])))
-
-	def menu(self):
-
-		request = ""
-
-		while True :
-
-			# Rafraichissement de l'écran
-			command = "clear"
-
-			if os.name == "nt":
-				command = "cls"
-
-			os.system(command)
-
-			# Affichage initial
-			print("[  MAIN    (1)  ]")
-			print("[  SANDBOX (2)  ]")
-
-			# Récupération de l'entrée utilisateur
-			user_input = input(">")
-
-			if(user_input == "1"):
-
-				request = "MAIN"
-
-				break
-
-			elif(user_input == "2"):
-				
-				request = "SANDBOX"
-
-				break			
-
-			else:
-
-				input("Erreur lors de la saisie, appuyez sur Entrée pour revenir au menu")
-
-		return request
 
 	def run(self):
 
@@ -123,7 +75,7 @@ class Server:
 
 				# Envoi vers le serveur : réponse (2)
 				self.__socket.sendto(pickle.dumps(("ACCEPT",game_netconfig)),client_netconfig)
-			
+
 			else:
 
 				# Envoi vers le serveur : réponse (2)
@@ -152,8 +104,8 @@ class Server:
 
 		# Ajout du serveur de jeu à la liste de parties
 		self.__gamelist.append(game)
-		
-		return game.netconfig()	
+
+		return game.netconfig()
 
 	def game_thread(self, game):
 
@@ -162,14 +114,14 @@ class Server:
 		game.wait_client()
 
 		game.choose_deck()
-		
+
 		game.start()
 
 		game.turn()
-		
+
 		print("Fermeture du serveur de jeu")
 
-		sys.exit() 
+		sys.exit()
 
 if __name__ == "__main__":
 	try:

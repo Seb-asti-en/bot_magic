@@ -12,9 +12,7 @@
             "Target":"move",
 			"Nb_target": 2,
 			"Temporary": 0,
-            "Activable":{
-                
-            },
+            "Activable":{},
             "Temporality":"play"
         }
     ],
